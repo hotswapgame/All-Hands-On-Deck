@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>AHOD</title>
+    <link rel="stylesheet" type="text/css" href="./styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Arvo:400,400i,700,700i|Eczar:400,500,600,700,800" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="start-screen" class="full-page active">
+      <div id="title" class="full-width">
+        <h1>hot swap</h1>
+        <h2>all hands on deck</h2>
+      </div>
+
+      <div id="instruction"  class="full-width">
+        <div id="to-begin">to begin</div>
+        <div class="instruction-text active" id="instruction-1">lower the sails</div>
+        <div class="instruction-text" id="instruction-2">man the helm</div>
+        <div class="instruction-text" id="instruction-3">load the cannons</div>
+        <div class="instruction-text" id="instruction-4">light the fuse</div>
+      </div>
+    </div>
+
+    <div id="game-over" class="full-page">
+      <div id="game-over-headline"  class="full-width">
+        <h2>☠ game over ☠</h2>
+      </div>
+      <div id="all-stats">
+        <div id="sunk" class="stat-box">
+          <p class="stat-heading">enemies sunk</p>
+          <p class="stat">25</p>
+        </div>
+        <div id="cannon" class="stat-box">
+          <p class="stat-heading">cannonballs fired</p>
+          <p class="stat">103</p>
+        </div>
+        <div id="time" class="stat-box">
+          <p class="stat-heading">total time</p>
+          <p class="stat">10:15</p>
+        </div>
+        <div id="fire" class="stat-box">
+          <p class="stat-heading">ship on fire duration</p>
+          <p class="stat">2:08</p>
+        </div>
+        <div id="fire-proportion" class="stat-box"><div></div></div>
+      </div>
+    </div>
+
+    <div id="screen"></div>
+  </body>
+
+  <script>
+    // These need to be imported here so that the compiled code can use it
+    // BC i'm weird and wanted to use babel... :P
+    const SerialPort = require('serialport');
+    const DelimiterParser = require('@serialport/parser-delimiter');
+
+    require('./build/app.js');
+  </script>
+</html>

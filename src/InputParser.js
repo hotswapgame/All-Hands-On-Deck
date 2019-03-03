@@ -12,6 +12,7 @@ const isRudder = data => (data[1] > 167 && data[1] < 197);
 const isHatch = data => (data[1] > 498 && data[1] < 528);
 const isWick = data => (data[1] > 389 && data[1] < 419);
 const isFlame = data => (data[1] > 690 && data[1] < 724);
+const isKey = data => (data[1] > 830 && data[1] < 850);
 
 // all of the ids are hardcoded, we should create a function check and look at
 // a file elseware
@@ -82,6 +83,13 @@ export function getFlame(input$) {
     .map(find(isFlame))
     .filter(notNil)
     .map(data => ({ id: data[0], isPressed: data[2] > 800 }));
+}
+
+export function getKey(input$) {
+  return input$
+    .map(find(isKey))
+    .filter(notNil)
+    .map(data => ({ id: data[0], isPressed: data[2] > 498 }));
 }
 
 function getInputChange(input$, idFunc, type) {

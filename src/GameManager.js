@@ -7,7 +7,7 @@ import { getModel } from './AssetManager';
 import EnemyShip from './Actors/EnemyShip';
 import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
 import {
-  getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame
+  getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame, getKey
 } from './InputParser';
 
 import {
@@ -469,6 +469,22 @@ export function init(input$) {
         else player.calmFire(600);
 
         if (resetPressCount >= RESET_PRESS_MAX) reset();
+      },
+      error: console.log,
+      complete: console.log,
+    });
+
+  // open treasure
+  getKey(input$)
+    .fold((acc, curr) => ({
+      prev: curr.isPressed,
+      output: (!acc.prev && curr.isPressed),
+    }), { prev: false })
+    .filter(data => data.output)
+    .subscribe({
+      next: (d) => {
+        // Do the thing here
+        console.log('');
       },
       error: console.log,
       complete: console.log,

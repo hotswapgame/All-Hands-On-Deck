@@ -10,7 +10,10 @@ import {
   getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame
 } from './InputParser';
 
-import { cycleInstructions, hideStartScreen, runGameOverSequence } from './UI';
+import {
+  cycleInstructions, hideStartScreen, showStartScreen,
+  runGameOverSequence, hideEndScreen
+} from './UI';
 
 import { playSound, createLoopedSound } from './SoundPlayer';
 
@@ -23,11 +26,16 @@ let isGameOver = false;
 // Use this to give players grace period at start
 let canSpawn = true;
 let enemySpawnSide = -1;
+let activeEnemies = 0;
 
 // Start sequence stuff
-let canRun = false;
+let isStartSeq = true;
 let startSeqCount = 0;
 const startSequence = ['SAIL', 'RUDDER', 'HATCH', 'WICK'];
+
+// reset stuff
+let resetPressCount = 0;
+const RESET_PRESS_MAX = 5;
 
 let screen;
 
@@ -38,8 +46,6 @@ const shakeIntensity = 3;
 let shakeXScale = 0;
 let shakeYScale = 0;
 const SHAKE_TIME_MAX = 100;
-
-let activeEnemies = 0;
 
 let hitPauseTime = 0;
 const HIT_PAUSE_MAX = 30;
@@ -88,7 +94,6 @@ const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
 
 function triggerGameOver(cannonsFired, fireTime) {
   isGameOver = true;
-  canRun = false;
   runGameOverSequence(shipsSunk, cannonsFired, totalTime, fireTime);
 }
 
@@ -187,7 +192,7 @@ function update(currentTime) {
   prevTime = currentTime;
 
   // start sequence stuff
-  if (!isGameOver && !canRun) {
+  if (isStartSeq) {
     switch (startSeqCount) {
       case 0:
         if (player.velocityTarget > 0.000001) {
@@ -205,23 +210,28 @@ function update(currentTime) {
         break;
       case 4:
         hideStartScreen();
-        canRun = true;
+        isStartSeq = false;
         break;
       default: break;
     }
   }
 
   // update all this on start screen
+  // Split this into sep update functions pls
   if (!isGameOver) {
     player.update(dt);
     cannonballPool.forEach(c => c.update(dt));
   }
 
-  if (canRun) {
+  if (!isGameOver && !isStartSeq) {
     if (!soundtrack) {
       soundtrack = createLoopedSound('SOUNDTRACK');
       soundtrack.sound.start(0);
       soundtrack.GAIN.gain.setValueAtTime(0.5, soundtrack.ctx.currentTime);
+      soundtrack.playing = true;
+    } else if (!soundtrack.playing) {
+      soundtrack.GAIN.gain.setValueAtTime(0.5, soundtrack.ctx.currentTime);
+      soundtrack.playing = true;
     }
     totalTime += dt;
     enemyPool.forEach(e => e.update(dt, player.getPosition()));
@@ -257,6 +267,37 @@ function reset() {
   // do game state reset stuff here
   prevTime = 0;
   totalTime = 0;
+  shipsSunk = 0;
+  score = 0;
+  isGameOver = false;
+
+  isStartSeq = true; // ????
+  startSeqCount = 0;
+
+  resetPressCount = 0;
+  // Use this to give players grace period at start
+  canSpawn = true;
+  enemySpawnSide = -1;
+  activeEnemies = 0;
+
+  // reset ui?
+  cycleInstructions(startSeqCount);
+  // Hide end screen
+  hideEndScreen();
+  showStartScreen();
+
+  // Reset player?
+  player.reset();
+  // reset enemy and cannonball pool
+  enemyPool.forEach(e => e.hide());
+  cannonballPool.forEach(c => c.hide());
+
+  // Something something soundtrack
+  if (soundtrack) {
+    soundtrack.GAIN.gain.setValueAtTime(0, soundtrack.ctx.currentTime);
+    soundtrack.playing = false;
+  }
+
   requestAnimationFrame(update.bind(this));
 }
 
@@ -302,22 +343,24 @@ export function init(input$) {
     // Load port
     if (e.keyCode === 38) {
       player.setSailSpeed(0.00001);
-      if (!canRun && !isGameOver) {
+      if (isStartSeq && !isGameOver) {
         hideStartScreen();
-        canRun = true;
+        isStartSeq = false;
       }
     }
 
-    // Load starboard
     if (e.keyCode === 40) {
       player.setSailSpeed(-0.00001);
+
+      if (isGameOver) {
+        reset();
+      }
     }
 
     if (e.keyCode === 37) {
       player.setTurnAngle(0.00005);
     }
 
-    // Load starboard
     if (e.keyCode === 39) {
       player.setTurnAngle(-0.00005);
     }
@@ -325,23 +368,6 @@ export function init(input$) {
     if (e.keyCode === 70) {
       player.calmFire(500);
     }
-
-    if (e.key === 'z') {
-      player.triggerBubble(SHIP_DIRECTIONS.PORT, 'SAIL');
-    }
-
-    if (e.key === 'x') {
-      player.triggerBubble(SHIP_DIRECTIONS.PORT, 'RUDDER');
-    }
-
-    if (e.key === 'c') {
-      player.triggerBubble(SHIP_DIRECTIONS.STARBOARD, 'HATCH');
-    }
-
-    if (e.key === 'v') {
-      player.triggerBubble(SHIP_DIRECTIONS.STARBOARD, 'WICK');
-    }
-
   };
 
   // Steering
@@ -438,14 +464,19 @@ export function init(input$) {
     }), { prev: false })
     .filter(data => data.output)
     .subscribe({
-      next: () => player.calmFire(600),
+      next: () => {
+        if (isGameOver) resetPressCount += 1;
+        else player.calmFire(600);
+
+        if (resetPressCount >= RESET_PRESS_MAX) reset();
+      },
       error: console.log,
       complete: console.log,
     });
 
   // Used to trigger speech bubbles
   getAllInputSwap(input$)
-    .map(([sideId, type]) =>[
+    .map(([sideId, type]) => [
       sideId === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD,
       type,
     ])

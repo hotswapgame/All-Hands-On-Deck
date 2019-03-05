@@ -6,6 +6,7 @@ import Cannonball from './Actors/Cannonball';
 import { getModel } from './AssetManager';
 import EnemyShip from './Actors/EnemyShip';
 import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
+import { WAVE_SIZES } from './WaveConfig';
 import {
   getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame, getKey
 } from './InputParser';
@@ -23,10 +24,17 @@ let totalTime = 0;
 let shipsSunk = 0;
 let score = 0;
 let isGameOver = false;
+
 // Use this to give players grace period at start
-let canSpawn = true;
 let enemySpawnSide = -1;
 let activeEnemies = 0;
+
+let waveCount = 0;
+let waveEnemiesToSpawn = 0;
+let enemySpawnTimer = 0;
+let waveEnemySpawnWindow = 0;
+const WAVE_MAX_TIME = 60000;
+let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff
 let isStartSeq = true;
@@ -69,9 +77,6 @@ const cannonballPool = Array.from(
   { length: 150 },
   () => new Cannonball(scene, WORLD_SIZE)
 );
-
-let enemySpawnTimer = 0; // start negative to give more time to adapt
-let enemySpawnThreshold = 10000;
 
 // Arrow to keep scope, pass to enemy so we can share one pool
 // maybe create a separate pool for enemy and player :|
@@ -120,15 +125,12 @@ getModel('./Assets/world.stl')
   });
 
 function spawnEnemy() {
-  if (canSpawn) {
-    enemySpawnTimer = 0;
-    activeEnemies += 1;
-    const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
-    // Hard cap is in the enemy pool rn ~50
-    if (enemy) {
-      enemySpawnSide *= -1;
-      enemy.spawn(player.moveSphere.rotation, enemySpawnSide);
-    }
+  activeEnemies += 1;
+  const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
+  // Hard cap is in the enemy pool rn ~50
+  if (enemy) {
+    enemySpawnSide *= -1;
+    enemy.spawn(player.moveSphere.rotation, enemySpawnSide);
   }
 }
 
@@ -238,11 +240,26 @@ function update(currentTime) {
 
     checkCollisions();
 
-    // Enemy spawn logic
-    enemySpawnTimer += dt;
-    enemySpawnThreshold = clamp(1000, 10000, 10000 * (120000 - totalTime) / 120000);
+    // Wave Change Logic
+    if (waveTimer < 0) {
+      // We stop having a difficulty curve after the wave config is empty
+      if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
+      else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
+      waveEnemySpawnWindow = (WAVE_MAX_TIME - 20000) / waveEnemiesToSpawn; // Divy out enemy spawns in the 1st 15 sec
+      enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
 
-    if (enemySpawnTimer > enemySpawnThreshold && activeEnemies < 20) spawnEnemy();
+      waveTimer = WAVE_MAX_TIME;
+      waveCount += 1; // set next wave index too
+    }
+    waveTimer -= dt;
+
+    // Enemy spawn logic
+    if (waveEnemiesToSpawn > 0 && enemySpawnTimer < 0) {
+      spawnEnemy();
+      enemySpawnTimer = waveEnemySpawnWindow;
+      waveEnemiesToSpawn -= 1;
+    }
+    enemySpawnTimer -= dt;
 
     // screen shake
     if (isShaking) {
@@ -275,8 +292,6 @@ function reset() {
   startSeqCount = 0;
 
   resetPressCount = 0;
-  // Use this to give players grace period at start
-  canSpawn = true;
   enemySpawnSide = -1;
   activeEnemies = 0;
 

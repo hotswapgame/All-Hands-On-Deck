@@ -264,6 +264,32 @@ class Player {
     scene.add(this.moveSphere);
   }
 
+  reset() {
+    this.velocityTarget = this.velocityMin;
+    this.velocity = this.velocityMin;
+    this.worldPos = new THREE.Vector3(0, 0, 0); // stores world location
+
+    this.rollOffset = 0;
+    this.turnRollOffset = 0;
+
+    this.turnRate = 0;
+    this.rollSpeed = 0;
+    this.rollAcc = 0;
+
+    this.bobTime = 0;
+
+    this.onFire = false;
+    this.fireTime = 0;
+    this.fireTimeTotal = 0;
+    this.flames.forEach(f => f.hide());
+
+    this.moveSphere.rotation.set(0, 0, 0);
+
+    // reset Sails Rudder
+    this.setSailSpeed(0);
+    this.setTurnAngle(0);
+  }
+
   updateWorldPosition() {
     this.gameObject.getWorldPosition(this.worldPos);
   }
@@ -424,7 +450,7 @@ class Player {
         this.rollSpeed += this.rollAcc;
         this.rollSpeed *= 0.98;
         this.rollOffset += this.rollSpeed;
-        // console.log(this.rollOffset);
+
         this.rollOffset = clamp(-0.17, 0.17, this.rollOffset);
         this.ship.rotation.y = this.rollOffset + this.turnRollOffset;
       }
@@ -469,6 +495,7 @@ class Player {
 
     if (this.onFire && this.fireTime >= this.fireMax) {
       // trigger game over here
+      this.gameOverCallback(this.cannonsFired, this.fireTimeTotal);
     }
   }
 
@@ -508,10 +535,6 @@ class Player {
     this.moveSphere.rotateOnAxis(this.forwardAxis, dt * this.velocity);
     // Set this once a frame so that enemies can use it
     this.updateWorldPosition();
-
-    if (this.flames[0].time > this.flames[0].maxTime) {
-      this.gameOverCallback(this.cannonsFired, this.fireTimeTotal);
-    }
   }
 }
 

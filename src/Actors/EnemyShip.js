@@ -195,6 +195,7 @@ class EnemyShip {
     this.floatPos = -20;
     this.gameObject.visible = false;
     this.stopFlash();
+    this.isActive = false;
     this.isDying = false;
   }
 

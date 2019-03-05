@@ -33,7 +33,7 @@ export function createLoopedSound(key) {
   source.connect(gainNode);
   gainNode.connect(audioCtx.destination);
 
-  return { sound: source, GAIN: gainNode, ctx: audioCtx };
+  return { sound: source, GAIN: gainNode, ctx: audioCtx, playing: false };
 }
 
 export function playSound(key) {

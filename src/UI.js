@@ -1,3 +1,5 @@
+import { forEach } from 'ramda';
+
 export function cycleInstructions(instructionCounter) {
   const elements = document.getElementsByClassName('instruction-text');
   for (let i = 0; i < 4; i += 1) {
@@ -6,48 +8,24 @@ export function cycleInstructions(instructionCounter) {
   elements[instructionCounter].classList.add('active');
 }
 
+
+export function showStartScreen() {
+  document.getElementById('start-screen').classList.add('active');
+}
+
 export function hideStartScreen() {
   document.getElementById('start-screen').classList.remove('active');
 }
 
-/* e key: game over sequence */
-// if (e.key === 'e' && start_game_bool) {
-//     end_game_bool = true;
-//     gameOverSequence(
-//         Math.floor(10 + Math.random() * 40), //ships sunk
-//         Math.floor(50 + Math.random() * 200), //cannon balls fired
-//         Math.floor(300000 + Math.random() * 500000), //total time (ms)
-//         Math.floor(Math.random() * 300000) //total duration on fire (ms)
-//     );
-// }
-
-/* r key: restart game */
-// if (e.key === 'r') {
-//   start_game_bool = false;
-//   end_game_bool = false;
-//   instruction_counter = 0;
-//   var element = document.getElementById('game_over');
-
-//   element.classList.remove('active');
-//   element = document.getElementsByClassName('stat');
-//   for (var i=0; i<5; i++) {
-//       var item = element[i];
-//       item.classList.remove('active');
-//   }
-
-//   var element = document.getElementById('start_screen');
-//   element.classList.add('active');
-//   var element = document.getElementsByClassName('instruction_text');
-//   for (var i=0; i<4; i++) {
-//       element[i].classList.remove('active');
-//   }
-//   element[instruction_counter].classList.add('active');
-// }
+export function hideEndScreen() {
+  document.getElementById('game-over').classList.remove('active');
+  const statElements = document.getElementsByClassName('stat-box');
+  forEach(e => e.classList.remove('active'), statElements);
+}
 
 function revealStat(i) {
   const element = document.getElementsByClassName('stat-box')[i];
   element.classList.add('active');
-  console.log(element);
 }
 
 export function runGameOverSequence(shipSunk, cannonsFired, timeTotal, timeFire) {

@@ -6,11 +6,15 @@ import Cannonball from './Actors/Cannonball';
 import { getModel } from './AssetManager';
 import EnemyShip from './Actors/EnemyShip';
 import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
+import { WAVE_SIZES } from './WaveConfig';
 import {
-  getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame
+  getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame, getKey
 } from './InputParser';
 
-import { cycleInstructions, hideStartScreen, runGameOverSequence } from './UI';
+import {
+  cycleInstructions, hideStartScreen, showStartScreen,
+  runGameOverSequence, hideEndScreen
+} from './UI';
 
 import { playSound, createLoopedSound } from './SoundPlayer';
 
@@ -20,14 +24,26 @@ let totalTime = 0;
 let shipsSunk = 0;
 let score = 0;
 let isGameOver = false;
+
 // Use this to give players grace period at start
-let canSpawn = true;
 let enemySpawnSide = -1;
+let activeEnemies = 0;
+
+let waveCount = 0;
+let waveEnemiesToSpawn = 0;
+let enemySpawnTimer = 0;
+let waveEnemySpawnWindow = 0;
+const WAVE_MAX_TIME = 60000;
+let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff
-let canRun = false;
+let isStartSeq = true;
 let startSeqCount = 0;
 const startSequence = ['SAIL', 'RUDDER', 'HATCH', 'WICK'];
+
+// reset stuff
+let resetPressCount = 0;
+const RESET_PRESS_MAX = 5;
 
 let screen;
 
@@ -38,8 +54,6 @@ const shakeIntensity = 3;
 let shakeXScale = 0;
 let shakeYScale = 0;
 const SHAKE_TIME_MAX = 100;
-
-let activeEnemies = 0;
 
 let hitPauseTime = 0;
 const HIT_PAUSE_MAX = 30;
@@ -64,9 +78,6 @@ const cannonballPool = Array.from(
   () => new Cannonball(scene, WORLD_SIZE)
 );
 
-let enemySpawnTimer = 0; // start negative to give more time to adapt
-let enemySpawnThreshold = 10000;
-
 // Arrow to keep scope, pass to enemy so we can share one pool
 // maybe create a separate pool for enemy and player :|
 const fireEnemyCannon = (enemyRot, enemyHeading) => {
@@ -88,7 +99,6 @@ const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
 
 function triggerGameOver(cannonsFired, fireTime) {
   isGameOver = true;
-  canRun = false;
   runGameOverSequence(shipsSunk, cannonsFired, totalTime, fireTime);
 }
 
@@ -115,15 +125,12 @@ getModel('./Assets/world.stl')
   });
 
 function spawnEnemy() {
-  if (canSpawn) {
-    enemySpawnTimer = 0;
-    activeEnemies += 1;
-    const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
-    // Hard cap is in the enemy pool rn ~50
-    if (enemy) {
-      enemySpawnSide *= -1;
-      enemy.spawn(player.moveSphere.rotation, enemySpawnSide);
-    }
+  activeEnemies += 1;
+  const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
+  // Hard cap is in the enemy pool rn ~50
+  if (enemy) {
+    enemySpawnSide *= -1;
+    enemy.spawn(player.moveSphere.rotation, enemySpawnSide);
   }
 }
 
@@ -187,7 +194,7 @@ function update(currentTime) {
   prevTime = currentTime;
 
   // start sequence stuff
-  if (!isGameOver && !canRun) {
+  if (isStartSeq) {
     switch (startSeqCount) {
       case 0:
         if (player.velocityTarget > 0.000001) {
@@ -205,34 +212,54 @@ function update(currentTime) {
         break;
       case 4:
         hideStartScreen();
-        canRun = true;
+        isStartSeq = false;
         break;
       default: break;
     }
   }
 
   // update all this on start screen
+  // Split this into sep update functions pls
   if (!isGameOver) {
     player.update(dt);
     cannonballPool.forEach(c => c.update(dt));
   }
 
-  if (canRun) {
+  if (!isGameOver && !isStartSeq) {
     if (!soundtrack) {
       soundtrack = createLoopedSound('SOUNDTRACK');
       soundtrack.sound.start(0);
       soundtrack.GAIN.gain.setValueAtTime(0.5, soundtrack.ctx.currentTime);
+      soundtrack.playing = true;
+    } else if (!soundtrack.playing) {
+      soundtrack.GAIN.gain.setValueAtTime(0.5, soundtrack.ctx.currentTime);
+      soundtrack.playing = true;
     }
     totalTime += dt;
     enemyPool.forEach(e => e.update(dt, player.getPosition()));
 
     checkCollisions();
 
-    // Enemy spawn logic
-    enemySpawnTimer += dt;
-    enemySpawnThreshold = clamp(1000, 10000, 10000 * (120000 - totalTime) / 120000);
+    // Wave Change Logic
+    if (waveTimer < 0) {
+      // We stop having a difficulty curve after the wave config is empty
+      if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
+      else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
+      waveEnemySpawnWindow = (WAVE_MAX_TIME - 20000) / waveEnemiesToSpawn; // Divy out enemy spawns in the 1st 15 sec
+      enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
 
-    if (enemySpawnTimer > enemySpawnThreshold && activeEnemies < 20) spawnEnemy();
+      waveTimer = WAVE_MAX_TIME;
+      waveCount += 1; // set next wave index too
+    }
+    waveTimer -= dt;
+
+    // Enemy spawn logic
+    if (waveEnemiesToSpawn > 0 && enemySpawnTimer < 0) {
+      spawnEnemy();
+      enemySpawnTimer = waveEnemySpawnWindow;
+      waveEnemiesToSpawn -= 1;
+    }
+    enemySpawnTimer -= dt;
 
     // screen shake
     if (isShaking) {
@@ -257,6 +284,35 @@ function reset() {
   // do game state reset stuff here
   prevTime = 0;
   totalTime = 0;
+  shipsSunk = 0;
+  score = 0;
+  isGameOver = false;
+
+  isStartSeq = true; // ????
+  startSeqCount = 0;
+
+  resetPressCount = 0;
+  enemySpawnSide = -1;
+  activeEnemies = 0;
+
+  // reset ui?
+  cycleInstructions(startSeqCount);
+  // Hide end screen
+  hideEndScreen();
+  showStartScreen();
+
+  // Reset player?
+  player.reset();
+  // reset enemy and cannonball pool
+  enemyPool.forEach(e => e.hide());
+  cannonballPool.forEach(c => c.hide());
+
+  // Something something soundtrack
+  if (soundtrack) {
+    soundtrack.GAIN.gain.setValueAtTime(0, soundtrack.ctx.currentTime);
+    soundtrack.playing = false;
+  }
+
   requestAnimationFrame(update.bind(this));
 }
 
@@ -302,22 +358,24 @@ export function init(input$) {
     // Load port
     if (e.keyCode === 38) {
       player.setSailSpeed(0.00001);
-      if (!canRun && !isGameOver) {
+      if (isStartSeq && !isGameOver) {
         hideStartScreen();
-        canRun = true;
+        isStartSeq = false;
       }
     }
 
-    // Load starboard
     if (e.keyCode === 40) {
       player.setSailSpeed(-0.00001);
+
+      if (isGameOver) {
+        reset();
+      }
     }
 
     if (e.keyCode === 37) {
       player.setTurnAngle(0.00005);
     }
 
-    // Load starboard
     if (e.keyCode === 39) {
       player.setTurnAngle(-0.00005);
     }
@@ -325,23 +383,6 @@ export function init(input$) {
     if (e.keyCode === 70) {
       player.calmFire(500);
     }
-
-    if (e.key === 'z') {
-      player.triggerBubble(SHIP_DIRECTIONS.PORT, 'SAIL');
-    }
-
-    if (e.key === 'x') {
-      player.triggerBubble(SHIP_DIRECTIONS.PORT, 'RUDDER');
-    }
-
-    if (e.key === 'c') {
-      player.triggerBubble(SHIP_DIRECTIONS.STARBOARD, 'HATCH');
-    }
-
-    if (e.key === 'v') {
-      player.triggerBubble(SHIP_DIRECTIONS.STARBOARD, 'WICK');
-    }
-
   };
 
   // Steering
@@ -438,14 +479,35 @@ export function init(input$) {
     }), { prev: false })
     .filter(data => data.output)
     .subscribe({
-      next: () => player.calmFire(600),
+      next: () => {
+        if (isGameOver) resetPressCount += 1;
+        else player.calmFire(600);
+
+        if (resetPressCount >= RESET_PRESS_MAX) reset();
+      },
+      error: console.log,
+      complete: console.log,
+    });
+
+  // open treasure
+  getKey(input$)
+    .fold((acc, curr) => ({
+      prev: curr.isPressed,
+      output: (!acc.prev && curr.isPressed),
+    }), { prev: false })
+    .filter(data => data.output)
+    .subscribe({
+      next: (d) => {
+        // Do the thing here
+        console.log('');
+      },
       error: console.log,
       complete: console.log,
     });
 
   // Used to trigger speech bubbles
   getAllInputSwap(input$)
-    .map(([sideId, type]) =>[
+    .map(([sideId, type]) => [
       sideId === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD,
       type,
     ])

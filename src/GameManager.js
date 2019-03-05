@@ -148,10 +148,12 @@ function checkCollisions() {
       if (c.ownerType === GAME_TYPES.PLAYER) {
         enemyPool.forEach((e) => {
           if (e.isActive && e.getHit(c.getPosition())) {
-            e.die();
-            activeEnemies -= 1;
+            e.die(false);
             c.explode();
-            shipsSunk += 1;
+            if (e.hitCount > 1) {
+              activeEnemies -= 1;
+              shipsSunk += 1;
+            }
           }
         });
       } else if (c.ownerType === GAME_TYPES.ENEMY) {
@@ -168,15 +170,15 @@ function checkCollisions() {
       if (e1.isActive) {
         enemyPool.forEach((e2) => {
           if (e2.isActive && e2.id !== e1.id && e1.getEnemyHit(e2)) {
-            e1.die();
-            e2.die();
+            e1.die(true);
+            e2.die(true);
             activeEnemies -= 2;
             playSound('EXPLODE');
           }
         });
 
         if (player.getEnemyHit(e1)) {
-          e1.die();
+          e1.die(true);
           activeEnemies -= 1;
           playSound('EXPLODE');
           player.addFlame(1500);
@@ -245,7 +247,9 @@ function update(currentTime) {
       // We stop having a difficulty curve after the wave config is empty
       if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
       else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
-      waveEnemySpawnWindow = (WAVE_MAX_TIME - 20000) / waveEnemiesToSpawn; // Divy out enemy spawns in the 1st 15 sec
+
+      // Divy out enemy spawns in the 1st 15 sec
+      waveEnemySpawnWindow = (WAVE_MAX_TIME - 20000) / waveEnemiesToSpawn;
       enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
 
       waveTimer = WAVE_MAX_TIME;

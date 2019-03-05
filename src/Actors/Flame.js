@@ -3,19 +3,21 @@ import * as THREE from 'three';
 import { createLoopedSound } from '../SoundPlayer';
 
 class Flame {
-  constructor(parent, position, maxTime, maxFireCallback) {
+  constructor(parent, position, maxTime, isStatic) {
     this.gameObject = new THREE.Object3D();
     this.gameObject.position.copy(position);
     parent.add(this.gameObject);
 
-    this.time = 0;
+    this.isStatic = isStatic;
+    this.time = isStatic ? maxTime : 0;
+
     // for when to stop growing
     this.maxTime = maxTime;
 
     // Create particles here
     this.particleGeo = new THREE.SphereGeometry(5, 4, 2);
     this.particles = Array.from(
-      { length: 30 },
+      { length: 25 },
       () => ({
         mesh: new THREE.Mesh(
           this.particleGeo,
@@ -63,7 +65,7 @@ class Flame {
     this.time = startTime;
     this.gameObject.visible = true;
 
-    if (!this.sound) {
+    if (!this.sound && !this.isStatic) {
       this.sound = createLoopedSound('FLAME');
       this.sound.sound.start(0);
     } else {
@@ -74,7 +76,7 @@ class Flame {
   updateParticles() {
     this.particles.forEach((p) => {
       const pos = p.forward.clone();
-      const s = ((p.initialPos + this.time) % 1000) / 1000;
+      const s = ((p.initialPos + this.time) % 700) / 700;
 
       pos.multiplyScalar(s);
       p.mesh.position.x = pos.x;
@@ -113,7 +115,10 @@ class Flame {
     this.updateFlash(dt);
 
     this.time += dt;
-    const s = this.time > this.maxTime ? (this.maxTime + 600) * this.growthRate : (this.time + 600) * this.growthRate;
+
+    let s = (this.time + 4500) * this.growthRate;
+    if (this.time > this.maxTime) s = (this.maxTime + 4500) * this.growthRate;
+    if (this.isStatic) s = this.maxTime / 10000;
     this.gameObject.scale.set(s, s, s);
 
     if (this.sound && this.time > 0 && this.time < this.maxTime) {

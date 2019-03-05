@@ -216,7 +216,7 @@ class Player {
     this.fireTimeTotal = 0;
     this.fireMax = 20000;
     this.flames = [
-      new Flame(this.gameObject, new THREE.Vector3(0, -5, 7), this.fireMax),
+      new Flame(this.gameObject, new THREE.Vector3(0, -5, 7), this.fireMax, false),
     ];
 
     // Speech Bubbles

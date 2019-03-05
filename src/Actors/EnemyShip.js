@@ -5,6 +5,7 @@ import { getModel } from '../AssetManager';
 import { isInRange } from '../utils';
 
 import { playSound } from '../SoundPlayer';
+import Flame from './Flame';
 
 class EnemyShip {
   constructor(scene, worldSize, fireCannon) {
@@ -22,11 +23,6 @@ class EnemyShip {
     this.floatVel = 0;
     this.restingPos = this.worldSize - 2;
     this.headingRotation = 0;
-
-    this.isDying = false;
-    this.deathTime = 0;
-    this.DEATH_TIME_MAX = 1000;
-    this.deathRollDir = 0;
 
     this.pitchSpawnOffset = 0;
     this.pitchOffset = 0;
@@ -95,6 +91,17 @@ class EnemyShip {
       h.visible = false;
       this.gameObject.add(h);
     });
+
+    // Hit and death stuff
+    this.hitCount = 0;
+    this.flashTime = 0;
+    this.flames = new Flame(this.gameObject, new THREE.Vector3(0, 10, 0), 20000, true);
+    this.flames.burn(10000);
+
+    this.isDying = false;
+    this.deathTime = 0;
+    this.DEATH_TIME_MAX = 1000;
+    this.deathRollDir = 0;
 
     // this is the same thing as in all other actors
     this.moveSphere = new THREE.Object3D();
@@ -171,12 +178,22 @@ class EnemyShip {
     // trigger spawning animation right here
   }
 
-  die() {
-    // trigger death animation
-    this.isActive = false;
-    this.isDying = true;
-    this.deathTime = 0;
-    this.deathRollDir = Math.random() > 0.5 ? 1 : -1;
+  die(bigHit) {
+    if (this.hitCount === 0) {
+      this.flames.burn(10000);
+      this.showFlash();
+      this.flashTime = 60;
+    }
+    this.hitCount += 1;
+
+    if (this.hitCount > 1 || bigHit) {
+      // Hide flames here or in hide?
+      // trigger death animation
+      this.isActive = false;
+      this.isDying = true;
+      this.deathTime = 0;
+      this.deathRollDir = Math.random() > 0.5 ? 1 : -1;
+    }
   }
 
   showFlash() {
@@ -192,6 +209,8 @@ class EnemyShip {
   }
 
   hide() {
+    this.hitCount = 0;
+    this.flames.hide();
     this.floatPos = -20;
     this.gameObject.visible = false;
     this.stopFlash();
@@ -269,6 +288,12 @@ class EnemyShip {
         this.fireCannon(this.moveSphere.rotation, this.headingRotation * 0.0003);
         this.addPitch(0.006);
       }
+
+      // if it is hit
+      this.flames.update(dt);
+
+      if (this.flashTime < 0) this.stopFlash(); // maybe don't do this every frame .__.
+      else this.flashTime -= dt;
     } else if (this.isDying) {
       this.deathTime += dt;
       // white flash

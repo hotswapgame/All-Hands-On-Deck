@@ -55,7 +55,6 @@ let shakeXScale = 0;
 let shakeYScale = 0;
 const SHAKE_TIME_MAX = 100;
 
-let hitPauseTime = 0;
 const HIT_PAUSE_MAX = 30;
 
 const WORLD_SIZE = 300;
@@ -268,8 +267,8 @@ function update(currentTime) {
     // screen shake
     if (isShaking) {
       shakeTime += dt;
-      screen.style.left = (Math.cos(shakeTime) * shakeIntensity * shakeXScale) + 'px';
-      screen.style.top = (Math.sin(shakeTime) * shakeIntensity * shakeYScale) + 'px';
+      screen.style.left = `${(Math.cos(shakeTime) * shakeIntensity * shakeXScale)}px`;
+      screen.style.top = `${(Math.sin(shakeTime) * shakeIntensity * shakeYScale)}px`;
 
       if (shakeTime > SHAKE_TIME_MAX) {
         isShaking = false;

@@ -222,13 +222,33 @@ class Player {
     // Speech Bubbles
     this.speechBubbles = {
       PORT: [
-        new SpeechBubble(this.gameObject, new THREE.Vector3(-10, 17, 6), new THREE.Vector3(-10, 0, 9), 0),
-        new SpeechBubble(this.gameObject, new THREE.Vector3(-12, 1, 6), new THREE.Vector3(-10, 0, 9), Math.PI / 18),
+        new SpeechBubble(
+          this.gameObject,
+          new THREE.Vector3(-10, 17, 6),
+          new THREE.Vector3(-10, 0, 9),
+          0
+        ),
+        new SpeechBubble(
+          this.gameObject,
+          new THREE.Vector3(-12, 1, 6),
+          new THREE.Vector3(-10, 0, 9),
+          Math.PI / 18
+        ),
       ],
 
       STARBOARD: [
-        new SpeechBubble(this.gameObject, new THREE.Vector3(10, 17, 6), new THREE.Vector3(10, 0, 9), 0),
-        new SpeechBubble(this.gameObject, new THREE.Vector3(12, 1, 6), new THREE.Vector3(10, 0, 9), -Math.PI / 18),
+        new SpeechBubble(
+          this.gameObject,
+          new THREE.Vector3(10, 17, 6),
+          new THREE.Vector3(10, 0, 9),
+          0
+        ),
+        new SpeechBubble(
+          this.gameObject,
+          new THREE.Vector3(12, 1, 6),
+          new THREE.Vector3(10, 0, 9),
+          -Math.PI / 18
+        ),
       ],
     };
 
@@ -444,7 +464,8 @@ class Player {
     // Only roll when there is roll speed
     if (this.rollSpeed !== 0) {
       // Stop the roll if the speed is low and at center
-      if (isInRange(0.0015, -0.0015, this.rollOffset) && isInRange(0.0015, -0.0015, this.rollSpeed)) {
+      if (isInRange(0.0015, -0.0015, this.rollOffset)
+          && isInRange(0.0015, -0.0015, this.rollSpeed)) {
         this.rollSpeed = 0;
       } else {
         this.rollSpeed += this.rollAcc;

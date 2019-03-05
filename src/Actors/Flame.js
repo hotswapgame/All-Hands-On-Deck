@@ -23,7 +23,11 @@ class Flame {
           this.particleGeo,
           new THREE.MeshBasicMaterial({ color: 0xF00000, transparent: true })
         ),
-        forward: new THREE.Vector3(Math.random() * 6 - 3, Math.random() * 6 - 3, Math.random() * 5 + 4),
+        forward: new THREE.Vector3(
+          Math.random() * 6 - 3,
+          Math.random() * 6 - 3,
+          Math.random() * 5 + 4
+        ),
         initialPos: Math.random() * 900,
       })
     );
@@ -122,7 +126,10 @@ class Flame {
     this.gameObject.scale.set(s, s, s);
 
     if (this.sound && this.time > 0 && this.time < this.maxTime) {
-      this.sound.GAIN.gain.setValueAtTime(0.2 + this.time / this.maxTime * 0.8, this.sound.ctx.currentTime);
+      this.sound.GAIN.gain.setValueAtTime(
+        0.2 + this.time / this.maxTime * 0.8,
+        this.sound.ctx.currentTime
+      );
     }
   }
 }

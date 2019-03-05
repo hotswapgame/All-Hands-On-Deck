@@ -235,7 +235,8 @@ class EnemyShip {
     // Only roll when there is roll speed
     if (this.pitchSpeed !== 0) {
       // Stop the roll if the speed is low and at center
-      if (isInRange(0.0015, -0.0015, this.pitchOffset) && isInRange(0.0015, -0.0015, this.pitchSpeed)) {
+      if (isInRange(0.0015, -0.0015, this.pitchOffset)
+          && isInRange(0.0015, -0.0015, this.pitchSpeed)) {
         this.pitchSpeed = 0;
       } else {
         this.pitchSpeed += this.pitchAcc;

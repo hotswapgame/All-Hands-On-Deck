@@ -89,7 +89,7 @@ export function getKey(input$) {
   return input$
     .map(find(isKey))
     .filter(notNil)
-    .map(data => ({ id: data[0], isPressed: data[2] > 498 }));
+    .map(data => ({ id: data[0], isPressed: data[2] > 530 }));
 }
 
 function getInputChange(input$, idFunc, type) {

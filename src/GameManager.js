@@ -534,8 +534,11 @@ export function init(input$) {
     .filter(data => data.output)
     .subscribe({
       next: (d) => {
-        // Do the thing here
-        console.log('');
+        treasurePool.forEach((t) => {
+          if (t.keyTurnCheck()) {
+            // score
+          }
+        });
       },
       error: console.log,
       complete: console.log,

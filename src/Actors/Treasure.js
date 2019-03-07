@@ -16,7 +16,7 @@ class Treasure {
 
     // Three stuff
     this.gameObject = new THREE.Object3D();
-    this.markerFloatMax = -4.3; // MAX -4.3 MIN -7
+    this.markerFloatMax = -5; // MAX -4.3 MIN -7
     this.chestPosMin = -20;
 
     this.markerMat = new THREE.MeshBasicMaterial({ color: 0xdddddd });
@@ -34,7 +34,7 @@ class Treasure {
     this.gameObject.add(this.chest);
     this.chest.position.x = -20;
 
-    this.chestScale = 10;
+    this.chestScale = 8;
     getModel('./Assets/Treasure/chest_body.stl')
       .then((geo) => {
         this.chestBody = new THREE.Mesh(geo, this.chestMat);
@@ -86,7 +86,7 @@ class Treasure {
     this.moveSphere.rotation.set(spawnRot.x, spawnRot.y, spawnRot.z);
 
     // Spawn opposite of player
-    this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI / 1.6);
+    this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI / 20);
 
     // fix roll offset from death animation
     this.gameObject.visible = true;
@@ -126,8 +126,8 @@ class Treasure {
     const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));
     // some hard coded position bs
     // Tweak these with ease
-    this.marker.position.x = this.markerFloatMax - 2.5 * triggerOffset;
-    this.chest.position.x = this.chestPosMin + this.chestScale * 4 * triggerOffset;
+    this.marker.position.x = this.markerFloatMax - 3 * triggerOffset;
+    this.chest.position.x = this.chestPosMin + this.chestScale * 3 * triggerOffset;
     if (this.isTriggered) {
       if (this.triggerAnimationTime > 0) {
         this.triggerAnimationTime -= dt;

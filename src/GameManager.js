@@ -126,7 +126,21 @@ renderer.setPixelRatio(window.devicePixelRatio);
 // Make world a class that just holds the globe and maybe some clouds, land?
 // should also include lights, except for player point light
 // const worldTex = new THREE.TextureLoader().load('./Assets/world.png'); //0x5599AA
-const worldMat = new THREE.MeshLambertMaterial({ color: 0x5599AA, flatShading: true });
+const worldMat = new THREE.MeshPhysicalMaterial({
+  // color: 0x5599AA,
+  // flatShading: true,
+  // map: null,
+  color: 0x5599AA,
+  clearCoatRoughness: 1,
+  clearCoat: 1,
+  reflectivity: 1,
+  // roughness: 0,
+  // opacity: 0.999,
+  // side: THREE.FrontSide,
+  // transparent: true,
+  // envMapIntensity: 5,
+  // premultipliedAlpha: true,
+});
 
 let world;
 getModel('./Assets/world.stl')
@@ -284,7 +298,7 @@ function update(currentTime) {
     enemySpawnTimer -= dt;
 
     // Treasure spawn logic
-    if (!waveChestSpawned && waveTimer < (WAVE_MAX_TIME - WAVE_MAX_TIME / 3)) {
+    if (!waveChestSpawned && waveTimer < (WAVE_MAX_TIME - WAVE_MAX_TIME / 100)) {
       waveChestSpawned = true;
       const treasure = treasurePool.find(t => !t.isActive);
       treasure.spawn(player.moveSphere.rotation);

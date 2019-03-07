@@ -18,6 +18,7 @@ class Rock {
         this.size = Math.random() * 10 + 7;
         this.gameObject.scale.set(this.size, this.size, this.size);
         this.gameObject.rotation.y = Math.PI / 2;
+        this.gameObject.rotation.z = Math.random() * Math.PI;
         this.gameObject.position.x = worldSize;
 
         this.posSphere.add(this.gameObject);

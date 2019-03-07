@@ -76,7 +76,7 @@ const camera = new THREE.OrthographicCamera(
 );
 
 const rocks = Array.from(
-  { length: 35 },
+  { length: 25 },
   () => new Rock(scene, WORLD_SIZE),
 );
 

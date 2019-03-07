@@ -86,7 +86,7 @@ class Treasure {
     this.moveSphere.rotation.set(spawnRot.x, spawnRot.y, spawnRot.z);
 
     // Spawn opposite of player
-    this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI);
+    this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI / 1.6);
 
     // fix roll offset from death animation
     this.gameObject.visible = true;

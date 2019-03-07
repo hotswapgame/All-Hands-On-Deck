@@ -22,6 +22,7 @@ export const GAME_TYPES = {
   ENEMY: 'ENEMY',
   CANNONBALL: 'CANNONBALL',
   TREASURE: 'TREASURE',
+  ROCK: 'ROCK',
 };
 
 export const INPUT_TYPES = {

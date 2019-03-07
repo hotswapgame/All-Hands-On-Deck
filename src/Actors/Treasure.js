@@ -52,7 +52,7 @@ class Treasure {
         this.chestTop.scale.set(this.chestScale, this.chestScale, this.chestScale);
         this.chestTop.rotateY(Math.PI / 2);
         this.topRotContainer.position.y = this.chestScale * 0.75; // actually forward
-        this.topRotContainer.position.x = this.chestScale * 0.875; // actually up
+        this.topRotContainer.position.x = this.chestScale * 0.89; // actually up
         // pivot axis = z, max rot = Math.PI / 3;
         // this.topRotContainer.rotation.z = (Math.PI / 3);
         this.topRotContainer.add(this.chestTop);

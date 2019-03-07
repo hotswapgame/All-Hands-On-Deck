@@ -5,6 +5,7 @@ import Player from './Actors/Player';
 import Cannonball from './Actors/Cannonball';
 import EnemyShip from './Actors/EnemyShip';
 import Treasure from './Actors/Treasure';
+import Rock from './Actors/Rock';
 import { getModel } from './AssetManager';
 import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
 import { WAVE_SIZES } from './WaveConfig';
@@ -74,13 +75,18 @@ const camera = new THREE.OrthographicCamera(
   1000
 );
 
+const rocks = Array.from(
+  { length: 35 },
+  () => new Rock(scene, WORLD_SIZE),
+);
+
 const treasurePool = Array.from(
   { length: 10 },
   () => new Treasure(scene, WORLD_SIZE),
 );
 
 const cannonballPool = Array.from(
-  { length: 150 },
+  { length: 50 },
   () => new Cannonball(scene, WORLD_SIZE)
 );
 

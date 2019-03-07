@@ -16,7 +16,8 @@ class Treasure {
 
     // Three stuff
     this.gameObject = new THREE.Object3D();
-    this.markerFloat = -4.3; // MAX -4.3 MIN -7
+    this.markerFloatMax = -4.3; // MAX -4.3 MIN -7
+    this.chestPosMin = -20;
 
     this.markerMat = new THREE.MeshBasicMaterial({ color: 0xdddddd });
     getModel('./Assets/Treasure/xmark.stl')
@@ -32,10 +33,12 @@ class Treasure {
     this.chest = new THREE.Object3D();
     this.gameObject.add(this.chest);
     this.chest.position.x = -20;
+
+    this.chestScale = 10;
     getModel('./Assets/Treasure/chest_body.stl')
       .then((geo) => {
         this.chestBody = new THREE.Mesh(geo, this.chestMat);
-        this.chestBody.scale.set(10, 10, 10);
+        this.chestBody.scale.set(this.chestScale, this.chestScale, this.chestScale);
         // this.chestBody.position.x = this.markerFloat;
         this.chestBody.rotateY(Math.PI / 2);
         this.chest.add(this.chestBody);
@@ -45,10 +48,11 @@ class Treasure {
       .then((geo) => {
         this.topRotContainer = new THREE.Object3D();
         this.chestTop = new THREE.Mesh(geo, this.chestMat);
-        this.chestTop.scale.set(10, 10, 10);
+
+        this.chestTop.scale.set(this.chestScale, this.chestScale, this.chestScale);
         this.chestTop.rotateY(Math.PI / 2);
-        this.topRotContainer.position.y = 7.5; // actually forward
-        this.topRotContainer.position.x = 8.75; // actually up
+        this.topRotContainer.position.y = this.chestScale * 0.75; // actually forward
+        this.topRotContainer.position.x = this.chestScale * 0.875; // actually up
         // pivot axis = z, max rot = Math.PI / 3;
         // this.topRotContainer.rotation.z = (Math.PI / 3);
         this.topRotContainer.add(this.chestTop);
@@ -122,8 +126,8 @@ class Treasure {
     const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));
     // some hard coded position bs
     // Tweak these with ease
-    this.marker.position.x = -4.3 - 2.5 * triggerOffset;
-    this.chest.position.x = -20 + 37 * triggerOffset;
+    this.marker.position.x = this.markerFloatMax - 2.5 * triggerOffset;
+    this.chest.position.x = this.chestPosMin + this.chestScale * 4 * triggerOffset;
     if (this.isTriggered) {
       if (this.triggerAnimationTime > 0) {
         this.triggerAnimationTime -= dt;

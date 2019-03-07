@@ -3,8 +3,9 @@ import { prop, clamp } from 'ramda';
 
 import Player from './Actors/Player';
 import Cannonball from './Actors/Cannonball';
-import { getModel } from './AssetManager';
 import EnemyShip from './Actors/EnemyShip';
+import Treasure from './Actors/Treasure';
+import { getModel } from './AssetManager';
 import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
 import { WAVE_SIZES } from './WaveConfig';
 import {
@@ -31,9 +32,10 @@ let activeEnemies = 0;
 
 let waveCount = 0;
 let waveEnemiesToSpawn = 0;
+let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 60000;
+const WAVE_MAX_TIME = 70000;
 let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff
@@ -70,6 +72,11 @@ const camera = new THREE.OrthographicCamera(
   window.innerHeight / (-cameraScale),
   -150,
   1000
+);
+
+const treasurePool = Array.from(
+  { length: 10 },
+  () => new Treasure(scene, WORLD_SIZE),
 );
 
 const cannonballPool = Array.from(
@@ -238,6 +245,10 @@ function update(currentTime) {
     }
     totalTime += dt;
     enemyPool.forEach(e => e.update(dt, player.getPosition()));
+    treasurePool.forEach((t) => {
+      t.checkTrigger(player.getPosition());
+      t.update(dt);
+    });
 
     checkCollisions();
 
@@ -247,9 +258,11 @@ function update(currentTime) {
       if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
       else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
 
-      // Divy out enemy spawns in the 1st 15 sec
-      waveEnemySpawnWindow = (WAVE_MAX_TIME - 20000) / waveEnemiesToSpawn;
+      // Divy out enemy spawns in the 1st 45 sec
+      waveEnemySpawnWindow = (WAVE_MAX_TIME - 30000) / waveEnemiesToSpawn;
       enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
+
+      waveChestSpawned = false;
 
       waveTimer = WAVE_MAX_TIME;
       waveCount += 1; // set next wave index too
@@ -263,6 +276,13 @@ function update(currentTime) {
       waveEnemiesToSpawn -= 1;
     }
     enemySpawnTimer -= dt;
+
+    // Treasure spawn logic
+    if (!waveChestSpawned && waveTimer < (WAVE_MAX_TIME - WAVE_MAX_TIME / 3)) {
+      waveChestSpawned = true;
+      const treasure = treasurePool.find(t => !t.isActive);
+      treasure.spawn(player.moveSphere.rotation);
+    }
 
     // screen shake
     if (isShaking) {
@@ -335,6 +355,13 @@ export function init(input$) {
   resize();
 
   window.onkeyup = (e) => {
+    if (e.keyCode === 75) {
+      treasurePool.forEach((t) => {
+        if (t.keyTurnCheck()) {
+          // score
+        }
+      });
+    }
     // light port
     if (e.keyCode === 87) {
       player.lightFuse(SHIP_DIRECTIONS.PORT);

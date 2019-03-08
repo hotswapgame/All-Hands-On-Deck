@@ -46,7 +46,11 @@ class Player {
     this.gameObject.add(this.ship);
 
     // this mat might need to change
-    const bodyMat = new THREE.MeshLambertMaterial({ flatShading: true, color: 0xBBBBBB });
+    const bodyMat = new THREE.MeshPhongMaterial({ 
+                          flatShading: true, 
+                          color: 0x725a35, 
+                          shininess: 0.1,
+                        });
     getModel('./Assets/pirate/pirate_body.stl')
       .then((geo) => {
         this.body = new THREE.Mesh(geo, bodyMat);

@@ -13,13 +13,14 @@ class Rock {
     const rockModelNum = Math.floor(Math.random() * 3);
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {
-        const mat = new THREE.MeshPhongMaterial({ color: 0xdddddd });
+        const mat = new THREE.MeshLambertMaterial({ color: 0xdddddd });
         this.gameObject = new THREE.Mesh(geo, mat);
-        this.size = Math.random() * 10 + 7;
-        this.gameObject.scale.set(this.size, this.size, this.size);
+        this.sizeArea = Math.random() * 12 + 10;
+        this.sizeHeight = Math.random() * 10 + 7;
+        this.gameObject.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
         this.gameObject.rotation.y = Math.PI / 2;
         this.gameObject.rotation.z = Math.random() * Math.PI;
-        this.gameObject.position.x = worldSize;
+        this.gameObject.position.x = worldSize - this.sizeHeight*0.05;
 
         this.posSphere.add(this.gameObject);
 

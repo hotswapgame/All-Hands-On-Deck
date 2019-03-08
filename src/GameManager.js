@@ -131,8 +131,8 @@ const worldMat = new THREE.MeshPhysicalMaterial({
   // flatShading: true,
   // map: null,
   color: 0x5599AA,
-  //clearCoatRoughness: 1,
-  //clearCoat: 1,
+  // clearCoatRoughness: 1,
+  // clearCoat: 1,
   reflectivity: 1,
   roughness: 0,
   metalness: 0,
@@ -151,11 +151,16 @@ getModel('./Assets/world.stl')
     scene.add(world);
   });
 
+function checkNearRock() {
+  console.log(rocks[0].getPosition());
+}
+
 function spawnEnemy() {
   activeEnemies += 1;
   const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
   // Hard cap is in the enemy pool rn ~50
   if (enemy) {
+    checkNearRock();
     enemySpawnSide *= -1;
     enemy.spawn(player.moveSphere.rotation, enemySpawnSide);
   }

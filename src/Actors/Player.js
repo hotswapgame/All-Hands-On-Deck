@@ -48,13 +48,22 @@ class Player {
     // this mat might need to change
     const bodyMat = new THREE.MeshPhongMaterial({ 
                           flatShading: true, 
-                          color: 0x725a35, 
+                          color: 0xCCCCCC, 
                           shininess: 0.1,
+                        });
+    const bodyMatOffset = new THREE.MeshBasicMaterial({ 
+                          color: 0x000000, 
+                          side: THREE.BackSide,
                         });
     getModel('./Assets/pirate/pirate_body.stl')
       .then((geo) => {
         this.body = new THREE.Mesh(geo, bodyMat);
         this.ship.add(this.body);
+      });
+    getModel('./Assets/pirate/pirate_body_offset.stl')
+      .then((geo) => {
+        this.bodyOffset = new THREE.Mesh(geo, bodyMatOffset);
+        this.ship.add(this.bodyOffset);
       });
     const specular = new THREE.Color(0xffffff);
     // Sails

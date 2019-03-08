@@ -11,22 +11,39 @@ class Rock {
 
     this.posSphere = new THREE.Object3D();
     const rockModelNum = Math.floor(Math.random() * 3);
+    this.sizeArea = Math.random() * 12 + 10;
+    this.sizeHeight = Math.random() * 10 + 7;
+    this.posZ = Math.random() * Math.PI;
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshLambertMaterial({ color: 0xdddddd });
         this.gameObject = new THREE.Mesh(geo, mat);
-        this.sizeArea = Math.random() * 12 + 10;
-        this.sizeHeight = Math.random() * 10 + 7;
+        // this.sizeArea = Math.random() * 12 + 10;
+        // this.sizeHeight = Math.random() * 10 + 7;
         this.gameObject.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
         this.gameObject.rotation.y = Math.PI / 2;
-        this.gameObject.rotation.z = Math.random() * Math.PI;
-        this.gameObject.position.x = worldSize - this.sizeHeight*0.05;
+        // this.gameObject.rotation.z = Math.random() * Math.PI;
+        this.gameObject.rotation.z = this.posZ;
+        this.gameObject.position.x = worldSize - this.sizeHeight*0.03;
 
         this.posSphere.add(this.gameObject);
 
         // this.worldPos = new THREE.Vector3();
         // this.gameObject.getWorldPosition(this.worldPos);
         // console.log(this.worldPos);
+      });
+    getModel(`./Assets/Rocks/rocksOffset${rockModelNum}.stl`)
+      .then((geo) => {
+        const mat = new THREE.MeshBasicMaterial({ 
+                          color: 0x444455,
+                          side: THREE.BackSide
+                        });
+        this.gameObject = new THREE.Mesh(geo, mat);
+        this.gameObject.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
+        this.gameObject.rotation.y = Math.PI / 2;
+        this.gameObject.rotation.z = this.posZ;
+        this.gameObject.position.x = worldSize - this.sizeHeight*0.03;
+        this.posSphere.add(this.gameObject);
       });
 
     this.scene.add(this.posSphere);

@@ -29,12 +29,13 @@ class Treasure {
         this.gameObject.add(this.marker);
       });
 
-    this.chestMat = new THREE.MeshPhongMaterial({ color: 0xdddddd });
+    this.chestMat = new THREE.MeshPhongMaterial({ color: 0xDDDD99 });
+    this.chestMatOffset = new THREE.MeshBasicMaterial({ color: 0xFFFFAA, side: THREE.BackSide });
     this.chest = new THREE.Object3D();
     this.gameObject.add(this.chest);
     this.chest.position.x = -20;
 
-    this.chestScale = 8;
+    this.chestScale = 7;
     getModel('./Assets/Treasure/chest_body.stl')
       .then((geo) => {
         this.chestBody = new THREE.Mesh(geo, this.chestMat);
@@ -42,6 +43,14 @@ class Treasure {
         // this.chestBody.position.x = this.markerFloat;
         this.chestBody.rotateY(Math.PI / 2);
         this.chest.add(this.chestBody);
+      });
+    getModel('./Assets/Treasure/chest_body_offset.stl')
+      .then((geo) => {
+        this.chestBodyOffset = new THREE.Mesh(geo, this.chestMatOffset);
+        this.chestBodyOffset.scale.set(this.chestScale, this.chestScale, this.chestScale);
+        // this.chestBody.position.x = this.markerFloat;
+        this.chestBodyOffset.rotateY(Math.PI / 2);
+        this.chest.add(this.chestBodyOffset);
       });
 
     getModel('./Assets/Treasure/chest_top.stl')
@@ -57,6 +66,20 @@ class Treasure {
         // this.topRotContainer.rotation.z = (Math.PI / 3);
         this.topRotContainer.add(this.chestTop);
         this.chest.add(this.topRotContainer);
+      });
+    getModel('./Assets/Treasure/chest_top_offset.stl')
+      .then((geo) => {
+        this.topRotContainerOffset = new THREE.Object3D();
+        this.chestTopOffset = new THREE.Mesh(geo, this.chestMatOffset);
+
+        this.chestTopOffset.scale.set(this.chestScale, this.chestScale, this.chestScale);
+        this.chestTopOffset.rotateY(Math.PI / 2);
+        this.topRotContainerOffset.position.y = this.chestScale * 0.75; // actually forward
+        this.topRotContainerOffset.position.x = this.chestScale * 0.89; // actually up
+        // pivot axis = z, max rot = Math.PI / 3;
+        // this.topRotContainer.rotation.z = (Math.PI / 3);
+        this.topRotContainerOffset.add(this.chestTopOffset);
+        this.chest.add(this.topRotContainerOffset);
       });
 
     this.triggerRadius = 42;
@@ -141,6 +164,7 @@ class Treasure {
     if (this.isOpening) {
       if (this.openTime + 300 > this.openTimeMax) {
         this.topRotContainer.rotation.z += Math.PI / 2 * dt / this.openTimeMax;
+        this.topRotContainerOffset.rotation.z += Math.PI / 2 * dt / this.openTimeMax;
       }
 
       this.openTime -= dt;

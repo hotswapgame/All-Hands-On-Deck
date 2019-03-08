@@ -76,12 +76,12 @@ const camera = new THREE.OrthographicCamera(
 );
 
 const rocks = Array.from(
-  { length: 25 },
+  { length: 20 },
   () => new Rock(scene, WORLD_SIZE),
 );
 
 const treasurePool = Array.from(
-  { length: 10 },
+  { length: 5 },
   () => new Treasure(scene, WORLD_SIZE),
 );
 

@@ -269,6 +269,8 @@ class EnemyShip {
     this.headingRotation = turn;
     // hard coded turn rate at end, maybe make this a twean
     this.moveSphere.rotateOnAxis(this.yawAxis, dt * turn * 0.0003);
+
+    // Use cross to also avoid rocks that are close
   }
 
   update(dt, playerPos) {

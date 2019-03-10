@@ -195,6 +195,12 @@ function checkCollisions() {
           startShake();
         }
       }
+
+      rocks.forEach((r) => {
+        if (c.getPosition().distanceTo(r.getPosition()) < r.hitRadius + c.hitRadius) {
+          c.explode();
+        }
+      });
     }
 
     // should also map over enemies to intersect player and each other

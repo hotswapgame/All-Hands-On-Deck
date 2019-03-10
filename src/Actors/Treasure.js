@@ -45,7 +45,7 @@ class Treasure {
       .then((geo) => {
         this.chestBody = new THREE.Mesh(geo, this.chestMat);
         this.chestBody.scale.set(this.chestScale, this.chestScale, this.chestScale);
-        // this.chestBody.position.x = this.markerFloat;
+
         this.chestBody.rotateY(Math.PI / 2);
         this.chest.add(this.chestBody);
       });
@@ -53,7 +53,7 @@ class Treasure {
       .then((geo) => {
         this.chestBodyOffset = new THREE.Mesh(geo, this.chestMatOffset);
         this.chestBodyOffset.scale.set(this.chestScale, this.chestScale, this.chestScale);
-        // this.chestBody.position.x = this.markerFloat;
+
         this.chestBodyOffset.rotateY(Math.PI / 2);
         this.chest.add(this.chestBodyOffset);
       });

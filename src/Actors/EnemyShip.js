@@ -42,7 +42,10 @@ class EnemyShip {
 
     // used to create a plane to track player
     this.forwardMarker = new THREE.Object3D();
-    this.forwardMarker.position.y = worldSize - 2;
+    this.forwardMarker.position.y = worldSize;
+
+    this.leftMarker = new THREE.Object3D();
+    this.leftMarker.position.z = worldSize;
 
     // container for body of the ship
     this.gameObject = new THREE.Object3D();
@@ -111,6 +114,7 @@ class EnemyShip {
     this.moveSphere = new THREE.Object3D();
     this.moveSphere.add(this.gameObject);
     this.moveSphere.add(this.forwardMarker);
+    this.moveSphere.add(this.leftMarker);
     this.scene.add(this.moveSphere);
     this.gameObject.visible = false;
     this.id = this.gameObject.id;// for collisions!
@@ -261,16 +265,34 @@ class EnemyShip {
     this.gameObject.getWorldPosition(this.worldPos);
     const forwardVec = new THREE.Vector3();
     this.forwardMarker.getWorldPosition(forwardVec);
+
+    const leftVec = new THREE.Vector3();
+    this.leftMarker.getWorldPosition(leftVec);
     // B′=B−A, C′=C−A, X′=X−A.
-    const cross = new THREE.Vector3().crossVectors(this.worldPos, forwardVec).normalize();
-    const planeTest = cross.dot(playerPos.normalize());
+    const forwardCross = new THREE.Vector3().crossVectors(this.worldPos, forwardVec).normalize();
+    const sideCross = new THREE.Vector3().crossVectors(this.worldPos, leftVec).normalize();
+
+    const planeTest = forwardCross.dot(playerPos.normalize());
     let turn = 0;
     if (planeTest > 0.001 || planeTest < -0.001) turn = planeTest > 0 ? 1 : -1;
+
+    this.rocks.forEach((r) => {
+      // Check if rock is close
+      if (r.getPosition().distanceTo(this.worldPos) < 40 + r.spawnBlockRadius) {
+        const rockPos = r.getPosition().normalize();
+        const sideTest = sideCross.dot(rockPos);
+        const frontTest = forwardCross.dot(rockPos);
+        // See if rock is in front
+        if (sideTest < 0) {
+          // tweak to find angle of avoidance
+          if (frontTest < 0.1 && frontTest > -0.1) turn = frontTest > 0 ? -1 : 1;
+        }
+      }
+    });
+
     this.headingRotation = turn;
     // hard coded turn rate at end, maybe make this a twean
     this.moveSphere.rotateOnAxis(this.yawAxis, dt * turn * 0.0003);
-
-    // Use cross to also avoid rocks that are close
   }
 
   update(dt, playerPos) {

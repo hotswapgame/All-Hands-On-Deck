@@ -6,6 +6,7 @@
   "rules": {
     "no-param-reassign": "warn",
     "function-paren-newline": ["error", "multiline"],
+    "linebreak-style": 0,
     "no-unused-vars": 1,
     "comma-dangle": ["error", {
         "arrays": "always-multiline",

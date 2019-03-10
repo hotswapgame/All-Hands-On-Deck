@@ -82,7 +82,7 @@ const rocks = Array.from(
 
 const treasurePool = Array.from(
   { length: 5 },
-  () => new Treasure(scene, WORLD_SIZE),
+  () => new Treasure(scene, WORLD_SIZE, rocks),
 );
 
 const cannonballPool = Array.from(

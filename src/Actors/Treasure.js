@@ -1,18 +1,23 @@
 import * as THREE from 'three';
-import { GAME_TYPES } from '../Constants';
+import { any } from 'ramda';
 
+import { GAME_TYPES } from '../Constants';
 import { getModel } from '../AssetManager';
 
 class Treasure {
-  constructor(scene, worldSize) {
+  constructor(scene, worldSize, rocks) {
     this.type = GAME_TYPES.TREASURE;
     this.scene = scene;
     this.worldSize = worldSize;
+    this.rocks = rocks;
+    this.passedRockCheck = false;
+    this.spawnRot = new THREE.Vector3();
 
     // Positioning... really only need this on spawn
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     // Used to calc actual world position
     this.worldPos = new THREE.Vector3();
+    this.deathWorldPos = new THREE.Vector3();
 
     // Three stuff
     this.gameObject = new THREE.Object3D();
@@ -104,12 +109,13 @@ class Treasure {
   spawn(spawnRot) {
     this.isActive = true;
     // randomly rotate the model, or spin it on update
+    this.spawRot = spawnRot;
 
     // start with player position
     this.moveSphere.rotation.set(spawnRot.x, spawnRot.y, spawnRot.z);
 
     // Spawn opposite of player
-    this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI / 4);
+    this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI / 2);
 
     // fix roll offset from death animation
     this.gameObject.visible = true;
@@ -122,11 +128,13 @@ class Treasure {
     this.isTriggered = false;
     this.isOpening = false;
     this.isHiding = false;
+    this.deathWorldPos.copy(this.worldPos);
 
     this.topRotContainer.rotation.z = 0;
     this.topRotContainerOffset.rotation.z = 0;
     this.openTime = this.openTimeMax;
     this.triggerAnimationTime = this.triggerAnimationMax;
+    this.passedRockCheck = false;
   }
 
   checkTrigger(playerPos) {
@@ -147,33 +155,52 @@ class Treasure {
   }
 
   update(dt) {
-    const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));
-    // some hard coded position bs
-    // Tweak these with ease
-    this.marker.position.x = this.markerFloatMax - 3 * triggerOffset;
-    this.chest.position.x = this.chestPosMin + this.chestScale * 3 * triggerOffset;
-    if (this.isTriggered) {
-      if (this.triggerAnimationTime > 0) {
-        this.triggerAnimationTime -= dt;
-      } else {
-        this.triggerAnimationTime = 0;
+    if (this.isActive) {
+      if (!this.passedRockCheck) {
+        this.gameObject.getWorldPosition(this.worldPos);
+        if (this.worldPos.x !== this.deathWorldPos.x) {
+          const posCheck = r => (r.getPosition().distanceTo(this.worldPos)
+                                 < 25 + r.spawnBlockRadius);
+          this.passedRockCheck = !any(posCheck)(this.rocks);
+
+          // start with player position
+          this.moveSphere.rotation.set(this.spawnRot.x, this.spawnRot.y, this.spawnRot.z);
+
+          // Spawn opposite of player
+          this.moveSphere.rotateOnAxis(
+            this.forwardAxis,
+            Math.PI / 2 + (Math.PI / 4 * Math.random())
+          );
+        }
       }
-    } else if (this.triggerAnimationTime < this.triggerAnimationMax) {
-      this.triggerAnimationTime += dt;
-    }
-
-    if (this.isOpening) {
-      if (this.openTime + 300 > this.openTimeMax) {
-        this.topRotContainer.rotation.z += Math.PI / 2 * dt / this.openTimeMax;
-        this.topRotContainerOffset.rotation.z += Math.PI / 2 * dt / this.openTimeMax;
+      const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));
+      // some hard coded position bs
+      // Tweak these with ease
+      this.marker.position.x = this.markerFloatMax - 3 * triggerOffset;
+      this.chest.position.x = this.chestPosMin + this.chestScale * 3 * triggerOffset;
+      if (this.isTriggered) {
+        if (this.triggerAnimationTime > 0) {
+          this.triggerAnimationTime -= dt;
+        } else {
+          this.triggerAnimationTime = 0;
+        }
+      } else if (this.triggerAnimationTime < this.triggerAnimationMax) {
+        this.triggerAnimationTime += dt;
       }
 
-      this.openTime -= dt;
+      if (this.isOpening) {
+        if (this.openTime + 300 > this.openTimeMax) {
+          this.topRotContainer.rotation.z += Math.PI / 2 * dt / this.openTimeMax;
+          this.topRotContainerOffset.rotation.z += Math.PI / 2 * dt / this.openTimeMax;
+        }
 
-      if (this.openTime < 0) {
-        this.isHiding = true;
-        this.isOpening = false;
-        this.hide();
+        this.openTime -= dt;
+
+        if (this.openTime < 0) {
+          this.isHiding = true;
+          this.isOpening = false;
+          this.hide();
+        }
       }
     }
   }

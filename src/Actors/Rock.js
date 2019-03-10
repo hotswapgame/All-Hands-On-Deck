@@ -58,7 +58,7 @@ class Rock {
       this.gameObject.getWorldPosition(this.worldPos);
     }
 
-    return this.worldPos;
+    return this.worldPos.clone();
   }
 
   fixPlacement() {

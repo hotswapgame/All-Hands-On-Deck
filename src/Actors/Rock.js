@@ -13,22 +13,31 @@ class Rock {
     const rockModelNum = Math.floor(Math.random() * 3);
     this.sizeArea = Math.random() * 12 + 10;
     this.sizeHeight = Math.random() * 10 + 7;
-    this.posZ = Math.random() * Math.PI;
+    this.rotZ = Math.random() * Math.PI;
+
+    this.gameObject = new THREE.Object3D();
+    this.gameObject.position.x = worldSize - this.sizeHeight * 0.03;
+    this.gameObject.rotation.y = Math.PI / 2;
+    this.gameObject.rotation.z = this.rotZ;
+    this.posSphere.add(this.gameObject);
+    this.scene.add(this.posSphere);
+
+    this.spawnBlockRadius = this.sizeArea + 10;
+    this.hitRadius = this.sizeArea * 0.8;
+    // Uncomment to show hitbox debug
+    // const hitgeo = new THREE.SphereGeometry(this.hitRadius, 10, 10);
+    // this.hitBox = new THREE.Mesh(hitgeo, new THREE.MeshBasicMaterial({ wireframe: true }));
+    // this.gameObject.add(this.hitBox);
+
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshLambertMaterial({ color: 0xdddddd });
-        this.gameObject = new THREE.Mesh(geo, mat);
+        this.rock = new THREE.Mesh(geo, mat);
         // this.sizeArea = Math.random() * 12 + 10;
         // this.sizeHeight = Math.random() * 10 + 7;
-        this.gameObject.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
-        this.gameObject.rotation.y = Math.PI / 2;
-        // this.gameObject.rotation.z = Math.random() * Math.PI;
-        this.gameObject.rotation.z = this.posZ;
-        this.gameObject.position.x = worldSize - this.sizeHeight * 0.03;
-
-        this.posSphere.add(this.gameObject);
-
-        this.scene.add(this.posSphere);
+        this.rock.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
+        // this.rock.rotation.y = Math.PI / 2;
+        this.gameObject.add(this.rock);
       });
     getModel(`./Assets/Rocks/rocksOffset${rockModelNum}.stl`)
       .then((geo) => {
@@ -36,12 +45,10 @@ class Rock {
           color: 0x444455,
           side: THREE.BackSide,
         });
-        this.gameObject = new THREE.Mesh(geo, mat);
-        this.gameObject.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
-        this.gameObject.rotation.y = Math.PI / 2;
-        this.gameObject.rotation.z = this.posZ;
-        this.gameObject.position.x = worldSize - this.sizeHeight * 0.03;
-        this.posSphere.add(this.gameObject);
+        this.rockOutline = new THREE.Mesh(geo, mat);
+        this.rockOutline.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
+        // this.rockOutline.rotation.y = Math.PI / 2;
+        this.gameObject.add(this.rockOutline);
       });
 
     // set a random rotation

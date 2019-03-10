@@ -1,4 +1,5 @@
 export const WAVE_SIZES = [
+  30,
   5,
   8,
   10,

@@ -101,7 +101,7 @@ const fireEnemyCannon = (enemyRot, enemyHeading) => {
 
 const enemyPool = Array.from(
   { length: 50 },
-  () => new EnemyShip(scene, WORLD_SIZE, fireEnemyCannon)
+  () => new EnemyShip(scene, WORLD_SIZE, fireEnemyCannon, rocks)
 );
 
 const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
@@ -151,8 +151,8 @@ getModel('./Assets/world.stl')
     scene.add(world);
   });
 
-function checkNearRock() {
-  console.log(rocks[0].getPosition());
+function checkNearRock(enemyPosition) {
+  // .updateMatrixWorld();
 }
 
 function spawnEnemy() {
@@ -162,7 +162,7 @@ function spawnEnemy() {
   if (enemy) {
     checkNearRock();
     enemySpawnSide *= -1;
-    enemy.spawn(player.moveSphere.rotation, enemySpawnSide);
+    enemy.spawn(player.moveSphere.rotation, enemySpawnSide, rocks);
   }
 }
 

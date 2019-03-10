@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { any } from 'ramda';
 import { GAME_TYPES } from '../Constants';
 
 import { getModel } from '../AssetManager';
@@ -8,11 +9,13 @@ import { playSound } from '../SoundPlayer';
 import Flame from './Flame';
 
 class EnemyShip {
-  constructor(scene, worldSize, fireCannon) {
+  constructor(scene, worldSize, fireCannon, rocks) {
     this.type = GAME_TYPES.ENEMY;
     this.scene = scene;
     this.worldSize = worldSize;
     this.fireCannon = fireCannon;
+    this.rocks = rocks;
+
     this.speed = 0.009 / worldSize;
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
@@ -34,6 +37,7 @@ class EnemyShip {
 
     // Used to calc actual world position
     this.worldPos = new THREE.Vector3();
+    this.deathWorldPos = new THREE.Vector3();
     this.hitPos = new THREE.Vector3();
 
     // used to create a plane to track player
@@ -158,17 +162,11 @@ class EnemyShip {
   // Spawn within an arc of the player at a set distance
   spawn(playerRot, spawnSide) {
     this.isActive = true;
+    this.passedRockCheck = false;
     this.floatPos = -20;
     this.pitchSpawnOffset = -Math.PI / 3;
-
-    // start with player position
-    this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);
-    const yawOffset = Math.PI + (Math.random() * Math.PI / 4) * spawnSide;
-    const startOffset = -Math.PI / 4;
-
-    // move away from player based on randomly generated position
-    this.moveSphere.rotateOnAxis(this.yawAxis, yawOffset);
-    this.moveSphere.rotateOnAxis(this.forwardAxis, startOffset);
+    this.playerRot = playerRot;
+    this.spawnSide = spawnSide;
 
     // Add top level obj to scene
     this.gameObject.visible = true;
@@ -216,6 +214,8 @@ class EnemyShip {
     this.stopFlash();
     this.isActive = false;
     this.isDying = false;
+    this.gameObject.getWorldPosition(this.worldPos);
+    this.deathWorldPos.copy(this.worldPos);
   }
 
   addPitch(impulse) {
@@ -273,6 +273,24 @@ class EnemyShip {
 
   update(dt, playerPos) {
     if (this.isActive) {
+      if (!this.passedRockCheck) {
+        this.gameObject.getWorldPosition(this.worldPos);
+        if (this.worldPos.x !== this.deathWorldPos.x) {
+          const posCheck = r => (r.getPosition().distanceTo(this.worldPos)
+                                 < 10 + r.spawnBlockRadius);
+          this.passedRockCheck = !any(posCheck)(this.rocks);
+
+          // start with player position
+          this.moveSphere.rotation.set(this.playerRot.x, this.playerRot.y, this.playerRot.z);
+          const yawOffset = Math.PI + (Math.random() * Math.PI / 4) * this.spawnSide;
+          const startOffset = -Math.PI / 4;
+
+          // move away from player based on randomly generated position
+          this.moveSphere.rotateOnAxis(this.yawAxis, yawOffset);
+          this.moveSphere.rotateOnAxis(this.forwardAxis, startOffset);
+        }
+      }
+
       this.updatePitch(dt);
       this.updateFloat(dt);
       this.updateHeading(dt, playerPos);

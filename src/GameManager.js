@@ -151,16 +151,11 @@ getModel('./Assets/world.stl')
     scene.add(world);
   });
 
-function checkNearRock(enemyPosition) {
-  // .updateMatrixWorld();
-}
-
 function spawnEnemy() {
   activeEnemies += 1;
   const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
   // Hard cap is in the enemy pool rn ~50
   if (enemy) {
-    checkNearRock();
     enemySpawnSide *= -1;
     enemy.spawn(player.moveSphere.rotation, enemySpawnSide, rocks);
   }
@@ -233,6 +228,28 @@ function update(currentTime) {
   const dt = currentTime - prevTime;
   prevTime = currentTime;
 
+  // Render at the start to update the matrix
+  renderer.render(scene, camera);
+
+  // update all this on start screen
+  // Split this into sep update functions pls
+  if (!isGameOver) {
+    player.update(dt);
+    cannonballPool.forEach(c => c.update(dt));
+  }
+
+  // Make sure rocks don't spawn on player position
+  rocks.forEach((r) => {
+    if (!r.isGoodPlacement) {
+      // arbitary spawn distance of 130
+      if (r.getPosition().distanceTo(player.getPosition()) < 130) {
+        r.randomlyPlace();
+      } else {
+        r.fixPlacement();
+      }
+    }
+  });
+
   // start sequence stuff
   if (isStartSeq) {
     switch (startSeqCount) {
@@ -256,13 +273,6 @@ function update(currentTime) {
         break;
       default: break;
     }
-  }
-
-  // update all this on start screen
-  // Split this into sep update functions pls
-  if (!isGameOver) {
-    player.update(dt);
-    cannonballPool.forEach(c => c.update(dt));
   }
 
   if (!isGameOver && !isStartSeq) {
@@ -330,8 +340,7 @@ function update(currentTime) {
     }
   }
 
-  // Rendering is so much simpler with THREE than Canvas
-  renderer.render(scene, camera);
+  // set next frame
   requestAnimationFrame(update.bind(this));
 }
 

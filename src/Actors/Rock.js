@@ -33,10 +33,7 @@ class Rock {
       .then((geo) => {
         const mat = new THREE.MeshLambertMaterial({ color: 0xdddddd });
         this.rock = new THREE.Mesh(geo, mat);
-        // this.sizeArea = Math.random() * 12 + 10;
-        // this.sizeHeight = Math.random() * 10 + 7;
         this.rock.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
-        // this.rock.rotation.y = Math.PI / 2;
         this.gameObject.add(this.rock);
       });
     getModel(`./Assets/Rocks/rocksOffset${rockModelNum}.stl`)
@@ -47,16 +44,11 @@ class Rock {
         });
         this.rockOutline = new THREE.Mesh(geo, mat);
         this.rockOutline.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
-        // this.rockOutline.rotation.y = Math.PI / 2;
         this.gameObject.add(this.rockOutline);
       });
 
-    // set a random rotation
-    this.posSphere.rotation.set(
-      Math.random() * Math.PI * 2,
-      Math.random() * Math.PI * 2,
-      Math.random() * Math.PI * 2
-    );
+    this.randomlyPlace();
+    this.isGoodPlacement = false;
   }
 
   getPosition() {
@@ -69,9 +61,21 @@ class Rock {
     return this.worldPos;
   }
 
-  // checkPlayerCollision(playerPos) {
+  fixPlacement() {
+    this.isGoodPlacement = true;
+  }
 
-  // }
+  randomlyPlace() {
+    // set a random rotation
+    this.posSphere.rotation.set(
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2
+    );
+
+    // Hack to make the position regenerate
+    this.worldPos = undefined;
+  }
 }
 
 export default Rock;

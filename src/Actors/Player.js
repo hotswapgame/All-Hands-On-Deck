@@ -46,15 +46,16 @@ class Player {
     this.gameObject.add(this.ship);
 
     // this mat might need to change
-    const bodyMat = new THREE.MeshPhongMaterial({ 
-                          flatShading: true, 
-                          color: 0xCCCCCC, 
-                          shininess: 0.1,
-                        });
-    const bodyMatOffset = new THREE.MeshBasicMaterial({ 
-                          color: 0x000000, 
-                          side: THREE.BackSide,
-                        });
+    const bodyMat = new THREE.MeshPhongMaterial({
+      flatShading: true,
+      color: 0xCCCCCC,
+      shininess: 0.1,
+    });
+    const bodyMatOffset = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      side: THREE.BackSide,
+    });
+
     getModel('./Assets/pirate/pirate_body.stl')
       .then((geo) => {
         this.body = new THREE.Mesh(geo, bodyMat);
@@ -329,7 +330,7 @@ class Player {
 
   // Used for collisions and player tracking on enemies
   getPosition() {
-    return this.worldPos.clone();
+    return this.worldPos;
   }
 
   getHit(ballPos) {
@@ -552,6 +553,9 @@ class Player {
     this.updateBubbles(dt);
     this.updateBob(dt);
 
+    // Set this once a frame so that enemies can use it
+    this.updateWorldPosition();
+
     // always moving forward
     // switch to acceleration and velocity with a max speed
     if (this.velocity >= this.velocityMin && this.turnRate !== 0) {
@@ -567,8 +571,6 @@ class Player {
 
     // apply rotspeed to move sphere based on forward
     this.moveSphere.rotateOnAxis(this.forwardAxis, dt * this.velocity);
-    // Set this once a frame so that enemies can use it
-    this.updateWorldPosition();
   }
 }
 

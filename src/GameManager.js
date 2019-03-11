@@ -56,7 +56,6 @@ let shakeTime = 0;
 const shakeIntensity = 3;
 let shakeXScale = 0;
 let shakeYScale = 0;
-const SHAKE_TIME_MAX = 100;
 
 const HIT_PAUSE_MAX = 30;
 
@@ -114,7 +113,14 @@ function triggerGameOver(cannonsFired, fireTime) {
   runGameOverSequence(shipsSunk, cannonsFired, totalTime, fireTime);
 }
 
-const player = new Player(scene, camera, WORLD_SIZE, firePlayerCannon, triggerGameOver);
+function startShake(intensity, time) {
+  isShaking = true;
+  shakeTime = time;
+  shakeXScale = intensity * Math.random() > 0.5 ? 1 : -1;
+  shakeYScale = intensity * Math.random() > 0.5 ? 1 : -1;
+}
+
+const player = new Player(scene, camera, WORLD_SIZE, firePlayerCannon, triggerGameOver, startShake);
 
 // init renderer
 const renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -161,13 +167,6 @@ function spawnEnemy() {
   }
 }
 
-function startShake() {
-  isShaking = true;
-  shakeTime = 0;
-  shakeXScale = Math.random() > 0.5 ? 1 : -1;
-  shakeYScale = Math.random() > 0.5 ? 1 : -1;
-}
-
 function checkCollisions() {
   cannonballPool.forEach((c) => {
     if (c.isActive && !c.isExploding) {
@@ -187,7 +186,7 @@ function checkCollisions() {
         if (player.getHit(c.getPosition())) {
           c.explode();
           player.addFlame(2000);
-          startShake();
+          startShake(1, 100);
         }
       }
 
@@ -215,7 +214,7 @@ function checkCollisions() {
           activeEnemies -= 1;
           playSound('EXPLODE');
           player.addFlame(1500);
-          startShake();
+          startShake(2, 200);
           shipsSunk += 1;
         }
       }
@@ -328,11 +327,11 @@ function update(currentTime) {
 
     // screen shake
     if (isShaking) {
-      shakeTime += dt;
+      shakeTime -= dt;
       screen.style.left = `${(Math.cos(shakeTime) * shakeIntensity * shakeXScale)}px`;
       screen.style.top = `${(Math.sin(shakeTime) * shakeIntensity * shakeYScale)}px`;
 
-      if (shakeTime > SHAKE_TIME_MAX) {
+      if (shakeTime < 0) {
         isShaking = false;
         screen.style.left = '0px';
         screen.style.top = '0px';

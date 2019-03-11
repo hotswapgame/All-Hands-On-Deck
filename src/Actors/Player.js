@@ -12,11 +12,12 @@ import SpeechBubble, { SPRITES } from './SpeechBubble';
 import { playSound } from '../SoundPlayer';
 
 class Player {
-  constructor(scene, camera, worldSize, fireCannon, gameOverCallback) {
+  constructor(scene, camera, worldSize, fireCannon, gameOverCallback, triggerShake) {
     this.type = GAME_TYPES.PLAYER;
     // move camera to a class that looks at the player maybe
     this.scene = scene;
     this.gameOverCallback = gameOverCallback;
+    this.triggerShake = triggerShake;
     this.velocityMin = 0;
     this.velocityMax = 0.00015; // scaled to world size bc rotation
     this.velocityTarget = this.velocityMin;
@@ -41,8 +42,12 @@ class Player {
     this.gameObject = new THREE.Object3D();
     this.gameObject.position.x = this.basePosition;
     this.gameObject.rotateY(Math.PI / 2);
+    // this.isRockTurn = false;
+    this.rockTurnVal = 0;
+    this.rockTurnTime = 0;
+    this.rockTurnTimeMax = 2000;
+    this.rockHitRadius = 10;
     // visualize rock hitbox CURRENTLY NOT USED
-    // this.rockHitRadius = 10;
     // this.rockHit = new THREE.Mesh(
     //   new THREE.SphereGeometry(this.rockHitRadius, 10, 10),
     //   new THREE.MeshBasicMaterial({ wireframe: true })
@@ -566,6 +571,9 @@ class Player {
   }
 
   checkRockCollision(rocks) {
+    // Bail bc it's still recovering
+    if (this.rockTurnTime > 0) return;
+
     // Maybe do rock invulrablity window?
     const forwardVec = new THREE.Vector3();
     this.forwardMarker.getWorldPosition(forwardVec);
@@ -577,6 +585,7 @@ class Player {
     const sideCross = new THREE.Vector3().crossVectors(this.worldPos, leftVec).normalize();
 
     // this seems like a bottle neck
+    // maybe only do first two
     this.hitboxes.forEach((b) => {
       // get this hitbox world position
       const worldP = new THREE.Vector3();
@@ -588,22 +597,34 @@ class Player {
         // we use good placement bc sometimes the rock will hit on spawn
         if (r.isGoodPlacement
             && r.getPosition().distanceTo(worldP) < this.rockHitRadius + r.hitRadius) {
-          console.log('HIT ROCK');
+
           const rockPos = r.getPosition().normalize();
 
-          // +,- | -,-
-          // _ _ | _ _
-          //     |
-          // +,+ | -,+
-
+          //        -0.14
+          //      +,- | -,-
+          // 0.06 _ _ | _ _ -0.06
+          //          |
+          //      +,+ | -,+
+          //         0.14
           const frontTest = sideCross.dot(rockPos); // for grid y
           const sideTest = forwardCross.dot(rockPos); // for grid x
 
           // // See if rock is in front
-          // console.log(sideTest, frontTest);
           // if (sideTest < 0) {
-          //   // tweak to find angle of avoidance
-          //   if (frontTest < 0.1 && frontTest > -0.1) turn = frontTest > 0 ? -1 : 1;
+          // tweak to find angle of avoidance
+          const turn = sideTest > 0 ? -1 : 1;
+          // hard coded turn rate at end, maybe make this a twean
+          this.velocity = 0; // this.velocity * 0.001;
+          // this.moveSphere.rotateOnAxis(this.forwardAxis, -0.01); // linear
+          // this.moveSphere.rotateOnAxis(this.yawAxis, turn * 0.6); // ease in
+          // this.isRockTurn = true;
+          this.triggerShake(50, 300);
+          this.addFlame(5000);
+          this.addRoll(turn * -0.01);
+          this.turnRate = 0;
+          this.setTurnAngle(0);
+          this.rockTurnVal = turn;
+          this.rockTurnTime = this.rockTurnTimeMax;
           // }
         }
       });
@@ -623,21 +644,27 @@ class Player {
 
     this.checkRockCollision(rocks);
 
-    // always moving forward
-    // switch to acceleration and velocity with a max speed
-    if (this.velocity >= this.velocityMin && this.turnRate !== 0) {
-      // if turning apply yaw to forward
-      this.moveSphere.rotateOnAxis(this.yawAxis, this.turnRate * dt);
-    }
-    // just change velocity max
-    if (this.velocity > this.velocityTarget) {
-      this.velocity -= this.acceleration * dt;
-    } else {
-      this.velocity += this.acceleration * dt;
-    }
+    if (this.rockTurnTime <= 0) {
+      // always moving forward
+      // switch to acceleration and velocity with a max speed
+      if (this.velocity >= this.velocityMin && this.turnRate !== 0) {
+        // if turning apply yaw to forward
+        this.moveSphere.rotateOnAxis(this.yawAxis, this.turnRate * dt);
+      }
+      // just change velocity max
+      if (this.velocity > this.velocityTarget) {
+        this.velocity -= this.acceleration * dt;
+      } else {
+        this.velocity += this.acceleration * dt;
+      }
 
-    // apply rotspeed to move sphere based on forward
-    this.moveSphere.rotateOnAxis(this.forwardAxis, dt * this.velocity);
+      // apply rotspeed to move sphere based on forward
+      this.moveSphere.rotateOnAxis(this.forwardAxis, dt * this.velocity);
+    } else {
+      this.rockTurnTime -= dt;
+      const turnAmt = (this.rockTurnTime / this.rockTurnTimeMax) * this.rockTurnVal * 0.0006 * dt;
+      this.moveSphere.rotateOnAxis(this.yawAxis, turnAmt); // ease in
+    }
   }
 }
 

@@ -21,6 +21,7 @@ import {
 import { playSound, createLoopedSound } from './SoundPlayer';
 
 let soundtrack;
+let seagulls;
 let prevTime = 0;
 let totalTime = 0;
 let shipsSunk = 0;
@@ -278,10 +279,10 @@ function update(currentTime) {
     if (!soundtrack) {
       soundtrack = createLoopedSound('SOUNDTRACK');
       soundtrack.sound.start(0);
-      soundtrack.GAIN.gain.setValueAtTime(0.5, soundtrack.ctx.currentTime);
+      soundtrack.GAIN.gain.setValueAtTime(0.2, soundtrack.ctx.currentTime);
       soundtrack.playing = true;
     } else if (!soundtrack.playing) {
-      soundtrack.GAIN.gain.setValueAtTime(0.5, soundtrack.ctx.currentTime);
+      soundtrack.GAIN.gain.setValueAtTime(0.2, soundtrack.ctx.currentTime);
       soundtrack.playing = true;
     }
     totalTime += dt;
@@ -375,6 +376,12 @@ function reset() {
     soundtrack.GAIN.gain.setValueAtTime(0, soundtrack.ctx.currentTime);
     soundtrack.playing = false;
   }
+
+  if (!seagulls) {
+    seagulls = createLoopedSound('SEAGULLS');
+    seagulls.sound.start(0);
+  }
+  seagulls.GAIN.gain.setValueAtTime(0.5, seagulls.ctx.currentTime);
 
   requestAnimationFrame(update.bind(this));
 }

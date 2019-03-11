@@ -21,6 +21,7 @@ loadSound('ERROR', './Assets/Sound/error.wav');
 loadSound('FLAME', './Assets/Sound/flame.wav');
 loadSound('EXPLODE', './Assets/Sound/explode.wav');
 loadSound('SOUNDTRACK', './Assets/Sound/Holding_Steady.mp3');
+loadSound('SEAGULLS', './Assets/Sound/seagulls.mp3');
 
 // ERROR HANDLE IF THE FILE ISN"T LOADED
 

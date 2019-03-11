@@ -234,7 +234,7 @@ function update(currentTime) {
   // update all this on start screen
   // Split this into sep update functions pls
   if (!isGameOver) {
-    player.update(dt);
+    player.update(dt, rocks);
     cannonballPool.forEach(c => c.update(dt));
   }
 

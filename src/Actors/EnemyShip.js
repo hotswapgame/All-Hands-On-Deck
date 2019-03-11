@@ -40,7 +40,7 @@ class EnemyShip {
     this.deathWorldPos = new THREE.Vector3();
     this.hitPos = new THREE.Vector3();
 
-    // used to create a plane to track player
+    // Steering markers
     this.forwardMarker = new THREE.Object3D();
     this.forwardMarker.position.y = worldSize;
 
@@ -278,7 +278,7 @@ class EnemyShip {
 
     this.rocks.forEach((r) => {
       // Check if rock is close
-      if (r.getPosition().distanceTo(this.worldPos) < 40 + r.spawnBlockRadius) {
+      if (r.getPosition().distanceTo(this.worldPos) < 30 + r.spawnBlockRadius) {
         const rockPos = r.getPosition().normalize();
         const sideTest = sideCross.dot(rockPos);
         const frontTest = forwardCross.dot(rockPos);

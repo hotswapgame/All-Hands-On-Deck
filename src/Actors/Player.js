@@ -36,10 +36,19 @@ class Player {
 
     this.bobTime = 0;
     this.basePosition = worldSize - 4;
+
     // Set it to be on the edge of the world
     this.gameObject = new THREE.Object3D();
     this.gameObject.position.x = this.basePosition;
     this.gameObject.rotateY(Math.PI / 2);
+    // visualize rock hitbox CURRENTLY NOT USED
+    // this.rockHitRadius = 10;
+    // this.rockHit = new THREE.Mesh(
+    //   new THREE.SphereGeometry(this.rockHitRadius, 10, 10),
+    //   new THREE.MeshBasicMaterial({ wireframe: true })
+    // );
+    // this.rockHit.position.y = 10;
+    // this.gameObject.add(this.rockHit);
 
     // ship body
     this.ship = new THREE.Object3D();
@@ -294,6 +303,16 @@ class Player {
     this.moveSphere.add(this.gameObject);
     this.gameObject.position.x = worldSize - 4;
 
+    // Plane test markers
+    this.forwardMarker = new THREE.Object3D();
+    this.forwardMarker.position.y = worldSize;
+
+    this.leftMarker = new THREE.Object3D();
+    this.leftMarker.position.z = worldSize;
+
+    this.moveSphere.add(this.forwardMarker);
+    this.moveSphere.add(this.leftMarker);
+
     // Add top level obj to scene
     scene.add(this.moveSphere);
   }
@@ -546,15 +565,63 @@ class Player {
     this.ship.position.z = bobOffset;
   }
 
+  checkRockCollision(rocks) {
+    // Maybe do rock invulrablity window?
+    const forwardVec = new THREE.Vector3();
+    this.forwardMarker.getWorldPosition(forwardVec);
+
+    const leftVec = new THREE.Vector3();
+    this.leftMarker.getWorldPosition(leftVec);
+    // B′=B−A, C′=C−A, X′=X−A.
+    const forwardCross = new THREE.Vector3().crossVectors(this.worldPos, forwardVec).normalize();
+    const sideCross = new THREE.Vector3().crossVectors(this.worldPos, leftVec).normalize();
+
+    // this seems like a bottle neck
+    this.hitboxes.forEach((b) => {
+      // get this hitbox world position
+      const worldP = new THREE.Vector3();
+      b.getWorldPosition(worldP);
+
+      // Loop over rocks
+      rocks.forEach((r) => {
+        // Check if rock is hit
+        // we use good placement bc sometimes the rock will hit on spawn
+        if (r.isGoodPlacement
+            && r.getPosition().distanceTo(worldP) < this.rockHitRadius + r.hitRadius) {
+          console.log('HIT ROCK');
+          const rockPos = r.getPosition().normalize();
+
+          // +,- | -,-
+          // _ _ | _ _
+          //     |
+          // +,+ | -,+
+
+          const frontTest = sideCross.dot(rockPos); // for grid y
+          const sideTest = forwardCross.dot(rockPos); // for grid x
+
+          // // See if rock is in front
+          // console.log(sideTest, frontTest);
+          // if (sideTest < 0) {
+          //   // tweak to find angle of avoidance
+          //   if (frontTest < 0.1 && frontTest > -0.1) turn = frontTest > 0 ? -1 : 1;
+          // }
+        }
+      });
+    });
+  }
+
   // Central update
-  update(dt) {
+  update(dt, rocks) {
+    // Set this at the start of each frame, bc why not
+    // Actually it's so that we are using the proper matrix from last frame
+    this.updateWorldPosition();
+
     this.updateRoll(dt);
     this.updateFlames(dt);
     this.updateBubbles(dt);
     this.updateBob(dt);
 
-    // Set this once a frame so that enemies can use it
-    this.updateWorldPosition();
+    this.checkRockCollision(rocks);
 
     // always moving forward
     // switch to acceleration and velocity with a max speed

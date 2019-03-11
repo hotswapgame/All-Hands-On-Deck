@@ -278,7 +278,8 @@ class EnemyShip {
 
     this.rocks.forEach((r) => {
       // Check if rock is close
-      if (r.getPosition().distanceTo(this.worldPos) < 30 + r.spawnBlockRadius) {
+
+      if (r.getPosition().distanceTo(this.worldPos) < 40 + r.spawnBlockRadius) {
         const rockPos = r.getPosition().normalize();
         const sideTest = sideCross.dot(rockPos);
         const frontTest = forwardCross.dot(rockPos);

@@ -16,11 +16,17 @@ class Rock {
     this.rotZ = Math.random() * Math.PI;
 
     this.gameObject = new THREE.Object3D();
-    this.gameObject.position.x = worldSize - this.sizeHeight * 0.03;
+    this.restingPos = worldSize - this.sizeHeight * 0.03;
+    this.riseDiff = this.sizeHeight * -2;
+    this.gameObject.position.x = this.restingPos;
     this.gameObject.rotation.y = Math.PI / 2;
     this.gameObject.rotation.z = this.rotZ;
     this.posSphere.add(this.gameObject);
     this.scene.add(this.posSphere);
+
+    this.rockHolder = new THREE.Object3D();
+    this.rockHolder.position.z = this.riseDiff;
+    this.gameObject.add(this.rockHolder);
 
     this.spawnBlockRadius = this.sizeArea + 10;
     this.hitRadius = this.sizeArea * 0.8;
@@ -33,11 +39,14 @@ class Rock {
 
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {
-        const mat = new THREE.MeshLambertMaterial({ color: this.colorArr[Math.floor(Math.random()*1.99)] });
+        const mat = new THREE.MeshLambertMaterial({
+          color: this.colorArr[Math.floor(Math.random() * 1.99)],
+        });
         this.rock = new THREE.Mesh(geo, mat);
         this.rock.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
-        this.gameObject.add(this.rock);
+        this.rockHolder.add(this.rock);
       });
+
     getModel(`./Assets/Rocks/rocksOffset${rockModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshBasicMaterial({
@@ -46,11 +55,14 @@ class Rock {
         });
         this.rockOutline = new THREE.Mesh(geo, mat);
         this.rockOutline.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);
-        this.gameObject.add(this.rockOutline);
+        this.rockHolder.add(this.rockOutline);
       });
 
     this.randomlyPlace();
     this.isGoodPlacement = false;
+    this.isRising = false;
+    this.RISE_TIME_MAX = 1800;
+    this.riseTime = this.RISE_TIME_MAX;
   }
 
   getPosition() {
@@ -65,6 +77,7 @@ class Rock {
 
   fixPlacement() {
     this.isGoodPlacement = true;
+    this.rising = true;
   }
 
   randomlyPlace() {
@@ -77,6 +90,18 @@ class Rock {
 
     // Hack to make the position regenerate
     this.worldPos = undefined;
+  }
+
+  update(dt) {
+    if (this.rising) {
+      const timeRatio = (this.riseTime / this.RISE_TIME_MAX);
+      this.rockHolder.position.z = timeRatio * timeRatio * this.riseDiff;
+
+      this.riseTime -= dt;
+      if (this.riseTime <= 0) {
+        this.rising = false;
+      }
+    }
   }
 }
 

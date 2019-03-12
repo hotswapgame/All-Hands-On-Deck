@@ -290,17 +290,23 @@ class Player {
     // Why am I setting lights on the player? so what you look at is illuminated nice
     const light = new THREE.PointLight(0xFFFFFF, 0.2, 2000000);
     const light2 = new THREE.PointLight(0x000000, 0.5, 2000000);
-    const point = new THREE.PointLight(0xFFEEEE, 0.8, 2000000);
-    const ambient = new THREE.AmbientLight(0x222222);
+    this.mainLight = new THREE.PointLight(0xFFEEEE, 0.8, 20000);
+    this.ambient = new THREE.AmbientLight(0x222222);
 
     this.gameObject.add(light);
     this.gameObject.add(light2);
-    this.gameObject.add(point);
-    this.gameObject.add(ambient);
+    this.gameObject.add(this.mainLight);
+    this.gameObject.add(this.ambient);
 
     light.position.set(0, 200, 200);
     light2.position.set(0, -200, 200);
-    point.position.set(0, -10, 200);
+    this.mainLight.position.set(0, -10, 200);
+
+    // Light transition
+    this.lightStart = 20000;
+    this.lightTarget = 20000;
+    this.LIGHT_CHANGE_MAX = 5000;
+    this.lightChangeTime = 0;
 
     // Avoid gimble lock with rotation spheres
     this.moveSphere = new THREE.Object3D();
@@ -354,6 +360,32 @@ class Player {
   // Used for collisions and player tracking on enemies
   getPosition() {
     return this.worldPos.clone();
+  }
+
+  cycleLights(waveCount) {
+    const cycleNum = waveCount % 2;
+
+    this.lightTarget = (cycleNum === 1) ? 20000 : 800;
+    this.lightStart = this.mainLight.distance;
+    this.lightChangeTime = this.LIGHT_CHANGE_MAX;
+  }
+
+  updateLights(dt) {
+    if (this.lightChangeTime > 0) {
+      const timeRatio = 1 - (this.lightChangeTime / this.LIGHT_CHANGE_MAX);
+      const lightDiff = (this.lightTarget - this.lightStart);
+
+      // diff alg for diff directions
+      if (lightDiff < 0) {
+        this.mainLight.distance = this.lightStart + (Math.sqrt(timeRatio) * lightDiff);  
+      } else {
+        this.mainLight.distance = this.lightStart + (timeRatio * timeRatio * lightDiff);
+      }
+
+      this.lightChangeTime -= dt;
+    } else {
+      this.mainLight.distance = this.lightTarget;
+    }
   }
 
   getHit(ballPos) {
@@ -643,6 +675,7 @@ class Player {
     this.updateFlames(dt);
     this.updateBubbles(dt);
     this.updateBob(dt);
+    this.updateLights(dt);
 
     this.checkRockCollision(rocks);
 

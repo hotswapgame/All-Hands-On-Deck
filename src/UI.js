@@ -66,6 +66,19 @@ export function runGameOverSequence(shipSunk, treasureFound, timeTotal, timeFire
   }
 }
 
+export function cycleDayNight(cycleCount) {
+  const element = document.getElementById('screen-bg');
+  if (cycleCount % 2 === 0) {
+    element.style.backgroundPosition = '50% 0%';
+  } else {
+    element.style.backgroundPosition = '50% 100%';
+  }
+  if (element.classList.length === 0) {
+    element.classList.add(`change-scene-${cycleCount % 2}`);
+    setTimeout(() => element.classList.remove(`change-scene-${cycleCount % 2}`), 5000);
+  }
+}
+
 export default {
   runGameOverSequence,
   cycleInstructions,

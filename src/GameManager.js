@@ -15,7 +15,7 @@ import {
 
 import {
   cycleInstructions, hideStartScreen, showStartScreen,
-  runGameOverSequence, hideEndScreen, updateResetGradient
+  runGameOverSequence, hideEndScreen, updateResetGradient, cycleDayNight
 } from './UI';
 
 import { playSound, createLoopedSound } from './SoundPlayer';
@@ -37,7 +37,7 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 70000;
+const WAVE_MAX_TIME = 10000; // 70000;
 let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff
@@ -76,12 +76,12 @@ const camera = new THREE.OrthographicCamera(
 );
 
 const rocks = Array.from(
-  { length: 20 },
+  { length: 30 },
   () => new Rock(scene, WORLD_SIZE),
 );
 
 const treasurePool = Array.from(
-  { length: 1 },
+  { length: 5 },
   () => new Treasure(scene, WORLD_SIZE, rocks),
 );
 
@@ -287,6 +287,7 @@ function update(currentTime) {
       soundtrack.playing = true;
     }
     totalTime += dt;
+    rocks.forEach(r => r.update(dt));
     enemyPool.forEach(e => e.update(dt, player.getPosition()));
     treasurePool.forEach((t) => {
       t.checkTrigger(player.getPosition());
@@ -300,6 +301,11 @@ function update(currentTime) {
       // We stop having a difficulty curve after the wave config is empty
       if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
       else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
+
+      // Divide the wave count to make it cycle less often
+      cycleDayNight(waveCount);
+      // cycle lights as well
+      player.cycleLights(waveCount);
 
       // Divy out enemy spawns in the 1st 45 sec
       waveEnemySpawnWindow = (WAVE_MAX_TIME - 30000) / waveEnemiesToSpawn;
@@ -324,7 +330,7 @@ function update(currentTime) {
     if (!waveChestSpawned && waveTimer < (WAVE_MAX_TIME - WAVE_MAX_TIME / 100)) {
       waveChestSpawned = true;
       const treasure = treasurePool.find(t => !t.isActive);
-      treasure.spawn(player.moveSphere.rotation);
+      if (treasure) treasure.spawn(player.moveSphere.rotation);
     }
 
     // screen shake

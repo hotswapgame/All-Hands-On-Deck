@@ -3,6 +3,7 @@ import { any } from 'ramda';
 
 import { GAME_TYPES } from '../Constants';
 import { getModel } from '../AssetManager';
+import { playSound } from '../SoundPlayer';
 
 class Treasure {
   constructor(scene, worldSize, rocks) {
@@ -151,6 +152,7 @@ class Treasure {
         && this.triggerAnimationMax / 3 > this.triggerAnimationTime) {
       // do that sweet end animation code
       this.isOpening = true;
+      playSound('COINS');
     }
   }
 

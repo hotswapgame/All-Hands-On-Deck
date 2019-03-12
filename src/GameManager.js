@@ -235,7 +235,7 @@ function update(currentTime) {
   // update all this on start screen
   // Split this into sep update functions pls
   if (!isGameOver) {
-    player.update(dt, rocks);
+    player.update(dt, rocks, !isStartSeq); // only collide rocks when not start seq
     cannonballPool.forEach(c => c.update(dt));
   }
 
@@ -595,6 +595,7 @@ export function init(input$) {
         treasurePool.forEach((t) => {
           if (t.keyTurnCheck()) {
             // score
+            treasureCount += 1;
           }
         });
       },

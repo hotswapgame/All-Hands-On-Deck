@@ -629,7 +629,7 @@ class Player {
       rocks.forEach((r) => {
         // Check if rock is hit
         // we use good placement bc sometimes the rock will hit on spawn
-        if (r.isGoodPlacement
+        if (r.isGoodPlacement && !r.isRising
             && r.getPosition().distanceTo(worldP) < this.rockHitRadius + r.hitRadius) {
 
           const rockPos = r.getPosition().normalize();
@@ -666,7 +666,7 @@ class Player {
   }
 
   // Central update
-  update(dt, rocks) {
+  update(dt, rocks, shouldCollideRocks) {
     // Set this at the start of each frame, bc why not
     // Actually it's so that we are using the proper matrix from last frame
     this.updateWorldPosition();
@@ -677,7 +677,7 @@ class Player {
     this.updateBob(dt);
     this.updateLights(dt);
 
-    this.checkRockCollision(rocks);
+    if (shouldCollideRocks) this.checkRockCollision(rocks);
 
     if (this.rockTurnTime <= 0) {
       // always moving forward

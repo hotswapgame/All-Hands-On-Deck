@@ -215,6 +215,7 @@ function checkCollisions() {
           activeEnemies -= 1;
           playSound('EXPLODE');
           player.addFlame(1500);
+          player.slowSpeed(0.6);
           startShake(2, 200);
           shipsSunk += 1;
         }

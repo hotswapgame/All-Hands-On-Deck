@@ -416,6 +416,10 @@ class Player {
     this.backSail.geometry.computeFaceNormals();
   }
 
+  slowSpeed(percent) {
+    this.velocity *= (1 - percent);
+  }
+
   addRoll(impulse) {
     this.rollSpeed += impulse;
   }

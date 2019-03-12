@@ -162,15 +162,16 @@ class Treasure {
           const posCheck = r => (r.getPosition().distanceTo(this.worldPos)
                                  < 25 + r.spawnBlockRadius);
           this.passedRockCheck = !any(posCheck)(this.rocks);
+          if (!this.passedRockCheck) {
+            // start with player position
+            this.moveSphere.rotation.set(this.spawnRot.x, this.spawnRot.y, this.spawnRot.z);
 
-          // start with player position
-          this.moveSphere.rotation.set(this.spawnRot.x, this.spawnRot.y, this.spawnRot.z);
-
-          // Spawn opposite of player
-          this.moveSphere.rotateOnAxis(
-            this.forwardAxis,
-            Math.PI / 2 + (Math.PI / 4 * Math.random())
-          );
+            // Spawn opposite of player
+            this.moveSphere.rotateOnAxis(
+              this.forwardAxis,
+              Math.PI / 2 + (Math.PI / 4 * Math.random())
+            );
+          }
         }
       }
       const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));

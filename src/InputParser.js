@@ -114,6 +114,7 @@ export function getAllInputSwap(input$) {
     getInputChange(input$, isRudder, INPUT_TYPES.RUDDER),
     getInputChange(input$, isHatch, INPUT_TYPES.HATCH),
     getInputChange(input$, isWick, INPUT_TYPES.WICK),
-    getInputChange(input$, isFlame, INPUT_TYPES.FLAME)
+    getInputChange(input$, isFlame, INPUT_TYPES.FLAME),
+    getInputChange(input$, isKey, INPUT_TYPES.KEY)
   );
 }

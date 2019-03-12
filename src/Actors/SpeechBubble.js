@@ -10,6 +10,7 @@ export const SPRITES = {
     NO_AMMO: texLoader.load('./Assets/SpeechBubbles/sb_l_no.png'),
     RUDDER: texLoader.load('./Assets/SpeechBubbles/sb_l_wheel.png'),
     WICK: texLoader.load('./Assets/SpeechBubbles/sb_l_wick.png'),
+    KEY: texLoader.load('./Assets/SpeechBubbles/sb_l_key.png'),
   },
 
   STARBOARD: {
@@ -19,6 +20,7 @@ export const SPRITES = {
     NO_AMMO: texLoader.load('./Assets/SpeechBubbles/sb_r_no.png'),
     RUDDER: texLoader.load('./Assets/SpeechBubbles/sb_r_wheel.png'),
     WICK: texLoader.load('./Assets/SpeechBubbles/sb_r_wick.png'),
+    KEY: texLoader.load('./Assets/SpeechBubbles/sb_r_key.png'),
   },
 };
 

@@ -31,6 +31,7 @@ export const INPUT_TYPES = {
   SAIL: 'SAIL',
   RUDDER: 'RUDDER',
   FLAME: 'FLAME',
+  KEY: 'KEY',
 };
 
 export const SHIP_DIRECTIONS = {

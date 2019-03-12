@@ -15,7 +15,7 @@ import {
 
 import {
   cycleInstructions, hideStartScreen, showStartScreen,
-  runGameOverSequence, hideEndScreen
+  runGameOverSequence, hideEndScreen, updateResetGradient
 } from './UI';
 
 import { playSound, createLoopedSound } from './SoundPlayer';
@@ -25,7 +25,7 @@ let seagulls;
 let prevTime = 0;
 let totalTime = 0;
 let shipsSunk = 0;
-let score = 0;
+let treasureCount = 0;
 let isGameOver = false;
 
 // Use this to give players grace period at start
@@ -47,7 +47,7 @@ const startSequence = ['SAIL', 'RUDDER', 'HATCH', 'WICK'];
 
 // reset stuff
 let resetPressCount = 0;
-const RESET_PRESS_MAX = 5;
+const RESET_PRESS_MAX = 15;
 
 let screen;
 
@@ -349,7 +349,7 @@ function reset() {
   prevTime = 0;
   totalTime = 0;
   shipsSunk = 0;
-  score = 0;
+  treasureCount = 0;
   isGameOver = false;
 
   isStartSeq = true; // ????
@@ -406,6 +406,7 @@ export function init(input$) {
       treasurePool.forEach((t) => {
         if (t.keyTurnCheck()) {
           // score
+          treasureCount += 1;
         }
       });
     }
@@ -458,7 +459,13 @@ export function init(input$) {
     }
 
     if (e.keyCode === 70) {
-      player.calmFire(500);
+      if (isGameOver) {
+        resetPressCount += 1;
+        if (resetPressCount >= RESET_PRESS_MAX) reset();
+        updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
+      } else {
+        player.calmFire(600);
+      }
     }
   };
 
@@ -557,10 +564,13 @@ export function init(input$) {
     .filter(data => data.output)
     .subscribe({
       next: () => {
-        if (isGameOver) resetPressCount += 1;
-        else player.calmFire(600);
-
-        if (resetPressCount >= RESET_PRESS_MAX) reset();
+        if (isGameOver) {
+          resetPressCount += 1;
+          if (resetPressCount >= RESET_PRESS_MAX) reset();
+          updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
+        } else {
+          player.calmFire(600);
+        }
       },
       error: console.log,
       complete: console.log,

@@ -8,7 +8,6 @@ export function cycleInstructions(instructionCounter) {
   elements[instructionCounter].classList.add('active');
 }
 
-
 export function showStartScreen() {
   document.getElementById('start-screen').classList.add('active');
 }
@@ -28,12 +27,24 @@ function revealStat(i) {
   element.classList.add('active');
 }
 
-export function runGameOverSequence(shipSunk, cannonsFired, timeTotal, timeFire) {
+export function updateResetGradient(resetPercent) {
+  const bg = document.getElementById('game-over');
+  const pos1 = resetPercent * 80;
+  const pos2 = 50 + resetPercent * 50;
+  bg.style.background = `linear-gradient(
+    0deg,
+    rgba(20, 0, 0, 1.0) 0%,
+    rgba(120, 40, 40, 0.8) ${pos1}%,
+    rgba(0, 0, 0, 0) ${pos2}%)
+  `;
+}
+
+export function runGameOverSequence(shipSunk, treasureFound, timeTotal, timeFire) {
   const element = document.getElementById('game-over'); // clement you should be more specifc than just 'element'
   element.classList.add('active');
 
   document.getElementById('sunk').getElementsByClassName('stat')[0].innerHTML = shipSunk;
-  document.getElementById('cannon').getElementsByClassName('stat')[0].innerHTML = cannonsFired;
+  document.getElementById('treasure').getElementsByClassName('stat')[0].innerHTML = treasureFound;
 
   let secA = Math.floor((timeTotal % 60000) / 1000);
   secA = ('0' + secA).slice(-2);
@@ -44,9 +55,6 @@ export function runGameOverSequence(shipSunk, cannonsFired, timeTotal, timeFire)
   secB = ('0' + secB).slice(-2);
   const minB = Math.floor(timeFire / 60000);
   document.getElementById('fire').getElementsByClassName('stat')[0].innerHTML = minB + ':' + secB;
-
-  const ratio = timeFire / timeTotal * 100;
-  document.getElementById('fire-proportion').innerHTML = '<div id=\'ship-ok\' style=\'width:' + (100 - ratio) + '%;\'></div><div id=\'ship-fire\' style=\'width:' + ratio + '%;\'></div>';
 
   const elements = document.getElementsByClassName('stat-box');
   // why did you use just five, and how did it work?

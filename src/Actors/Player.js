@@ -353,7 +353,7 @@ class Player {
 
   // Used for collisions and player tracking on enemies
   getPosition() {
-    return this.worldPos;
+    return this.worldPos.clone();
   }
 
   getHit(ballPos) {

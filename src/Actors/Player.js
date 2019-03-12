@@ -502,8 +502,8 @@ class Player {
       for (let i = 0; i < ammo; i += 1) {
         let rotOffset = 0;
 
-        if (i === 0) rotOffset = side === 'PORT' ? 0.05 : -0.05;
-        if (i === 2) rotOffset = side === 'PORT' ? -0.05 : 0.05;
+        if (i === 0) rotOffset = side === 'PORT' ? 0.1 : -0.1;
+        if (i === 2) rotOffset = side === 'PORT' ? -0.1 : 0.1;
         this.fireCannon(
           side,
           this.moveSphere.rotation,

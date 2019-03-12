@@ -37,7 +37,7 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 10000; // 70000;
+const WAVE_MAX_TIME = 70000; // 70000;
 let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff

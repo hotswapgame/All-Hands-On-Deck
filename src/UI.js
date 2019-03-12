@@ -31,11 +31,12 @@ export function updateResetGradient(resetPercent) {
   const bg = document.getElementById('game-over');
   const pos1 = resetPercent * 80;
   const pos2 = 50 + resetPercent * 50;
+  const pos0 = (1-resetPercent) * -10;
   bg.style.background = `linear-gradient(
     0deg,
-    rgba(20, 0, 0, 1.0) 0%,
-    rgba(120, 40, 40, 0.8) ${pos1}%,
-    rgba(0, 0, 0, 0) ${pos2}%)
+    rgba(20, 0, 0, 1.0) ${pos0}%,
+    rgba(100, 20, 10, 0.7) ${pos1}%,
+    rgba(100, 20, 10, 0) ${pos2}%)
   `;
 }
 

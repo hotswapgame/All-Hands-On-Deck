@@ -232,7 +232,6 @@ class Player {
     this.fireCannon = fireCannon; // passed in to use cannon pool
     // names for these need to match the constants
     this.ammo = { PORT: 0, STARBOARD: 0 };
-    this.cannonsFired = 0;
 
     // [back, mid, front]
     this.CANNON_POS = [0, 0.025, 0.05];
@@ -465,7 +464,6 @@ class Player {
       playSound('CANNON');
       // Filthy gosh darn for loop
       for (let i = 0; i < ammo; i += 1) {
-        this.cannonsFired += 1;
         let rotOffset = 0;
 
         if (i === 0) rotOffset = side === 'PORT' ? 0.05 : -0.05;
@@ -554,7 +552,7 @@ class Player {
 
     if (this.onFire && this.fireTime >= this.fireMax) {
       // trigger game over here
-      this.gameOverCallback(this.cannonsFired, this.fireTimeTotal);
+      this.gameOverCallback(this.fireTimeTotal);
     }
   }
 

@@ -109,9 +109,9 @@ const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
   if (cannonball) cannonball.playerFire(side, rotation, position, 0.03, cannonRotOffset);
 };
 
-function triggerGameOver(cannonsFired, fireTime) {
+function triggerGameOver(fireTime) {
   isGameOver = true;
-  runGameOverSequence(shipsSunk, cannonsFired, totalTime, fireTime);
+  runGameOverSequence(shipsSunk, treasureCount, totalTime, fireTime);
 }
 
 function startShake(intensity, time) {

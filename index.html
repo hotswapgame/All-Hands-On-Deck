@@ -54,6 +54,7 @@
     </div>
 
     <div id="screen"></div>
+    <div id="screen-bg"></div>
   </body>
 
   <script>
@@ -63,5 +64,24 @@
     const DelimiterParser = require('@serialport/parser-delimiter');
 
     require('./build/app.js');
+
+    let changeSceneCount = 0;
+    window.onkeypress = function(e) {
+      if (e.key === " ") {
+        let element = document.getElementById('screen-bg');
+        if (changeSceneCount%2===0) {
+          element.style.backgroundPosition = '50% 0%';
+        } else {
+          element.style.backgroundPosition = '50% 100%';
+        }
+        if (element.classList.length==0) {
+          element.classList.add('change-scene-'+changeSceneCount%2);
+          setTimeout(function() {
+            element.classList.remove('change-scene-'+(changeSceneCount%2));
+            changeSceneCount++;
+          }, 5000);
+        }
+      }
+    }
   </script>
 </html>

@@ -109,7 +109,7 @@ h2 {
 
 /* GAME OVER SCREEN */
 #game-over {
-  background: linear-gradient(0deg, rgba(20, 0, 0, 1.0) 0%, rgba(120, 40, 40, 0.8) 80%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(0deg, rgba(20, 0, 0, 1.0) 0%, rgba(100, 20, 10, 0.7) 80%, rgba(100, 20, 10, 0) 100%);
 }
 
 #game-over-headline {
@@ -194,12 +194,69 @@ h2 {
   top: 0;
   left: 0;
 
+  z-index: 1;
+}
+
+#screen-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
   background-image: linear-gradient(
-    0deg,
-    rgba(242, 208, 123, 0.7),
-    rgba(242, 208, 123, 0.7),
-    rgba(80, 0, 25, 0.8)
+    180deg,
+    rgba(0, 0, 50, 0.8),
+    rgba(80, 0, 25, 0.8),
+    rgba(242, 208, 123, 0.7)
+  );
+  background-position: 50% 100%;
+
+  background-size: 100% 400%;
+
+  z-index: -1;
+}
+
+@keyframes GradientA {
+	0% {
+		background-position: 50% 100%;
+  }
+	100% {
+		background-position: 50% 0%;
+	}
+}
+
+@keyframes GradientB {
+	0% {
+		background-position: 50% 0%;
+  }
+	100% {
+		background-position: 50% 100%;
+	}
+}
+
+#screen-bg.change-scene-0 {
+  background-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 50, 0.8),
+    rgba(80, 0, 25, 0.8),
+    rgba(242, 208, 123, 0.7)
   );
 
-  z-index: 1;
+  background-size: 100% 400%;
+  animation: GradientA 4.5s ease-in-out;
+  animation-iteration-count: 1;
+}
+
+#screen-bg.change-scene-1 {
+  background-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 50, 0.8),
+    rgba(80, 0, 25, 0.8),
+    rgba(242, 208, 123, 0.7)
+  );
+
+  background-size: 100% 400%;
+  animation: GradientB 4.5s ease-in-out;
+  animation-iteration-count: 1;
 }

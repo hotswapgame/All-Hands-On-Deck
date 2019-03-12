@@ -303,9 +303,9 @@ function update(currentTime) {
       else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
 
       // Divide the wave count to make it cycle less often
-      cycleDayNight(waveCount);
+      if (waveCount !== 0) cycleDayNight(waveCount + 1);
       // cycle lights as well
-      player.cycleLights(waveCount);
+      player.cycleLights(waveCount + 1);
 
       // Divy out enemy spawns in the 1st 45 sec
       waveEnemySpawnWindow = (WAVE_MAX_TIME - 30000) / waveEnemiesToSpawn;

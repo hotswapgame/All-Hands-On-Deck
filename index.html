@@ -35,7 +35,7 @@
           <p class="stat">25</p>
         </div>
         <div id="treasure" class="stat-box">
-            <p class="stat-heading">treasures found</p>
+            <p class="stat-heading">treasures collected</p>
             <p id="treasure-stat" class="stat">6</p>
         </div>
         <div id="time" class="stat-box">
@@ -53,6 +53,16 @@
       </div>
     </div>
 
+    <div id="screen-hud" class="hud">
+      <div id="enemy-counter">
+        <div class="heading">enemies</div>
+        <div id="enemy-count" class="counter">0</div>
+      </div>
+      <div id="treasure-counter">
+        <div class="heading">treasure</div>
+        <div id="treasure-count" class="counter">0</div>
+      </div>
+    </div>
     <div id="screen"></div>
     <div id="screen-bg"></div>
   </body>
@@ -64,5 +74,33 @@
     const DelimiterParser = require('@serialport/parser-delimiter');
 
     require('./build/app.js');
+
+    let enemyCount = 0;
+    let treasureCount = 0;
+    function increaseHUDCount(c, id) {
+      const element = document.getElementById(id);
+      element.innerHTML = c;
+      if (element.classList.contains('active')) {
+        element.classList.remove('active');
+      }
+      element.classList.add('active');
+      setTimeout(function() {
+        if (element.classList.contains('active')) {
+          element.classList.remove('active');
+        } 
+      }, 200);
+    }
+
+    window.onkeypress = function(e) {
+      if (e.key === "1") {
+        enemyCount++;
+        increaseHUDCount(enemyCount, 'enemy-count');
+      }
+      if (e.key === "2") {
+        treasureCount++;
+        increaseHUDCount(treasureCount, 'treasure-count');
+      }
+    }
+
   </script>
 </html>

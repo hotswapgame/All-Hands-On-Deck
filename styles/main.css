@@ -161,6 +161,15 @@ h2 {
   line-height: 1em;
 }
 
+#sunk .stat-heading, #treasure .stat-heading {
+  font-size: 3.0vh;
+}
+
+#sunk .stat, #treasure .stat {
+  font-size: 8vh;
+  margin-top: 0.2em;
+}
+
 #treasure-stat {
   color: #FFFFAA;
   animation: glow 1.5s ease infinite;
@@ -277,3 +286,87 @@ h2 {
   animation: GradientB 4.5s ease-in-out;
   animation-iteration-count: 1;
 }
+
+#screen-hud {
+  position: absolute;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  margin-top: 1em;
+  text-align: center;
+}
+
+#enemy-counter {
+  position: absolute;
+  width: 15vw;
+  top: 0;
+  left: 0;
+  margin: 1em;
+}
+
+#treasure-counter {
+  position: absolute;
+  width: 15vw;
+  top: 0;
+  right: 0;
+  margin: 1em;
+}
+
+.hud .heading {
+  position: relative;
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 1.8vh;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-shadow: 0.00em 0.00em 0.3em rgba(255, 255, 255, 0.7);
+  line-height: 1em;
+}
+
+.hud .counter {
+  padding: 0;
+  margin-top: 0.75em;
+  text-transform: uppercase;
+  font-size: 5vh;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-shadow: 0.00em 0.00em 0.3em rgba(255, 255, 255, 1.0);
+  line-height: 1em;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+#enemy-count.active {
+  animation: increaseCountA 200ms ease-out;
+  animation-iteration-count: 1;
+}
+
+#treasure-count.active {
+  animation: increaseCountB 200ms ease-out;
+  animation-iteration-count: 1;
+}
+
+@keyframes increaseCountA {
+  20% {
+    text-shadow: 0 0 0.7em #FF0000, 0 0 1em #FFFFFF;
+    font-size: 7vh;
+  }
+	100% {
+    text-shadow: 0.00em 0.00em 0.3em rgba(255, 255, 255, 1.0);
+    font-size: 5vh;
+	}
+}
+
+@keyframes increaseCountB {
+  20% {
+      text-shadow: 0 0 0.7em #FFAA00, 0 0 1em #FFFFFF;
+      font-size: 7vh;
+    }
+    100% {
+      text-shadow: 0.00em 0.00em 0.3em rgba(255, 255, 255, 1.0);
+      font-size: 5vh;
+    }
+  }

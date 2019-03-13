@@ -152,8 +152,12 @@ class Treasure {
         && this.triggerAnimationMax / 3 > this.triggerAnimationTime) {
       // do that sweet end animation code
       this.isOpening = true;
+
       playSound('COINS');
+      return true;
     }
+
+    return false;
   }
 
   update(dt) {

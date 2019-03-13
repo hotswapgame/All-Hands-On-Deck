@@ -483,8 +483,8 @@ export function init(input$) {
       (prev, value) => {
         let delta = 0;
         const valChange = prev.value - value;
-        if (valChange > 0.05) delta = -0.000005;
-        if (valChange < -0.05) delta = 0.000005;
+        if (valChange > 0.05) delta = -0.000007;
+        if (valChange < -0.05) delta = 0.000007; // 0.0003
         return {
           delta,
           value,
@@ -506,8 +506,8 @@ export function init(input$) {
       (prev, value) => {
         let delta = 0;
         const valChange = prev.value - value;
-        if (valChange > 0.05) delta = 0.000001;
-        if (valChange < -0.05) delta = -0.000001;
+        if (valChange > 0.05) delta = 0.000002;
+        if (valChange < -0.05) delta = -0.000002;
         return {
           delta,
           value,
@@ -596,6 +596,7 @@ export function init(input$) {
           if (t.keyTurnCheck()) {
             // score
             treasureCount += 1;
+            console.log('treasure');
           }
         });
       },

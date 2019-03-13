@@ -26,7 +26,7 @@ class Player {
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
     this.worldPos = new THREE.Vector3(0, 0, 0); // stores world location
-    this.TURN_MAX = 0.0003;
+    this.TURN_MAX = 0.0004;
 
     this.rollOffset = 0;
     this.turnRollOffset = 0;

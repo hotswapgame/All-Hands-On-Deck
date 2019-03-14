@@ -5,6 +5,8 @@ import { GAME_TYPES } from '../Constants';
 import { getModel } from '../AssetManager';
 import { playSound } from '../SoundPlayer';
 
+import TreasureParticles from './TreasureParticles';
+
 class Treasure {
   constructor(scene, worldSize, rocks) {
     this.type = GAME_TYPES.TREASURE;
@@ -105,6 +107,8 @@ class Treasure {
     this.gameObject.visible = false;
     this.isActive = false;
     this.id = this.gameObject.id; // for collisions!
+
+    this.particles = new TreasureParticles(this.gameObject, new THREE.Vector3(0, 0, 0));
   }
 
   spawn(spawnRot) {
@@ -180,6 +184,8 @@ class Treasure {
           }
         }
       }
+
+      this.particles.update(dt);
       const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));
       // some hard coded position bs
       // Tweak these with ease

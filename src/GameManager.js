@@ -391,6 +391,14 @@ function reset() {
   enemySpawnSide = -1;
   activeEnemies = 0;
 
+  // Init wave related stuff
+  waveCount = 0;
+  waveEnemiesToSpawn = 0;
+  waveChestSpawned = true;
+  enemySpawnTimer = 0;
+  waveEnemySpawnWindow = 0;
+  waveTimer = 5000;
+
   // reset ui?
   cycleInstructions(startSeqCount);
   // Hide end screen
@@ -399,9 +407,15 @@ function reset() {
 
   // Reset player?
   player.reset();
-  // reset enemy and cannonball pool
+  // reset enemy, treasure, and cannonball pool
   enemyPool.forEach(e => e.hide());
+  treasurePool.forEach(t => t.hide());
   cannonballPool.forEach(c => c.hide());
+
+  // Remove rocks from scene and reset array
+  shouldGenRocks = false;
+  rocks.forEach(r => scene.remove(r.posSphere)); // remove from scene
+  rocks.splice(0, rocks.length); // clean out rocks array
 
   // Something something soundtrack
   if (soundtrack) {

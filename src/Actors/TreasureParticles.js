@@ -7,18 +7,18 @@ class TreasureParticles {
     parent.add(this.gameObject);
 
     // Create particles here
-    this.particleGeo = new THREE.SphereGeometry(5, 4, 2);
+    this.particleGeo = new THREE.SphereGeometry(3, 4, 2);
     this.particles = Array.from(
-      { length: 170 },
+      { length: 500 },
       () => ({
         mesh: new THREE.Mesh(
           this.particleGeo,
-          new THREE.MeshBasicMaterial({ color: 0xFFFFAA, transparent: true })
+          new THREE.MeshBasicMaterial({ color: 0xFFFFCC, transparent: true })
         ),
         initialRot: Math.random() * Math.PI / 2,
         rotSpeed: (Math.random() + 0.2) / 5000,
-        intialHeight: Math.random() * 70,
-        radius: 10 + Math.random() * 6,
+        initialHeight: Math.pow(Math.random(), 1.8) * 80,
+        radius: 26 + Math.random() * 1,
       })
     );
     this.particles.forEach((p) => {
@@ -44,9 +44,10 @@ class TreasureParticles {
     this.particles.forEach((p) => {
       const newRot = p.initialRot + this.time * Math.PI * 2 * p.rotSpeed;
 
-      p.mesh.position.x = p.intialHeight;
-      p.mesh.position.y = Math.cos(newRot) * p.radius;
-      p.mesh.position.z = Math.sin(newRot) * p.radius;
+      const taperFactor = (0.3+0.7*(1-Math.pow(p.initialHeight/80, 0.3)));
+      p.mesh.position.x = p.initialHeight;
+      p.mesh.position.y = Math.cos(newRot) * (p.radius * taperFactor);
+      p.mesh.position.z = Math.sin(newRot) * (p.radius * taperFactor);
 
       // p.mesh.scale.x = (1 - s) * 0.3;
       // p.mesh.scale.y = (1 - s) * 0.3;
@@ -55,7 +56,7 @@ class TreasureParticles {
       // p.mesh.material.color.r = 1 - s + 0.3;
       // p.mesh.material.color.g = (1 - s) * 0.5;
       // p.mesh.material.color.b = 0;
-      p.mesh.material.opacity = 0.3 + (1 - p.intialHeight / 70);
+      p.mesh.material.opacity = 0.2 + 0.8*(1 - p.initialHeight / 80);
     });
   }
 }

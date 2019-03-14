@@ -99,6 +99,8 @@ class Treasure {
     this.openTime = this.openTimeMax;
     this.isHiding = false;
 
+    this.canOpenWindow = this.triggerAnimationMax / 4;
+
     // this is the same thing as in all other actors
     this.moveSphere = new THREE.Object3D();
     this.moveSphere.add(this.gameObject);
@@ -153,7 +155,7 @@ class Treasure {
 
   keyTurnCheck() {
     if (!this.isOpening && this.isTriggered
-        && this.triggerAnimationMax / 3 > this.triggerAnimationTime) {
+        && this.canOpenWindow > this.triggerAnimationTime) {
       // do that sweet end animation code
       this.isOpening = true;
 
@@ -183,6 +185,15 @@ class Treasure {
             );
           }
         }
+      }
+
+      // feedback for opening
+      if (this.canOpenWindow > this.triggerAnimationTime) {
+        this.chestBodyOffset.visible = true;
+        this.chestTopOffset.visible = true;
+      } else {
+        this.chestBodyOffset.visible = false;
+        this.chestTopOffset.visible = false;
       }
 
       this.particles.update(dt);

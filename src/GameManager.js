@@ -37,7 +37,7 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 70000; // 70000;
+const WAVE_MAX_TIME = 45000; // 45000;
 let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff
@@ -75,10 +75,8 @@ const camera = new THREE.OrthographicCamera(
   1000
 );
 
-const rocks = Array.from(
-  { length: 30 },
-  () => new Rock(scene, WORLD_SIZE),
-);
+let shouldGenRocks = false;
+const rocks = [];
 
 const treasurePool = Array.from(
   { length: 5 },
@@ -296,11 +294,38 @@ function update(currentTime) {
 
     checkCollisions();
 
+    // Filter hidden rocks from array
+    if (shouldGenRocks) {
+      let rockToRemove;
+
+      rocks.forEach((r, i) => {
+        if (r.isSunken) rockToRemove = i;
+      });
+
+      if (rockToRemove !== undefined) rocks.splice(rockToRemove, 1);
+    }
+
+    if (shouldGenRocks && rocks.length === 0) {
+      // some code
+      // actually need a for loop here :/
+      for (let i = 0; i < 30; i += 1) {
+        rocks.push(new Rock(scene, WORLD_SIZE));
+      }
+
+      shouldGenRocks = false;
+    }
+
     // Wave Change Logic
     if (waveTimer < 0) {
       // We stop having a difficulty curve after the wave config is empty
       if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
       else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
+
+      // Spawn new rocks
+      if (waveCount % 4 === 0) {
+        shouldGenRocks = true;
+        rocks.forEach(r => r.startSinking());
+      }
 
       // Divide the wave count to make it cycle less often
       if (waveCount !== 0) cycleDayNight(waveCount + 1);

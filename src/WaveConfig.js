@@ -1,4 +1,11 @@
 export const WAVE_SIZES = [
+  // Debug waves
+  // 1,
+  // 1,
+  // 1,
+  // 1,
+  // 1,
+  // actual curve
   2,
   3,
   4,

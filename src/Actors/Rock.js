@@ -17,7 +17,6 @@ class Rock {
 
     this.gameObject = new THREE.Object3D();
     this.restingPos = worldSize - this.sizeHeight * 0.03;
-    this.riseDiff = this.sizeHeight * -2;
     this.gameObject.position.x = this.restingPos;
     this.gameObject.rotation.y = Math.PI / 2;
     this.gameObject.rotation.z = this.rotZ;
@@ -63,6 +62,12 @@ class Rock {
     this.isRising = false;
     this.RISE_TIME_MAX = 1800;
     this.riseTime = this.RISE_TIME_MAX;
+    this.riseDiff = this.sizeHeight * -2;
+
+    // for wave transition sink code
+    this.isSunken = false;
+    this.sinking = false;
+    this.sinkTime = this.RISE_TIME_MAX;
   }
 
   getPosition() {
@@ -73,6 +78,10 @@ class Rock {
     }
 
     return this.worldPos.clone();
+  }
+
+  startSinking() {
+    this.sinking = true;
   }
 
   fixPlacement() {
@@ -100,6 +109,18 @@ class Rock {
       this.riseTime -= dt;
       if (this.riseTime <= 0) {
         this.rising = false;
+      }
+    }
+
+    if (this.sinking) {
+      const timeRatio = 1 - (this.sinkTime / this.RISE_TIME_MAX);
+      this.rockHolder.position.z = timeRatio * timeRatio * this.riseDiff;
+
+      this.sinkTime -= dt;
+      if (this.sinkTime <= 0) {
+        this.sinking = false;
+        this.isSunken = true;
+        this.scene.remove(this.posSphere); // make sure the rock gets deleted
       }
     }
   }

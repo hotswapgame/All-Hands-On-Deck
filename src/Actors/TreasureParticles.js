@@ -17,7 +17,7 @@ class TreasureParticles {
         ),
         initialRot: Math.random() * Math.PI / 2,
         rotSpeed: (Math.random() + 0.2) / 5000,
-        initialHeight: Math.pow(Math.random(), 1.8) * 80,
+        initialHeight: Math.random() * 80,
         radius: 26 + Math.random() * 1,
       })
     );
@@ -44,8 +44,8 @@ class TreasureParticles {
     this.particles.forEach((p) => {
       const newRot = p.initialRot + this.time * Math.PI * 2 * p.rotSpeed;
 
-      const taperFactor = (0.3+0.7*(1-Math.pow(p.initialHeight/80, 0.3)));
-      p.mesh.position.x = p.initialHeight;
+      p.mesh.position.x = Math.pow(((p.initialHeight + this.time/200)%80)/80, 1.8)*80;
+      const taperFactor = (0.3+0.7*(1-Math.pow(p.mesh.position.x/80, 0.3)));
       p.mesh.position.y = Math.cos(newRot) * (p.radius * taperFactor);
       p.mesh.position.z = Math.sin(newRot) * (p.radius * taperFactor);
 
@@ -56,7 +56,7 @@ class TreasureParticles {
       // p.mesh.material.color.r = 1 - s + 0.3;
       // p.mesh.material.color.g = (1 - s) * 0.5;
       // p.mesh.material.color.b = 0;
-      p.mesh.material.opacity = 0.2 + 0.8*(1 - p.initialHeight / 80);
+      p.mesh.material.opacity = 0.8*(1 - p.mesh.position.x / 80);
     });
   }
 }

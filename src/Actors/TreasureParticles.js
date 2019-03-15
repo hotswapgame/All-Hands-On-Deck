@@ -45,7 +45,7 @@ class TreasureParticles {
       const newRot = p.initialRot + this.time * Math.PI * 2 * p.rotSpeed;
 
       p.mesh.position.x = Math.pow(((p.initialHeight + this.time/200)%80)/80, 1.8)*80;
-      const taperFactor = (0.3+0.7*(1-Math.pow(p.mesh.position.x/80, 0.3)));
+      const taperFactor = (0.3+0.7*(1-Math.pow(p.mesh.position.x/80, 0.4)));
       p.mesh.position.y = Math.cos(newRot) * (p.radius * taperFactor);
       p.mesh.position.z = Math.sin(newRot) * (p.radius * taperFactor);
 

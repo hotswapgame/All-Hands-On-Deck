@@ -8,6 +8,21 @@ export function cycleInstructions(instructionCounter) {
   elements[instructionCounter].classList.add('active');
 }
 
+export function increaseHUDCount(c, id) {
+  const element = document.getElementById(id);
+  element.innerHTML = c;
+  if (element.classList.contains('active')) {
+    element.classList.remove('active');
+  }
+
+  element.classList.add('active');
+  setTimeout(() => {
+    if (element.classList.contains('active')) {
+      element.classList.remove('active');
+    }
+  }, 200);
+}
+
 export function showStartScreen() {
   document.getElementById('start-screen').classList.add('active');
 }

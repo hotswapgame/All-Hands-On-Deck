@@ -246,7 +246,7 @@ class Player {
       new Flame(this.gameObject, new THREE.Vector3(0, -5, 7), this.fireMax, false),
     ];
 
-    this.deathFlashStart = 17000;
+    this.deathFlashStart = 16000;
     this.deathFlashMod = 150;
     this.isDeathWarn = false;
 
@@ -597,7 +597,7 @@ class Player {
       && this.fireTime % this.deathFlashMod < 20) { // idk why 20 O.O
       // Swap btw white and black
       if (this.isDeathWarn) this.bodyOffset.material.setValues({ color: 0x000000 });
-      else this.bodyOffset.material.setValues({ color: 0xFFFFFF });
+      else this.bodyOffset.material.setValues({ color: 0xC80000 });
 
       this.isDeathWarn = !this.isDeathWarn;
     }

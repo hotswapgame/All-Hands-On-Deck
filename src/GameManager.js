@@ -15,7 +15,7 @@ import {
 
 import {
   cycleInstructions, hideStartScreen, showStartScreen,
-  runGameOverSequence, hideEndScreen, updateResetGradient, cycleDayNight
+  runGameOverSequence, hideEndScreen, updateResetGradient, cycleDayNight, increaseHUDCount
 } from './UI';
 
 import { playSound, createLoopedSound } from './SoundPlayer';
@@ -178,6 +178,7 @@ function checkCollisions() {
             if (e.hitCount > 1) {
               activeEnemies -= 1;
               shipsSunk += 1;
+              increaseHUDCount(shipsSunk, 'enemy-count');
             }
           }
         });
@@ -216,6 +217,7 @@ function checkCollisions() {
           player.slowSpeed(0.6);
           startShake(2, 200);
           shipsSunk += 1;
+          increaseHUDCount(shipsSunk, 'enemy-count');
         }
       }
     });
@@ -453,6 +455,7 @@ export function init(input$) {
         if (t.keyTurnCheck()) {
           // score
           treasureCount += 1;
+          increaseHUDCount(treasureCount, 'treasure-count');
         }
       });
     }
@@ -635,7 +638,7 @@ export function init(input$) {
           if (t.keyTurnCheck()) {
             // score
             treasureCount += 1;
-            console.log('treasure');
+            increaseHUDCount(treasureCount, 'treasure-count');
           }
         });
       },

@@ -16,7 +16,7 @@ function createWindow() {
     // fullscreen: true,
   });
 
-  mainWindow.setMenu(null);
+  // mainWindow.setMenu(null);
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({

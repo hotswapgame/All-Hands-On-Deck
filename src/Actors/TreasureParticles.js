@@ -7,7 +7,7 @@ class TreasureParticles {
     parent.add(this.gameObject);
 
     // Create particles here
-    this.particleGeo = new THREE.SphereGeometry(3, 4, 2);
+    this.particleGeo = new THREE.SphereGeometry(3.2, 4, 2);
     this.particles = Array.from(
       { length: 500 },
       () => ({
@@ -19,6 +19,7 @@ class TreasureParticles {
         rotSpeed: (Math.random() + 0.2) / 5000,
         initialHeight: Math.random() * 80,
         radius: 26 + Math.random() * 1,
+        disappearSpeed: 1 + Math.random() * 3.3,
       })
     );
     this.particles.forEach((p) => {
@@ -38,25 +39,33 @@ class TreasureParticles {
     this.gameObject.visible = false;
   }
 
-  update(dt) {
+  update(dt, opening, triggered) {
     this.time += dt;
-
+    if (triggered) {
+      this.time -= dt*0.7;
+    }
     this.particles.forEach((p) => {
-      const newRot = p.initialRot + this.time * Math.PI * 2 * p.rotSpeed;
 
-      p.mesh.position.x = Math.pow(((p.initialHeight + this.time/200)%80)/80, 1.8)*80;
-      const taperFactor = (0.3+0.7*(1-Math.pow(p.mesh.position.x/80, 0.4)));
-      p.mesh.position.y = Math.cos(newRot) * (p.radius * taperFactor);
-      p.mesh.position.z = Math.sin(newRot) * (p.radius * taperFactor);
+      if (opening) {
 
-      // p.mesh.scale.x = (1 - s) * 0.3;
-      // p.mesh.scale.y = (1 - s) * 0.3;
-      // p.mesh.scale.z = 1 - s;
+        const newRot = p.initialRot + this.time * Math.PI * 2 * p.rotSpeed;
+        p.mesh.position.x = p.mesh.position.x + p.disappearSpeed;
+        const taperFactor = (0.3+0.7*(1-Math.pow(p.mesh.position.x/80, 0.4)));
+        p.mesh.position.y = Math.cos(newRot) * (p.radius * taperFactor);
+        p.mesh.position.z = Math.sin(newRot) * (p.radius * taperFactor);
+        const opa = 0.8*(1 - p.mesh.position.x / 80);
+        p.mesh.material.opacity = opa < 0 ? 0 : opa;
 
-      // p.mesh.material.color.r = 1 - s + 0.3;
-      // p.mesh.material.color.g = (1 - s) * 0.5;
-      // p.mesh.material.color.b = 0;
-      p.mesh.material.opacity = 0.8*(1 - p.mesh.position.x / 80);
+      } else {
+
+        const newRot = p.initialRot + this.time * Math.PI * 2 * p.rotSpeed;
+        p.mesh.position.x = Math.pow(((p.initialHeight + this.time/2000)%80)/80, 1.8)*80;
+        const taperFactor = (0.3+0.7*(1-Math.pow(p.mesh.position.x/80, 0.4)));
+        p.mesh.position.y = Math.cos(newRot) * (p.radius * taperFactor);
+        p.mesh.position.z = Math.sin(newRot) * (p.radius * taperFactor);
+        p.mesh.material.opacity = 0.8*(1 - p.mesh.position.x / 80);
+        
+      }
     });
   }
 }

@@ -63,8 +63,8 @@ h2 {
   float: left;
   width: 100%;
   padding: 0;
-  margin: 0 0 0.3em 0;
-  line-height: 1em;
+  margin: 0 0 0 0;
+  line-height: 1.2;
   font-family: 'Eczar', sans-serif;
   color: rgba(255, 255, 255, 0.9);
 }
@@ -292,13 +292,18 @@ h2 {
   width: 100vw;
   top: 0;
   left: 0;
-  margin-top: 1em;
+  margin-top: -20em;
   text-align: center;
+  transition: all 500ms ease-in-out;
+}
+
+#screen-hud.active {
+  margin-top: 0.5em;
 }
 
 #enemy-counter {
   position: absolute;
-  width: 15vh;
+  width: 20vh;
   top: 0;
   left: 0;
   margin: 4vh;
@@ -306,7 +311,7 @@ h2 {
 
 #treasure-counter {
   position: absolute;
-  width: 15vh;
+  width: 20vh;
   top: 0;
   right: 0;
   margin: 4vh;
@@ -328,7 +333,7 @@ h2 {
 
 .hud .counter {
   padding: 0;
-  margin-top: 2vh;
+  margin-top: 2.5vh;
   text-transform: uppercase;
   font-size: 5vh;
   font-weight: 400;
@@ -351,7 +356,7 @@ h2 {
 
 @keyframes increaseCountA {
   20% {
-    text-shadow: 0 0 0.7em #FF0000, 0 0 1em #FFFFFF;
+    text-shadow: 0 0 0.6em #FF0000, 0 0 1em #FFFFFF;
     font-size: 10vh;
   }
 	100% {
@@ -362,7 +367,7 @@ h2 {
 
 @keyframes increaseCountB {
   20% {
-      text-shadow: 0 0 0.7em #FFAA00, 0 0 1em #FFFFFF;
+      text-shadow: 0 0 0.6em #FFAA00, 0 0 1em #FFFFFF;
       font-size: 10vh;
     }
     100% {

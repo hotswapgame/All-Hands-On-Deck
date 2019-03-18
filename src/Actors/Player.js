@@ -597,8 +597,7 @@ class Player {
       && this.fireTime % this.deathFlashMod < 20) { // idk why 20 O.O
       // Swap btw white and black
       if (this.isDeathWarn) this.bodyOffset.material.setValues({ color: 0x000000 });
-      else this.bodyOffset.material.setValues({ color: 0xC80000 });
-
+      else this.bodyOffset.material.setValues({ color: 0xFFFFFF });
       this.isDeathWarn = !this.isDeathWarn;
     }
 
@@ -715,6 +714,12 @@ class Player {
       this.rockTurnTime -= dt;
       const turnAmt = (this.rockTurnTime / this.rockTurnTimeMax) * this.rockTurnVal * 0.0006 * dt;
       this.moveSphere.rotateOnAxis(this.yawAxis, turnAmt); // ease in
+      if (this.velocity > this.velocityTarget) {
+        this.velocity -= this.acceleration * dt * 0.25;
+      } else {
+        this.velocity += this.acceleration * dt * 0.25;
+      }
+      this.moveSphere.rotateOnAxis(this.forwardAxis, dt * this.velocity);
     }
   }
 }

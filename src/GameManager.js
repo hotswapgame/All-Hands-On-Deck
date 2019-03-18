@@ -15,7 +15,7 @@ import {
 
 import {
   cycleInstructions, hideStartScreen, showStartScreen,
-  runGameOverSequence, hideEndScreen, updateResetGradient, cycleDayNight, increaseHUDCount
+  runGameOverSequence, hideEndScreen, updateResetGradient, cycleDayNight, increaseHUDCount, showHUD, hideHUD
 } from './UI';
 
 import { playSound, createLoopedSound } from './SoundPlayer';
@@ -493,7 +493,6 @@ export function init(input$) {
 
     if (e.keyCode === 40) {
       player.setSailSpeed(-0.00001);
-
       if (isGameOver) {
         reset();
       }

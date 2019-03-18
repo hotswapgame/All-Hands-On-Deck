@@ -29,6 +29,10 @@ export function showStartScreen() {
 
 export function hideStartScreen() {
   document.getElementById('start-screen').classList.remove('active');
+  const elementHUD = document.getElementById('screen-hud');
+  if (!elementHUD.classList.contains('active')) {
+    elementHUD.classList.add('active');
+  }
 }
 
 export function hideEndScreen() {
@@ -56,6 +60,10 @@ export function updateResetGradient(resetPercent) {
 }
 
 export function runGameOverSequence(shipSunk, treasureFound, timeTotal, timeFire) {
+  const elementHUD = document.getElementById('screen-hud');
+  if (elementHUD.classList.contains('active')) {
+    elementHUD.classList.remove('active');
+  }
   const element = document.getElementById('game-over'); // clement you should be more specifc than just 'element'
   element.classList.add('active');
 

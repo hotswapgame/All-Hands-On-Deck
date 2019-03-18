@@ -34,12 +34,12 @@ class Rock {
     // this.hitBox = new THREE.Mesh(hitgeo, new THREE.MeshBasicMaterial({ wireframe: true }));
     // this.gameObject.add(this.hitBox);
 
-    this.colorArr = [0xdddddd, 0xbbccaa];
+    this.colorArr = [0xdddddd, 0xcccccc, 0xbbbbbb];
 
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshLambertMaterial({
-          color: this.colorArr[Math.floor(Math.random() * 1.99)],
+          color: this.colorArr[Math.floor(Math.random() * 2.99)],
         });
         this.rock = new THREE.Mesh(geo, mat);
         this.rock.scale.set(this.sizeArea, this.sizeArea, this.sizeHeight);

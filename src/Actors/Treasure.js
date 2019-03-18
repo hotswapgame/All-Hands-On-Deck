@@ -196,7 +196,7 @@ class Treasure {
         this.chestTopOffset.visible = false;
       }
 
-      this.particles.update(dt);
+      this.particles.update(dt, this.isOpening, this.isTriggered);
       const triggerOffset = (1 - (this.triggerAnimationTime / this.triggerAnimationMax));
       // some hard coded position bs
       // Tweak these with ease

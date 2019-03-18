@@ -246,8 +246,8 @@ class Player {
       new Flame(this.gameObject, new THREE.Vector3(0, -5, 7), this.fireMax, false),
     ];
 
-    this.deathFlashStart = 16000;
-    this.deathFlashMod = 150;
+    this.deathFlashStart = 10000;
+    this.deathFlashMod = [300, 600, 900];
     this.isDeathWarn = false;
 
     // Speech Bubbles
@@ -593,13 +593,18 @@ class Player {
     // flash player when close to death, idk why i did this logic...
     // but I'm using one less timer so :P
     if (this.onFire
-      && this.fireTime > this.deathFlashStart
-      && this.fireTime % this.deathFlashMod < 20) { // idk why 20 O.O
-      // Swap btw white and black
-      if (this.isDeathWarn) this.bodyOffset.material.setValues({ color: 0x000000 });
-      else this.bodyOffset.material.setValues({ color: 0xFFFFFF });
-      this.isDeathWarn = !this.isDeathWarn;
-    }
+      && this.fireTime > this.deathFlashStart) {
+        let flashIndex = Math.floor((this.fireMax - this.fireTime)/((this.fireMax - this.deathFlashStart)/3));
+        let fireDelta = this.deathFlashMod[flashIndex];
+        // if ((this.fireMax - this.fireTime) < (this.fireMax - this.deathFlashStart) / 2) fireDelta = this.deathFlashMod;
+        // console.log(this.fireTime % fireDelta, fireDelta/2);
+
+        if (this.fireTime % fireDelta < fireDelta / 2) {
+          this.bodyOffset.material.setValues({ color: 0x000000 });
+        } else {
+          this.bodyOffset.material.setValues({ color: 0xFFFFFF });
+        }
+      }
 
     if (this.onFire && this.fireTime >= this.fireMax) {
       // trigger game over here

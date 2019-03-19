@@ -11,7 +11,7 @@ class Rock {
 
     this.posSphere = new THREE.Object3D();
     const rockModelNum = Math.floor(Math.random() * 3);
-    this.sizeArea = Math.random() * 12 + 10;
+    this.sizeArea = Math.random() * 10 + 8;
     this.sizeHeight = Math.random() * 10 + 7;
     this.rotZ = Math.random() * Math.PI;
 

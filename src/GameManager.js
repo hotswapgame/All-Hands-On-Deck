@@ -37,7 +37,8 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 45000; // 45000;
+const WAVE_MAX_TIME = 50000; // 45000;
+const ENEMY_SPAWN_BUFFER = 10000;
 let waveTimer = 5000; // Include a start offset when the game begins
 
 // Start sequence stuff
@@ -60,7 +61,7 @@ let shakeYScale = 0;
 
 const HIT_PAUSE_MAX = 30;
 
-const WORLD_SIZE = 300;
+const WORLD_SIZE = 200;
 
 const scene = new THREE.Scene();
 // Possibly make this a class so I can do that sweet tween
@@ -310,7 +311,7 @@ function update(currentTime) {
     if (shouldGenRocks && rocks.length === 0) {
       // some code
       // actually need a for loop here :/
-      for (let i = 0; i < 30; i += 1) {
+      for (let i = 0; i < 25; i += 1) {
         rocks.push(new Rock(scene, WORLD_SIZE));
       }
 
@@ -335,7 +336,7 @@ function update(currentTime) {
       player.cycleLights(waveCount + 1);
 
       // Divy out enemy spawns in the 1st 45 sec
-      waveEnemySpawnWindow = (WAVE_MAX_TIME - 30000) / waveEnemiesToSpawn;
+      waveEnemySpawnWindow = (WAVE_MAX_TIME - ENEMY_SPAWN_BUFFER) / waveEnemiesToSpawn;
       enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
 
       waveChestSpawned = false;

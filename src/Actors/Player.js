@@ -19,10 +19,10 @@ class Player {
     this.gameOverCallback = gameOverCallback;
     this.triggerShake = triggerShake;
     this.velocityMin = 0;
-    this.velocityMax = 0.00015; // scaled to world size bc rotation
+    this.velocityMax = 0.0002; // scaled to world size bc rotation
     this.velocityTarget = this.velocityMin;
     this.velocity = this.velocityMin;
-    this.acceleration = 0.0000001;
+    this.acceleration = 0.0000003;
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
     this.worldPos = new THREE.Vector3(0, 0, 0); // stores world location
@@ -357,6 +357,9 @@ class Player {
     this.setTurnAngle(0);
 
     this.bodyOffset.material.setValues({ color: 0x000000 });
+
+    this.ammo.PORT = 0;
+    this.ammo.STARBOARD = 0;
   }
 
   updateWorldPosition() {
@@ -600,17 +603,17 @@ class Player {
     // but I'm using one less timer so :P
     if (this.onFire
       && this.fireTime > this.deathFlashStart) {
-        let flashIndex = Math.floor((this.fireMax - this.fireTime)/((this.fireMax - this.deathFlashStart)/3));
-        let fireDelta = this.deathFlashMod[flashIndex];
-        // if ((this.fireMax - this.fireTime) < (this.fireMax - this.deathFlashStart) / 2) fireDelta = this.deathFlashMod;
-        // console.log(this.fireTime % fireDelta, fireDelta/2);
+      const flashIndex = Math.floor((this.fireMax - this.fireTime) / ((this.fireMax - this.deathFlashStart) / 3));
+      const fireDelta = this.deathFlashMod[flashIndex];
 
-        if (this.fireTime % fireDelta < fireDelta / 2) {
-          this.bodyOffset.material.setValues({ color: 0x000000 });
-        } else {
-          this.bodyOffset.material.setValues({ color: 0xFFFFFF });
-        }
+      if (this.fireTime % fireDelta < fireDelta / 2) {
+        this.bodyOffset.material.setValues({ color: 0x000000 });
+      } else {
+        this.bodyOffset.material.setValues({ color: 0xFFFFFF });
       }
+    } else {
+      this.bodyOffset.material.setValues({ color: 0x000000 });
+    }
 
     if (this.onFire && this.fireTime >= this.fireMax) {
       // trigger game over here

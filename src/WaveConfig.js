@@ -6,7 +6,7 @@ export const WAVE_SIZES = [
   // 1,
   // 1,
   // actual curve
-  2,
+  // 2,
   3,
   4,
   5,

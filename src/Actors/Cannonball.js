@@ -11,9 +11,9 @@ class Cannonball {
     this.type = GAME_TYPES.CANNONBALL;
     this.scene = scene;
     this.worldSize = worldSize;
-    this.speed = 0.07 / worldSize;
-    this.enemySpeed = 0.06 / worldSize;
-    this.playerSpeed = 0.04 / worldSize; // Use only when player owner
+    this.speed = 0.0003; // 0.07 / worldSize;
+    this.enemySpeed = 0.0003; // 0.06 / worldSize;
+    this.playerSpeed = 0.0002; // 0.04 / worldSize; // Use only when player owner
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
     this.hitRadius = 3; // Size for calculating collisions

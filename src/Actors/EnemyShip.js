@@ -16,7 +16,7 @@ class EnemyShip {
     this.fireCannon = fireCannon;
     this.rocks = rocks;
 
-    this.speed = 0.009 / worldSize;
+    this.speed = 0.00005;
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
 
@@ -33,7 +33,7 @@ class EnemyShip {
     this.pitchAcc = 0;
 
     this.shootTimer = 0;
-    this.shootMax = 7000;
+    this.shootMax = 7500;
 
     // Used to calc actual world position
     this.worldPos = new THREE.Vector3();

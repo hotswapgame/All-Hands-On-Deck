@@ -355,6 +355,8 @@ class Player {
     // reset Sails Rudder
     this.setSailSpeed(0);
     this.setTurnAngle(0);
+
+    this.bodyOffset.material.setValues({ color: 0x000000 });
   }
 
   updateWorldPosition() {
@@ -554,6 +556,10 @@ class Player {
     }
   }
 
+  heal() {
+    this.fireTimeTotal *= 0.5;
+  }
+
   addFlame(amount) {
     if (this.onFire) {
       // add more fire
@@ -651,7 +657,7 @@ class Player {
         // we use good placement bc sometimes the rock will hit on spawn
         if (r.isGoodPlacement && !r.isRising
             && r.getPosition().distanceTo(worldP) < this.rockHitRadius + r.hitRadius) {
-
+          playSound('EXPLODE');
           const rockPos = r.getPosition().normalize();
 
           //        -0.14

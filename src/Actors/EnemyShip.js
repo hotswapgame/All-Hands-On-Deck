@@ -33,7 +33,7 @@ class EnemyShip {
     this.pitchAcc = 0;
 
     this.shootTimer = 0;
-    this.shootMax = 5000;
+    this.shootMax = 7000;
 
     // Used to calc actual world position
     this.worldPos = new THREE.Vector3();

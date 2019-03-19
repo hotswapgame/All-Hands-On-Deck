@@ -123,9 +123,6 @@ class Treasure {
 
     // Spawn opposite of player
     this.moveSphere.rotateOnAxis(this.forwardAxis, Math.PI / 2);
-
-    // fix roll offset from death animation
-    this.gameObject.visible = true;
   }
 
   hide() {
@@ -183,6 +180,9 @@ class Treasure {
               this.forwardAxis,
               Math.PI / 2 + (Math.PI / 4 * Math.random())
             );
+          } else {
+            // Only show when placement is good
+            this.gameObject.visible = true;
           }
         }
       }

@@ -79,7 +79,7 @@ let shouldGenRocks = false;
 const rocks = [];
 
 const treasurePool = Array.from(
-  { length: 5 },
+  { length: 3 },
   () => new Treasure(scene, WORLD_SIZE, rocks),
 );
 
@@ -393,6 +393,12 @@ function reset() {
   enemySpawnSide = -1;
   activeEnemies = 0;
 
+  // Screen shake stuff
+  isShaking = false;
+  shakeTime = 0;
+  shakeXScale = 0;
+  shakeYScale = 0;
+
   // Init wave related stuff
   waveCount = 0;
   waveEnemiesToSpawn = 0;
@@ -455,6 +461,7 @@ export function init(input$) {
         if (t.keyTurnCheck()) {
           // score
           treasureCount += 1;
+          player.heal();
           increaseHUDCount(treasureCount, 'treasure-count');
         }
       });
@@ -617,7 +624,7 @@ export function init(input$) {
           if (resetPressCount >= RESET_PRESS_MAX) reset();
           updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
         } else {
-          player.calmFire(600);
+          player.calmFire(1000);
         }
       },
       error: console.log,
@@ -637,6 +644,7 @@ export function init(input$) {
           if (t.keyTurnCheck()) {
             // score
             treasureCount += 1;
+            player.heal();
             increaseHUDCount(treasureCount, 'treasure-count');
           }
         });

@@ -37,7 +37,7 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 50000; // 45000;
+const WAVE_MAX_TIME = 50000; // 50000;
 const ENEMY_SPAWN_BUFFER = 10000;
 let waveTimer = 5000; // Include a start offset when the game begins
 
@@ -436,7 +436,7 @@ function reset() {
     seagulls = createLoopedSound('SEAGULLS');
     seagulls.sound.start(0);
   }
-  seagulls.GAIN.gain.setValueAtTime(0.5, seagulls.ctx.currentTime);
+  seagulls.GAIN.gain.setValueAtTime(0.2, seagulls.ctx.currentTime);
 
   requestAnimationFrame(update.bind(this));
 }

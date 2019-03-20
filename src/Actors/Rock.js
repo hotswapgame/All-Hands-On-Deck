@@ -72,7 +72,7 @@ class Rock {
 
   getPosition() {
     // Calc world position on first use
-    if (!this.worldPos) {
+    if (!this.worldPos || !this.isGoodPlacement) {
       this.worldPos = new THREE.Vector3();
       this.gameObject.getWorldPosition(this.worldPos);
     }

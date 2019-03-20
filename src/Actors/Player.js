@@ -241,6 +241,7 @@ class Player {
     this.onFire = false;
     this.fireTime = 0;
     this.fireTimeTotal = 0;
+    this.fireScore = 0;
     this.fireMax = 20000;
     this.flames = [
       new Flame(this.gameObject, new THREE.Vector3(0, -5, 7), this.fireMax, false),
@@ -568,6 +569,7 @@ class Player {
       // add more fire
       this.fireTime += amount;
       this.fireTimeTotal += amount;
+
       if ((this.fireTimeTotal / 2.5) > this.fireTime) {
         this.fireTime = clamp(0, this.fireMax, this.fireTimeTotal / 2.5);
       }
@@ -595,6 +597,7 @@ class Player {
   updateFlames(dt) {
     if (this.onFire) {
       this.fireTimeTotal += dt;
+      this.fireScore += dt;
       this.fireTime += dt;
       this.flames.forEach(f => f.update(dt));
     }
@@ -617,7 +620,7 @@ class Player {
 
     if (this.onFire && this.fireTime >= this.fireMax) {
       // trigger game over here
-      this.gameOverCallback(this.fireTimeTotal);
+      this.gameOverCallback(this.fireScore);
     }
   }
 

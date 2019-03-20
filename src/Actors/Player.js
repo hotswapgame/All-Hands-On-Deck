@@ -349,6 +349,7 @@ class Player {
     this.onFire = false;
     this.fireTime = 0;
     this.fireTimeTotal = 0;
+    this.fireScore = 0;
     this.flames.forEach(f => f.hide());
 
     this.moveSphere.rotation.set(0, 0, 0);
@@ -387,7 +388,7 @@ class Player {
 
       // diff alg for diff directions
       if (lightDiff < 0) {
-        this.mainLight.distance = this.lightStart + (Math.sqrt(timeRatio) * lightDiff);  
+        this.mainLight.distance = this.lightStart + (Math.sqrt(timeRatio) * lightDiff);
       } else {
         this.mainLight.distance = this.lightStart + (timeRatio * timeRatio * lightDiff);
       }

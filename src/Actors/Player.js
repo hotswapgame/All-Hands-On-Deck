@@ -560,7 +560,7 @@ class Player {
   }
 
   heal() {
-    this.fireTimeTotal *= 0.5;
+    this.fireTimeTotal *= 0.8;
   }
 
   addFlame(amount) {

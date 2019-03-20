@@ -7,9 +7,9 @@ class TreasureParticles {
     parent.add(this.gameObject);
 
     // Create particles here
-    this.particleGeo = new THREE.SphereGeometry(3.2, 4, 2);
+    this.particleGeo = new THREE.SphereGeometry(5, 4, 2);
     this.particles = Array.from(
-      { length: 500 },
+      { length: 150 },
       () => ({
         mesh: new THREE.Mesh(
           this.particleGeo,

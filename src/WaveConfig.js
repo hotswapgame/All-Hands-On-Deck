@@ -7,14 +7,14 @@ export const WAVE_SIZES = [
   // 1,
   // actual curve
   // 2,
-  3,
-  4,
+  // 3,
+  // 4,
   5,
   6,
   7,
-  8,
+  // 8,
   9,
-  10,
+  // 10,
   11,
   12,
   13,
@@ -25,6 +25,14 @@ export const WAVE_SIZES = [
   13,
   13,
   13,
+  13,
+  13,
+  13,
+  13,
+  13,
+  15,
+  15,
+  15,
 ];
 
 export default {

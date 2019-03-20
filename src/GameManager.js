@@ -59,6 +59,11 @@ const shakeIntensity = 3;
 let shakeXScale = 0;
 let shakeYScale = 0;
 
+// night day
+let dayCount = 0;
+let dayStamp = 0;
+const dayDuration = 50000;
+
 const HIT_PAUSE_MAX = 30;
 
 const WORLD_SIZE = 200;
@@ -331,9 +336,9 @@ function update(currentTime) {
       }
 
       // Divide the wave count to make it cycle less often
-      if (waveCount !== 0) cycleDayNight(waveCount + 1);
+        // if (waveCount !== 0) cycleDayNight(waveCount + 1);
       // cycle lights as well
-      player.cycleLights(waveCount + 1);
+        // player.cycleLights(waveCount + 1);
 
       // Divy out enemy spawns in the 1st 45 sec
       waveEnemySpawnWindow = (WAVE_MAX_TIME - ENEMY_SPAWN_BUFFER) / waveEnemiesToSpawn;
@@ -373,6 +378,13 @@ function update(currentTime) {
         screen.style.top = '0px';
       }
     }
+  }
+
+  if (currentTime - dayStamp > dayDuration) {
+    cycleDayNight(dayCount);
+    player.cycleLights(dayCount);
+    dayCount += 1;
+    dayStamp = currentTime;
   }
 
   // set next frame

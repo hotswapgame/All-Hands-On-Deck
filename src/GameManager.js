@@ -438,6 +438,9 @@ function reset() {
   }
   seagulls.GAIN.gain.setValueAtTime(0.2, seagulls.ctx.currentTime);
 
+  increaseHUDCount(0, 'enemy-count');
+  increaseHUDCount(0, 'treasure-count');
+
   requestAnimationFrame(update.bind(this));
 }
 

@@ -208,10 +208,10 @@ function checkCollisions() {
       if (e1.isActive) {
         enemyPool.forEach((e2) => {
           if (e2.isActive && e2.id !== e1.id && e1.getEnemyHit(e2)) {
-            e1.die(true);
-            e2.die(true);
-            activeEnemies -= 2;
-            playSound('EXPLODE');
+            // e1.die(true);
+            // e2.die(true);
+            // activeEnemies -= 2;
+            // playSound('EXPLODE');
           }
         });
 

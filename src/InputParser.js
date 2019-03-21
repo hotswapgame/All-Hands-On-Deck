@@ -68,7 +68,7 @@ export function getHatch(input$) {
   return input$
     .map(find(isHatch))
     .filter(notNil)
-    .map(data => ({ id: data[0], isOpen: data[2] > 450 }));
+    .map(data => ({ id: data[0], isOpen: data[2] > 350 }));
 }
 
 export function getWick(input$) {

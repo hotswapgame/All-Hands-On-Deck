@@ -19,6 +19,7 @@ function createWindow() {
   });
 
   mainWindow.setMenu(null);
+  // mainWindow.webContents.openDevTools(); // Open the DevTools.
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -26,9 +27,6 @@ function createWindow() {
     protocol: 'file:',
     slashes: true,
   }));
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

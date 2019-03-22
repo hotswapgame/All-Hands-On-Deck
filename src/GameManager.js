@@ -197,8 +197,8 @@ function checkCollisions() {
       }
 
       rocks.forEach((r) => {
-        if (c.getPosition().distanceTo(r.getPosition()) < r.hitRadius + c.hitRadius) {
-          c.explode();
+        if (c.hitBuffer < 0 && c.getPosition().distanceTo(r.getPosition()) < r.hitRadius + c.hitRadius) {
+          c.explodeNextUpdate();
         }
       });
     }
@@ -206,15 +206,6 @@ function checkCollisions() {
     // should also map over enemies to intersect player and each other
     enemyPool.forEach((e1) => {
       if (e1.isActive) {
-        enemyPool.forEach((e2) => {
-          if (e2.isActive && e2.id !== e1.id && e1.getEnemyHit(e2)) {
-            // e1.die(true);
-            // e2.die(true);
-            // activeEnemies -= 2;
-            // playSound('EXPLODE');
-          }
-        });
-
         if (player.getEnemyHit(e1)) {
           e1.die(true);
           activeEnemies -= 1;
@@ -386,7 +377,7 @@ function update(currentTime) {
     dayCount += 1;
     dayStamp = currentTime;
   }
-
+  scene.updateMatrixWorld(true);
   // set next frame
   requestAnimationFrame(update.bind(this));
 }

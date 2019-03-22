@@ -254,7 +254,7 @@ class EnemyShip {
   updateFloat(dt) {
     this.floatAcc = -1 * (this.floatPos) * 0.00001;
     this.floatVel += this.floatAcc * dt;
-    this.floatVel *= 0.935;
+    this.floatVel *= 0.91;
     this.floatPos += this.floatVel * dt;
     this.gameObject.position.x = this.restingPos + this.floatPos;
     this.pitchSpawnOffset = -this.floatPos / this.restingPos * Math.PI * 4;

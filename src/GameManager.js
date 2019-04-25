@@ -3,9 +3,7 @@ import { prop, clamp } from 'ramda';
 
 import Player from './Actors/Player';
 import Cannonball from './Actors/Cannonball';
-import EnemyShip from './Actors/EnemyShip';
-import Treasure from './Actors/Treasure';
-import Rock from './Actors/Rock';
+
 import { getModel } from './AssetManager';
 import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
 import { WAVE_SIZES } from './WaveConfig';
@@ -24,47 +22,14 @@ let soundtrack;
 let seagulls;
 let prevTime = 0;
 let totalTime = 0;
-let shipsSunk = 0;
-let treasureCount = 0;
-let isGameOver = false;
-
-// Use this to give players grace period at start
-let enemySpawnSide = -1;
-let activeEnemies = 0;
-
-let waveCount = 0;
-let waveEnemiesToSpawn = 0;
-let waveChestSpawned = true;
-let enemySpawnTimer = 0;
-let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 50000; // 50000;
-const ENEMY_SPAWN_BUFFER = 10000;
-let waveTimer = 5000; // Include a start offset when the game begins
-
-// Start sequence stuff
-let isStartSeq = true;
-let startSeqCount = 0;
-const startSequence = ['SAIL', 'RUDDER', 'HATCH', 'WICK'];
-
-// reset stuff
-let resetPressCount = 0;
-const RESET_PRESS_MAX = 15;
 
 let screen;
 
-// Screen shake for juice
-let isShaking = false;
-let shakeTime = 0;
-const shakeIntensity = 3;
-let shakeXScale = 0;
-let shakeYScale = 0;
-
+// WHERE DIS STUFF GO?
 // night day
 let dayCount = 0;
 let dayStamp = 0;
 const dayDuration = 50000;
-
-const HIT_PAUSE_MAX = 30;
 
 const WORLD_SIZE = 200;
 
@@ -81,31 +46,10 @@ const camera = new THREE.OrthographicCamera(
   1000
 );
 
-let shouldGenRocks = false;
-const rocks = [];
-
-const treasurePool = Array.from(
-  { length: 3 },
-  () => new Treasure(scene, WORLD_SIZE, rocks),
-);
-
+// THESE ARE SHARED BTW MAIN AND START
 const cannonballPool = Array.from(
   { length: 50 },
   () => new Cannonball(scene, WORLD_SIZE)
-);
-
-// Arrow to keep scope, pass to enemy so we can share one pool
-// maybe create a separate pool for enemy and player :|
-const fireEnemyCannon = (enemyRot, enemyHeading) => {
-  const cannonball = cannonballPool.find(b => !b.isActive && !b.isExploding);
-  if (cannonball) {
-    cannonball.enemyFire(enemyRot, 0.09, enemyHeading);
-  }
-};
-
-const enemyPool = Array.from(
-  { length: 50 },
-  () => new EnemyShip(scene, WORLD_SIZE, fireEnemyCannon, rocks)
 );
 
 const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
@@ -113,18 +57,8 @@ const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
   if (cannonball) cannonball.playerFire(side, rotation, position, 0.03, cannonRotOffset);
 };
 
-function triggerGameOver(fireTime) {
-  isGameOver = true;
-  runGameOverSequence(shipsSunk, treasureCount, totalTime, fireTime);
-}
 
-function startShake(intensity, time) {
-  isShaking = true;
-  shakeTime = time;
-  shakeXScale = intensity * Math.random() > 0.5 ? 1 : -1;
-  shakeYScale = intensity * Math.random() > 0.5 ? 1 : -1;
-}
-
+// Maybe do the callback functions here in the main scene update
 const player = new Player(scene, camera, WORLD_SIZE, firePlayerCannon, triggerGameOver, startShake);
 
 // init renderer
@@ -162,222 +96,23 @@ getModel('./Assets/world.stl')
     scene.add(world);
   });
 
-function spawnEnemy() {
-  activeEnemies += 1;
-  const enemy = enemyPool.find(e => !e.isActive && !e.isDying);
-  // Hard cap is in the enemy pool rn ~50
-  if (enemy) {
-    enemySpawnSide *= -1;
-    enemy.spawn(player.moveSphere.rotation, enemySpawnSide, rocks);
-  }
-}
-
-function checkCollisions() {
-  cannonballPool.forEach((c) => {
-    if (c.isActive && !c.isExploding) {
-      // Check if enemy is hit
-      if (c.ownerType === GAME_TYPES.PLAYER) {
-        enemyPool.forEach((e) => {
-          if (e.isActive && e.getHit(c.getPosition())) {
-            e.die(false);
-            c.explode();
-            if (e.hitCount > 1) {
-              activeEnemies -= 1;
-              shipsSunk += 1;
-              increaseHUDCount(shipsSunk, 'enemy-count');
-            }
-          }
-        });
-      } else if (c.ownerType === GAME_TYPES.ENEMY) {
-        if (player.getHit(c.getPosition())) {
-          c.explode();
-          player.addFlame(2000);
-          startShake(1, 100);
-        }
-      }
-
-      rocks.forEach((r) => {
-        if (c.hitBuffer < 0 && c.getPosition().distanceTo(r.getPosition()) < r.hitRadius + c.hitRadius) {
-          c.explodeNextUpdate();
-        }
-      });
-    }
-
-    // should also map over enemies to intersect player and each other
-    enemyPool.forEach((e1) => {
-      if (e1.isActive) {
-        if (player.getEnemyHit(e1)) {
-          e1.die(true);
-          activeEnemies -= 1;
-          playSound('EXPLODE');
-          player.addFlame(1500);
-          player.slowSpeed(0.6);
-          startShake(2, 200);
-          shipsSunk += 1;
-          increaseHUDCount(shipsSunk, 'enemy-count');
-        }
-      }
-    });
-  });
-}
-
 function update(currentTime) {
   if (prevTime === 0) prevTime = currentTime;
   const dt = currentTime - prevTime;
   prevTime = currentTime;
 
   // Render at the start to update the matrix
-  renderer.render(scene, camera);
+  renderer.render(scene, camera); // use generic render function
 
-  // update all this on start screen
-  // Split this into sep update functions pls
-  if (!isGameOver) {
-    player.update(dt, rocks, !isStartSeq); // only collide rocks when not start seq
-    cannonballPool.forEach(c => c.update(dt));
-  }
-
-  // Make sure rocks don't spawn on player position
-  rocks.forEach((r) => {
-    if (!r.isGoodPlacement) {
-      // arbitary spawn distance of 130
-      if (r.getPosition().distanceTo(player.getPosition()) < 130) {
-        r.randomlyPlace();
-      } else {
-        r.fixPlacement();
-      }
-    }
-  });
-
-  // start sequence stuff
-  if (isStartSeq) {
-    switch (startSeqCount) {
-      case 0:
-        if (player.velocityTarget > 0.000001) {
-          startSeqCount += 1;
-        }
-
-        cycleInstructions(startSeqCount);
-        break;
-      case 1:
-        if (player.turnRate > 0.00001 || player.turnRate < -0.00001) {
-          startSeqCount += 1;
-        }
-
-        cycleInstructions(startSeqCount);
-        break;
-      case 4:
-        hideStartScreen();
-        isStartSeq = false;
-        break;
-      default: break;
-    }
-  }
-
-  if (!isGameOver && !isStartSeq) {
-    if (!soundtrack) {
-      soundtrack = createLoopedSound('SOUNDTRACK');
-      soundtrack.sound.start(0);
-      soundtrack.GAIN.gain.setValueAtTime(0.2, soundtrack.ctx.currentTime);
-      soundtrack.playing = true;
-    } else if (!soundtrack.playing) {
-      soundtrack.GAIN.gain.setValueAtTime(0.2, soundtrack.ctx.currentTime);
-      soundtrack.playing = true;
-    }
-    totalTime += dt;
-    rocks.forEach(r => r.update(dt));
-    enemyPool.forEach(e => e.update(dt, player.getPosition()));
-    treasurePool.forEach((t) => {
-      t.checkTrigger(player.getPosition());
-      t.update(dt);
-    });
-
-    checkCollisions();
-
-    // Filter hidden rocks from array
-    if (shouldGenRocks) {
-      let rockToRemove;
-
-      rocks.forEach((r, i) => {
-        if (r.isSunken) rockToRemove = i;
-      });
-
-      if (rockToRemove !== undefined) rocks.splice(rockToRemove, 1);
-    }
-
-    if (shouldGenRocks && rocks.length === 0) {
-      // some code
-      // actually need a for loop here :/
-      for (let i = 0; i < 25; i += 1) {
-        rocks.push(new Rock(scene, WORLD_SIZE));
-      }
-
-      shouldGenRocks = false;
-    }
-
-    // Wave Change Logic
-    if (waveTimer < 0) {
-      // We stop having a difficulty curve after the wave config is empty
-      if (waveCount < WAVE_SIZES.length) waveEnemiesToSpawn = WAVE_SIZES[waveCount];
-      else waveEnemiesToSpawn = WAVE_SIZES[WAVE_SIZES.length - 1];
-
-      // Spawn new rocks
-      if (waveCount % 4 === 0) {
-        shouldGenRocks = true;
-        rocks.forEach(r => r.startSinking());
-      }
-
-      // Divide the wave count to make it cycle less often
-        // if (waveCount !== 0) cycleDayNight(waveCount + 1);
-      // cycle lights as well
-        // player.cycleLights(waveCount + 1);
-
-      // Divy out enemy spawns in the 1st 45 sec
-      waveEnemySpawnWindow = (WAVE_MAX_TIME - ENEMY_SPAWN_BUFFER) / waveEnemiesToSpawn;
-      enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
-
-      waveChestSpawned = false;
-
-      waveTimer = WAVE_MAX_TIME;
-      waveCount += 1; // set next wave index too
-    }
-    waveTimer -= dt;
-
-    // Enemy spawn logic
-    if (waveEnemiesToSpawn > 0 && enemySpawnTimer < 0) {
-      spawnEnemy();
-      enemySpawnTimer = waveEnemySpawnWindow;
-      waveEnemiesToSpawn -= 1;
-    }
-    enemySpawnTimer -= dt;
-
-    // Treasure spawn logic
-    if (!waveChestSpawned && waveTimer < (WAVE_MAX_TIME - WAVE_MAX_TIME / 100)) {
-      waveChestSpawned = true;
-      const treasure = treasurePool.find(t => !t.isActive);
-      if (treasure) treasure.spawn(player.moveSphere.rotation);
-    }
-
-    // screen shake
-    if (isShaking) {
-      shakeTime -= dt;
-      screen.style.left = `${(Math.cos(shakeTime) * shakeIntensity * shakeXScale)}px`;
-      screen.style.top = `${(Math.sin(shakeTime) * shakeIntensity * shakeYScale)}px`;
-
-      if (shakeTime < 0) {
-        isShaking = false;
-        screen.style.left = '0px';
-        screen.style.top = '0px';
-      }
-    }
-  }
-
+  // Should we always do this?
   if (currentTime - dayStamp > dayDuration) {
     cycleDayNight(dayCount);
     player.cycleLights(dayCount);
     dayCount += 1;
     dayStamp = currentTime;
   }
-  scene.updateMatrixWorld(true);
+
+  scene.updateMatrixWorld(true); // does this need to be called?
   // set next frame
   requestAnimationFrame(update.bind(this));
 }
@@ -420,8 +155,6 @@ function reset() {
   // Reset player?
   player.reset();
   // reset enemy, treasure, and cannonball pool
-  enemyPool.forEach(e => e.hide());
-  treasurePool.forEach(t => t.hide());
   cannonballPool.forEach(c => c.hide());
 
   // Remove rocks from scene and reset array

@@ -25,6 +25,12 @@ export const GAME_TYPES = {
   ROCK: 'ROCK',
 };
 
+export const GAME_STATES = {
+  START: 'START',
+  MAIN: 'MAIN',
+  END: 'END',
+};
+
 export const INPUT_TYPES = {
   WICK: 'WICK',
   HATCH: 'HATCH',
@@ -37,6 +43,10 @@ export const INPUT_TYPES = {
 export const SHIP_DIRECTIONS = {
   PORT: 'PORT',
   STARBOARD: 'STARBOARD',
+};
+
+export const GLOBALS = {
+  WORLD_SIZE: 200,
 };
 
 export default {

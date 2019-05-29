@@ -5,23 +5,25 @@ import Player from './Actors/Player';
 import Cannonball from './Actors/Cannonball';
 
 import { getModel } from './AssetManager';
-import { GAME_TYPES, SHIP_DIRECTIONS } from './Constants';
-import { WAVE_SIZES } from './WaveConfig';
+import { GLOBALS, SHIP_DIRECTIONS } from './Constants';
 import {
   getHatch, getWick, getRudderKnob, getSailKnob, getAllInputSwap, getFlame, getKey
 } from './InputParser';
 
 import {
   cycleInstructions, hideStartScreen, showStartScreen,
-  runGameOverSequence, hideEndScreen, updateResetGradient, cycleDayNight, increaseHUDCount, showHUD, hideHUD
+  hideEndScreen, updateResetGradient, cycleDayNight,
 } from './UI';
 
-import { playSound, createLoopedSound } from './SoundPlayer';
+import ScreenShake from './ScreenShake';
+import StateManager from './StateHandlers';
+
+// state handlers
+
 
 let soundtrack;
 let seagulls;
 let prevTime = 0;
-let totalTime = 0;
 
 let screen;
 
@@ -30,8 +32,6 @@ let screen;
 let dayCount = 0;
 let dayStamp = 0;
 const dayDuration = 50000;
-
-const WORLD_SIZE = 200;
 
 const scene = new THREE.Scene();
 // Possibly make this a class so I can do that sweet tween
@@ -49,7 +49,7 @@ const camera = new THREE.OrthographicCamera(
 // THESE ARE SHARED BTW MAIN AND START
 const cannonballPool = Array.from(
   { length: 50 },
-  () => new Cannonball(scene, WORLD_SIZE)
+  () => new Cannonball(scene, GLOBALS.WORLD_SIZE)
 );
 
 const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
@@ -59,7 +59,7 @@ const firePlayerCannon = (side, rotation, position, cannonRotOffset) => {
 
 
 // Maybe do the callback functions here in the main scene update
-const player = new Player(scene, camera, WORLD_SIZE, firePlayerCannon, triggerGameOver, startShake);
+const player = new Player(scene, camera, GLOBALS.WORLD_SIZE, firePlayerCannon);
 
 // init renderer
 const renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -92,7 +92,7 @@ let world;
 getModel('./Assets/world.stl')
   .then((geo) => {
     world = new THREE.Mesh(geo, worldMat);
-    world.scale.set(WORLD_SIZE, WORLD_SIZE, WORLD_SIZE);
+    world.scale.set(GLOBALS.WORLD_SIZE, GLOBALS.WORLD_SIZE, GLOBALS.WORLD_SIZE);
     scene.add(world);
   });
 
@@ -103,64 +103,24 @@ function update(currentTime) {
 
   // Render at the start to update the matrix
   renderer.render(scene, camera); // use generic render function
-
+  StateManager.update(dt);
   // Should we always do this?
-  if (currentTime - dayStamp > dayDuration) {
-    cycleDayNight(dayCount);
-    player.cycleLights(dayCount);
-    dayCount += 1;
-    dayStamp = currentTime;
-  }
+  // if (currentTime - dayStamp > dayDuration) {
+  //   cycleDayNight(dayCount);
+  //   player.cycleLights(dayCount);
+  //   dayCount += 1;
+  //   dayStamp = currentTime;
+  // }
 
-  scene.updateMatrixWorld(true); // does this need to be called?
   // set next frame
   requestAnimationFrame(update.bind(this));
 }
 
 function reset() {
-  // do game state reset stuff here
   prevTime = 0;
-  totalTime = 0;
-  shipsSunk = 0;
-  treasureCount = 0;
-  isGameOver = false;
 
-  isStartSeq = true; // ????
-  startSeqCount = 0;
-
-  resetPressCount = 0;
-  enemySpawnSide = -1;
-  activeEnemies = 0;
-
-  // Screen shake stuff
-  isShaking = false;
-  shakeTime = 0;
-  shakeXScale = 0;
-  shakeYScale = 0;
-
-  // Init wave related stuff
-  waveCount = 0;
-  waveEnemiesToSpawn = 0;
-  waveChestSpawned = true;
-  enemySpawnTimer = 0;
-  waveEnemySpawnWindow = 0;
-  waveTimer = 5000;
-
-  // reset ui?
-  cycleInstructions(startSeqCount);
-  // Hide end screen
-  hideEndScreen();
-  showStartScreen();
-
-  // Reset player?
-  player.reset();
   // reset enemy, treasure, and cannonball pool
   cannonballPool.forEach(c => c.hide());
-
-  // Remove rocks from scene and reset array
-  shouldGenRocks = false;
-  rocks.forEach(r => scene.remove(r.posSphere)); // remove from scene
-  rocks.splice(0, rocks.length); // clean out rocks array
 
   // Something something soundtrack
   if (soundtrack) {
@@ -169,13 +129,10 @@ function reset() {
   }
 
   if (!seagulls) {
-    seagulls = createLoopedSound('SEAGULLS');
-    seagulls.sound.start(0);
+    // seagulls = createLoopedSound('SEAGULLS');
+    // seagulls.sound.start(0);
   }
-  seagulls.GAIN.gain.setValueAtTime(0.2, seagulls.ctx.currentTime);
-
-  increaseHUDCount(0, 'enemy-count');
-  increaseHUDCount(0, 'treasure-count');
+  // seagulls.GAIN.gain.setValueAtTime(0.2, seagulls.ctx.currentTime);
 
   requestAnimationFrame(update.bind(this));
 }
@@ -189,22 +146,46 @@ function playListener() {
   reset();
 }
 
+const gameState = {
+  state: 'START',
+  player,
+  scene,
+  renderer,
+  world,
+  camera,
+  cannonballPool,
+  score: {
+    ships: 0,
+    treasure: 0,
+    totalTime: 0,
+    fireTime: 0,
+  },
+};
+
 export function init(input$) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   screen = document.querySelector('#screen');
   screen.appendChild(renderer.domElement);
+  ScreenShake.init(screen); // attach screen shake el
   resize();
 
+  // initialize all state managers
+  StateManager.init(gameState);
+
+  // OTHER STUFF TO LOOK AT BELOW
+
+  // keyboard shortcuts
+  // maybe move these to the init of each state handler and remove them
   window.onkeyup = (e) => {
     if (e.keyCode === 75) {
-      treasurePool.forEach((t) => {
-        if (t.keyTurnCheck()) {
-          // score
-          treasureCount += 1;
-          player.heal();
-          increaseHUDCount(treasureCount, 'treasure-count');
-        }
-      });
+      // treasurePool.forEach((t) => {
+      //   if (t.keyTurnCheck()) {
+      //     // score
+      //     treasureCount += 1;
+      //     player.heal();
+      //     increaseHUDCount(treasureCount, 'treasure-count');
+      //   }
+      // });
     }
     // light port
     if (e.keyCode === 87) {
@@ -232,17 +213,17 @@ export function init(input$) {
     // Load port
     if (e.keyCode === 38) {
       player.setSailSpeed(0.00001);
-      if (isStartSeq && !isGameOver) {
-        hideStartScreen();
-        isStartSeq = false;
-      }
+      // if (isStartSeq && !isGameOver) {
+      //   hideStartScreen();
+      //   isStartSeq = false;
+      // }
     }
 
     if (e.keyCode === 40) {
       player.setSailSpeed(-0.00001);
-      if (isGameOver) {
-        reset();
-      }
+      // if (isGameOver) {
+      //   reset();
+      // }
     }
 
     if (e.keyCode === 37) {
@@ -254,13 +235,13 @@ export function init(input$) {
     }
 
     if (e.keyCode === 70) {
-      if (isGameOver) {
-        resetPressCount += 1;
-        if (resetPressCount >= RESET_PRESS_MAX) reset();
-        updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
-      } else {
-        player.calmFire(600);
-      }
+      // if (isGameOver) {
+      //   resetPressCount += 1;
+      //   if (resetPressCount >= RESET_PRESS_MAX) reset();
+      //   updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
+      // } else {
+      //   player.calmFire(600);
+      // }
     }
   };
 
@@ -320,10 +301,10 @@ export function init(input$) {
     .map(({ id }) => (id === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD))
     .subscribe({
       next: (direction) => {
-        if (startSeqCount === 2) {
-          startSeqCount += 1;
-          cycleInstructions(startSeqCount);
-        }
+        // if (startSeqCount === 2) {
+        //   startSeqCount += 1;
+        //   cycleInstructions(startSeqCount);
+        // }
         player.loadCannon(direction);
       },
       error: console.log,
@@ -340,9 +321,9 @@ export function init(input$) {
     .map(({ id }) => (id === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD))
     .subscribe({
       next: (direction) => {
-        if (startSeqCount === 3) {
-          startSeqCount += 1;
-        }
+        // if (startSeqCount === 3) {
+        //   startSeqCount += 1;
+        // }
 
         player.lightFuse(direction);
       },
@@ -359,13 +340,13 @@ export function init(input$) {
     .filter(data => data.output)
     .subscribe({
       next: () => {
-        if (isGameOver) {
-          resetPressCount += 1;
-          if (resetPressCount >= RESET_PRESS_MAX) reset();
-          updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
-        } else {
-          player.calmFire(1000);
-        }
+        // if (isGameOver) {
+        //   resetPressCount += 1;
+        //   if (resetPressCount >= RESET_PRESS_MAX) reset();
+        //   updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
+        // } else {
+        //   player.calmFire(1000);
+        // }
       },
       error: console.log,
       complete: console.log,
@@ -380,14 +361,14 @@ export function init(input$) {
     .filter(data => data.output)
     .subscribe({
       next: (d) => {
-        treasurePool.forEach((t) => {
-          if (t.keyTurnCheck()) {
-            // score
-            treasureCount += 1;
-            player.heal();
-            increaseHUDCount(treasureCount, 'treasure-count');
-          }
-        });
+        // treasurePool.forEach((t) => {
+        //   if (t.keyTurnCheck()) {
+        //     // score
+        //     treasureCount += 1;
+        //     player.heal();
+        //     increaseHUDCount(treasureCount, 'treasure-count');
+        //   }
+        // });
       },
       error: console.log,
       complete: console.log,

@@ -1,24 +1,37 @@
+import ScreenShake from '../ScreenShake';
+import { hideStartScreen, cycleInstructions, showStartScreen } from '../UI';
+import { GAME_STATES } from '../Constants';
+
 // local state variables
 // Start sequence stuff
 let isStartSeq = true;
 let startSeqCount = 0;
 const startSequence = ['SAIL', 'RUDDER', 'HATCH', 'WICK'];
 
-let shipsSunk = 0;
-let treasureCount = 0;
-
 let sharedData;
-
-function init(sharedSource) {
+let setState;
+function init(sharedSource, stateFunc) {
   sharedData = sharedSource;
+  setState = stateFunc;
 }
 
 function begin() {
-
+  startSeqCount = 0;
+  isStartSeq = true;
+  showStartScreen();
+  sharedData.player.reset();
 }
 
+// shared items
+/**
+ * treasurePool
+ */
+
 function update(dt) {
-  player.update(dt, rocks, !isStartSeq); // only collide rocks when not start seq
+  const { scene, renderer, camera, player, cannonballPool } = sharedData;
+  ScreenShake.update(dt);
+
+  player.update(dt, []); // only collide rocks when not start seq
   cannonballPool.forEach(c => c.update(dt));
 
   switch (startSeqCount) {
@@ -27,6 +40,7 @@ function update(dt) {
         startSeqCount += 1;
       }
 
+      // Does this need to happen every frame?
       cycleInstructions(startSeqCount);
       break;
     case 1:
@@ -38,16 +52,18 @@ function update(dt) {
       break;
     case 4:
       hideStartScreen();
-      isStartSeq = false;
+      setState(GAME_STATES.MAIN);
       break;
     default: break;
   }
+
+  scene.updateMatrixWorld(true);
+  renderer.render(scene, camera);
 }
 
 // naming?
 function exit() {
-  enemyPool.forEach(e => e.hide());
-  treasurePool.forEach(t => t.hide());
+  hideStartScreen();
 }
 
-export default { init, begin, update };
+export default { init, begin, update, exit };

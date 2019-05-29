@@ -1,9 +1,17 @@
 import EnemyShip from '../Actors/EnemyShip';
 import Treasure from '../Actors/Treasure';
 import Rock from '../Actors/Rock';
+import ScreenShake from '../ScreenShake';
+import { playSound, createLoopedSound } from '../SoundPlayer';
+
+import { GLOBALS, GAME_TYPES, GAME_STATES } from '../Constants';
+import { WAVE_SIZES } from '../WaveConfig';
+
+import { increaseHUDCount } from '../UI';
 
 // Set on init
 let sharedData;
+let setState;
 
 // Use this to give players grace period at start
 let enemySpawnSide = -1;
@@ -17,13 +25,7 @@ let waveEnemySpawnWindow = 0;
 const WAVE_MAX_TIME = 50000; // 50000;
 const ENEMY_SPAWN_BUFFER = 10000;
 let waveTimer = 5000; // Include a start offset when the game begins
-
-// Screen shake for juice
-let isShaking = false;
-let shakeTime = 0;
-const shakeIntensity = 3;
-let shakeXScale = 0;
-let shakeYScale = 0;
+let soundtrack;
 
 let shouldGenRocks = false;
 const rocks = [];
@@ -48,41 +50,43 @@ function spawnEnemy() {
   // Hard cap is in the enemy pool rn ~50
   if (enemy) {
     enemySpawnSide *= -1;
-    enemy.spawn(sharedData.player.moveSphere.rotation, enemySpawnSide, rocks); // WHY PASS ROCKS HERE?
+    // WHY PASS ROCKS HERE?
+    enemy.spawn(sharedData.player.moveSphere.rotation, enemySpawnSide, rocks);
   }
 }
 
-function triggerGameOver(fireTime) {
-  sharedData.setState('GAME_OVER'); // USE ENUM
-  runGameOverSequence(shipsSunk, treasureCount, totalTime, fireTime);
+function triggerGameOver() {
+  setState(GAME_STATES.END);
 }
 
-function startShake(intensity, time) {
-  isShaking = true;
-  shakeTime = time;
-  shakeXScale = intensity * Math.random() > 0.5 ? 1 : -1;
-  shakeYScale = intensity * Math.random() > 0.5 ? 1 : -1;
-}
-
-function init(sharedSource) {
+function init(sharedSource, stateFunc) {
   sharedData = sharedSource;
+  setState = stateFunc;
 
   for (let i = 0; i < 3; i += 1) {
-    treasurePool.push(new Treasure(sharedData.scene, sharedData.WORLD_SIZE));
+    treasurePool.push(new Treasure(sharedData.scene, GLOBALS.WORLD_SIZE));
     // REMOVE ROCKS FROM TREASURE
   }
 
   for (let i = 0; i < 50; i += 1) {
-    enemyPool.push(new EnemyShip(sharedData.scene, sharedData.WORLD_SIZE, fireEnemyCannon));
+    enemyPool.push(new EnemyShip(sharedData.scene, GLOBALS.WORLD_SIZE, fireEnemyCannon));
     // REMOVE ROCKS FROM ENEMY
   }
 }
 
 function begin() {
+  increaseHUDCount(0, 'enemy-count');
+  increaseHUDCount(0, 'treasure-count');
+}
 
+function endGame() {
+  // more stuff
+  setState(GAME_STATES.END);
 }
 
 function checkCollisions() {
+  const { player, cannonballPool, score } = sharedData;
+
   cannonballPool.forEach((c) => {
     if (c.isActive && !c.isExploding) {
       // Check if enemy is hit
@@ -93,8 +97,8 @@ function checkCollisions() {
             c.explode();
             if (e.hitCount > 1) {
               activeEnemies -= 1;
-              shipsSunk += 1;
-              increaseHUDCount(shipsSunk, 'enemy-count');
+              score.ships += 1;
+              increaseHUDCount(score.ships, 'enemy-count');
             }
           }
         });
@@ -102,12 +106,13 @@ function checkCollisions() {
         if (player.getHit(c.getPosition())) {
           c.explode();
           player.addFlame(2000);
-          startShake(1, 100);
+          ScreenShake.trigger(1, 100);
         }
       }
 
       rocks.forEach((r) => {
-        if (c.hitBuffer < 0 && c.getPosition().distanceTo(r.getPosition()) < r.hitRadius + c.hitRadius) {
+        if (c.hitBuffer < 0
+          && c.getPosition().distanceTo(r.getPosition()) < r.hitRadius + c.hitRadius) {
           c.explodeNextUpdate();
         }
       });
@@ -122,19 +127,22 @@ function checkCollisions() {
           playSound('EXPLODE');
           player.addFlame(1500);
           player.slowSpeed(0.6);
-          startShake(2, 200);
-          shipsSunk += 1;
-          increaseHUDCount(shipsSunk, 'enemy-count');
+          ScreenShake.trigger(2, 200);
+          score.ships += 1;
+          increaseHUDCount(score.ships, 'enemy-count');
         }
       }
     });
   });
 }
 
+// maybe pass in shared data?... ye
 function update(dt) {
-  sharedData.render();
+  const { scene, renderer, player, cannonballPool, score, camera } = sharedData;
+  // somehow render somewhere, also what goin on with matrix world update?
+  ScreenShake.update(dt);
 
-  player.update(dt, rocks, !isStartSeq); // only collide rocks when not start seq
+  player.update(dt, rocks);
   cannonballPool.forEach(c => c.update(dt));
 
   // Make sure rocks don't spawn on player position
@@ -158,7 +166,8 @@ function update(dt) {
     soundtrack.GAIN.gain.setValueAtTime(0.2, soundtrack.ctx.currentTime);
     soundtrack.playing = true;
   }
-  totalTime += dt;
+
+  score.totalTime += dt;
   rocks.forEach(r => r.update(dt));
   enemyPool.forEach(e => e.update(dt, player.getPosition()));
   treasurePool.forEach((t) => {
@@ -183,7 +192,7 @@ function update(dt) {
     // some code
     // actually need a for loop here :/
     for (let i = 0; i < 25; i += 1) {
-      rocks.push(new Rock(scene, WORLD_SIZE));
+      rocks.push(new Rock(scene, GLOBALS.WORLD_SIZE));
     }
 
     shouldGenRocks = false;
@@ -227,18 +236,14 @@ function update(dt) {
     if (treasure) treasure.spawn(player.moveSphere.rotation);
   }
 
-  // screen shake
-  if (isShaking) {
-    shakeTime -= dt;
-    screen.style.left = `${(Math.cos(shakeTime) * shakeIntensity * shakeXScale)}px`;
-    screen.style.top = `${(Math.sin(shakeTime) * shakeIntensity * shakeYScale)}px`;
-
-    if (shakeTime < 0) {
-      isShaking = false;
-      screen.style.left = '0px';
-      screen.style.top = '0px';
-    }
-  }
+  scene.updateMatrixWorld(true);
+  renderer.render(scene, camera);
 }
 
-export default { init, update };
+function exit() {
+  shouldGenRocks = false;
+  rocks.forEach(r => sharedData.scene.remove(r.posSphere)); // remove from scene
+  rocks.splice(0, rocks.length); // clean out rocks array
+}
+
+export default { init, begin, update, exit };

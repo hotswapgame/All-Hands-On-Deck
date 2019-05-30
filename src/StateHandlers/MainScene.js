@@ -32,6 +32,9 @@ const rocks = [];
 
 const treasurePool = [];
 
+// HACK FOR REDUCING GC LOAD
+let shouldUpdateWorldMatrix = false;
+
 // ENEMY STUFF
 const enemyPool = [];
 // Arrow to keep scope, pass to enemy so we can share one pool
@@ -247,7 +250,8 @@ function update(dt) {
     setState(GAME_STATES.END);
   }
 
-  scene.updateMatrixWorld(true);
+  shouldUpdateWorldMatrix = !shouldUpdateWorldMatrix;
+  if (shouldUpdateWorldMatrix) scene.updateMatrixWorld(true);
   renderer.render(scene, camera);
 }
 

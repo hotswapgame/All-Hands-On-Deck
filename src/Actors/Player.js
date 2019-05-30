@@ -618,11 +618,6 @@ class Player {
     } else {
       this.bodyOffset.material.setValues({ color: 0x000000 });
     }
-
-    if (this.onFire && this.fireTime >= this.fireMax) {
-      // trigger game over here
-      this.gameOverCallback(this.fireScore);
-    }
   }
 
   updateBubbles(dt) {

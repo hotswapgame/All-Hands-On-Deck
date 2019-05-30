@@ -26,7 +26,15 @@ export function init(source) {
 }
 
 export function update(dt) {
-  handlers[currentState].update(dt);
+  if (handlers[currentState]) handlers[currentState].update(dt);
 }
 
-export default { init, update };
+function handleInput(type, data) {
+  if (handlers[currentState]) handlers[currentState].handleInput(type, data);
+}
+
+function handleKeyboard(key) {
+  if (handlers[currentState]) handlers[currentState].handleKeyboard(key);
+}
+
+export default { init, update, handleInput, handleKeyboard };

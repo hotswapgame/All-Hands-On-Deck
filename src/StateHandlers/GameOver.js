@@ -1,4 +1,5 @@
-import { runGameOverSequence, hideEndScreen } from '../UI';
+import { runGameOverSequence, hideEndScreen, updateResetGradient } from '../UI';
+import { GAME_STATES, INPUT_TYPES } from '../Constants';
 
 // reset stuff
 let resetPressCount = 0;
@@ -9,6 +10,7 @@ let setState;
 function init(sharedSource, stateFunc) {
   sharedData = sharedSource;
   setState = stateFunc;
+  resetPressCount = 0;
 }
 
 function begin() {
@@ -17,11 +19,33 @@ function begin() {
 }
 
 function update(dt) {
-
+  // Has to exist, but unused
 }
 
 function exit() {
   hideEndScreen();
 }
 
-export default { init, begin, update, exit };
+function handleInput(type, data) {
+  if (type === INPUT_TYPES.FIRE) {
+    resetPressCount += 1;
+    if (resetPressCount >= RESET_PRESS_MAX) setState(GAME_STATES.START);
+    updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
+  }
+}
+
+function handleKeyboard(key) {
+  switch (key) {
+    case 40:
+      setState(GAME_STATES.START);
+      break;
+    case 70:
+      resetPressCount += 1;
+      if (resetPressCount >= RESET_PRESS_MAX) setState(GAME_STATES.START);
+      updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
+      break;
+    default: break;
+  }
+}
+
+export default { init, begin, update, exit, handleInput, handleKeyboard };

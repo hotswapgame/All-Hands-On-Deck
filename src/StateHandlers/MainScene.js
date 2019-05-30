@@ -4,8 +4,8 @@ import Rock from '../Actors/Rock';
 import ScreenShake from '../ScreenShake';
 import { playSound, createLoopedSound } from '../SoundPlayer';
 
-import { GLOBALS, GAME_TYPES, GAME_STATES } from '../Constants';
 import { WAVE_SIZES } from '../WaveConfig';
+import { GLOBALS, GAME_TYPES, GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';
 
 import { increaseHUDCount } from '../UI';
 
@@ -50,13 +50,8 @@ function spawnEnemy() {
   // Hard cap is in the enemy pool rn ~50
   if (enemy) {
     enemySpawnSide *= -1;
-    // WHY PASS ROCKS HERE?
-    enemy.spawn(sharedData.player.moveSphere.rotation, enemySpawnSide, rocks);
+    enemy.spawn(sharedData.player.moveSphere.rotation, enemySpawnSide);
   }
-}
-
-function triggerGameOver() {
-  setState(GAME_STATES.END);
 }
 
 function init(sharedSource, stateFunc) {
@@ -65,23 +60,30 @@ function init(sharedSource, stateFunc) {
 
   for (let i = 0; i < 3; i += 1) {
     treasurePool.push(new Treasure(sharedData.scene, GLOBALS.WORLD_SIZE));
-    // REMOVE ROCKS FROM TREASURE
   }
 
   for (let i = 0; i < 50; i += 1) {
     enemyPool.push(new EnemyShip(sharedData.scene, GLOBALS.WORLD_SIZE, fireEnemyCannon));
-    // REMOVE ROCKS FROM ENEMY
   }
 }
 
 function begin() {
   increaseHUDCount(0, 'enemy-count');
   increaseHUDCount(0, 'treasure-count');
-}
 
-function endGame() {
-  // more stuff
-  setState(GAME_STATES.END);
+  treasurePool.forEach(t => t.hide());
+  enemyPool.forEach(e => e.hide());
+
+  // Reset local state vars
+  enemySpawnSide = -1;
+  activeEnemies = 0;
+  waveCount = 0;
+  waveEnemiesToSpawn = 0;
+  waveChestSpawned = true;
+  enemySpawnTimer = 0;
+  waveEnemySpawnWindow = 0;
+  waveTimer = 5000; // Include a start offset when the game begins
+  shouldGenRocks = false;
 }
 
 function checkCollisions() {
@@ -169,10 +171,10 @@ function update(dt) {
 
   score.totalTime += dt;
   rocks.forEach(r => r.update(dt));
-  enemyPool.forEach(e => e.update(dt, player.getPosition()));
+  enemyPool.forEach(e => e.update(dt, player.getPosition(), rocks));
   treasurePool.forEach((t) => {
     t.checkTrigger(player.getPosition());
-    t.update(dt);
+    t.update(dt, rocks);
   });
 
   checkCollisions();
@@ -236,6 +238,15 @@ function update(dt) {
     if (treasure) treasure.spawn(player.moveSphere.rotation);
   }
 
+  // keep track of time player is on fire
+  if (player.onFire) score.fireTime += dt;
+
+  // Check end game
+  if (player.onFire && player.fireTime >= player.fireMax) {
+    // trigger game over here
+    setState(GAME_STATES.END);
+  }
+
   scene.updateMatrixWorld(true);
   renderer.render(scene, camera);
 }
@@ -246,4 +257,81 @@ function exit() {
   rocks.splice(0, rocks.length); // clean out rocks array
 }
 
-export default { init, begin, update, exit };
+function openTreasure() {
+  treasurePool.forEach((t) => {
+    if (t.keyTurnCheck()) {
+      // score
+      sharedData.score.treasure += 1;
+      sharedData.player.heal();
+      increaseHUDCount(sharedData.score.treasure, 'treasure-count');
+    }
+  });
+}
+
+// For rudder and sail data will be a delta value
+// For wick and cannon data will be a direction
+function handleInput(type, data) {
+  const { player } = sharedData;
+
+  switch (type) {
+    case INPUT_TYPES.SAIL:
+      player.setSailSpeed(data);
+      break;
+    case INPUT_TYPES.RUDDER:
+      player.setTurnAngle(data);
+      break;
+    case INPUT_TYPES.HATCH:
+      player.loadCannon(data);
+      break;
+    case INPUT_TYPES.WICK:
+      player.lightFuse(data);
+      break;
+    case INPUT_TYPES.KEY:
+      openTreasure();
+      break;
+    case INPUT_TYPES.FIRE:
+      player.calmFire(1000);
+      break;
+    default: break;
+  }
+}
+
+function handleKeyboard(key) {
+  const { player } = sharedData;
+
+  switch (key) {
+    case 87:
+      player.lightFuse(SHIP_DIRECTIONS.PORT);
+      break;
+    case 83:
+      player.lightFuse(SHIP_DIRECTIONS.STARBOARD);
+      break;
+    case 65:
+      player.loadCannon(SHIP_DIRECTIONS.PORT);
+      break;
+    case 68:
+      player.loadCannon(SHIP_DIRECTIONS.STARBOARD);
+      break;
+    case 38:
+      player.setSailSpeed(0.00001);
+      break;
+    case 40:
+      player.setSailSpeed(-0.00001);
+      break;
+    case 70:
+      player.calmFire(600);
+      break;
+    case 37:
+      player.setTurnAngle(0.00005);
+      break;
+    case 39:
+      player.setTurnAngle(-0.00005);
+      break;
+    case 75:
+      openTreasure();
+      break;
+    default: break;
+  }
+}
+
+export default { init, begin, update, exit, handleInput, handleKeyboard };

@@ -295,7 +295,7 @@ class Player {
     // Why am I setting lights on the player? so what you look at is illuminated nice
     const light = new THREE.PointLight(0xFFFFFF, 0.2, 2000000);
     const light2 = new THREE.PointLight(0x000000, 0.5, 2000000);
-    this.mainLight = new THREE.PointLight(0xFFEEEE, 0.8, 20000);
+    this.mainLight = new THREE.PointLight(0xFFDDCC, 0.8, 20000);
     this.ambient = new THREE.AmbientLight(0x222222);
 
     this.gameObject.add(light);

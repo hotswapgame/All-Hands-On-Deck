@@ -144,7 +144,7 @@ const worldMat = new THREE.MeshPhysicalMaterial({
   // color: 0x5599AA,
   // clearCoatRoughness: 1,
   // clearCoat: 1,
-  color: 0x555555,
+  color: 0x666666,
   reflectivity: 1,
   roughness: 0,
   metalness: 0,

@@ -49,7 +49,7 @@ class Rock {
     getModel(`./Assets/Rocks/rocksOffset${rockModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshBasicMaterial({
-          color: 0x222222,
+          color: 0x000000,
           side: THREE.BackSide,
         });
         this.rockOutline = new THREE.Mesh(geo, mat);

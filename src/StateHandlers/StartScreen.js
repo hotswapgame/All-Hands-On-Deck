@@ -20,6 +20,7 @@ function begin() {
   isStartSeq = true;
   showStartScreen();
   sharedData.player.reset();
+  sharedData.cannonballPool.forEach(c => c.hide());
 
   // reset score
   sharedData.score.ships = 0;

@@ -74,9 +74,6 @@ function begin() {
   increaseHUDCount(0, 'enemy-count');
   increaseHUDCount(0, 'treasure-count');
 
-  treasurePool.forEach(t => t.hide());
-  enemyPool.forEach(e => e.hide());
-
   // Reset local state vars
   enemySpawnSide = -1;
   activeEnemies = 0;
@@ -259,6 +256,9 @@ function exit() {
   shouldGenRocks = false;
   rocks.forEach(r => sharedData.scene.remove(r.posSphere)); // remove from scene
   rocks.splice(0, rocks.length); // clean out rocks array
+
+  treasurePool.forEach(t => t.hide());
+  enemyPool.forEach(e => e.hide());
 }
 
 function openTreasure() {

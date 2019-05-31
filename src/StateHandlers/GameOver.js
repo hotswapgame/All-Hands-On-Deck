@@ -10,11 +10,12 @@ let setState;
 function init(sharedSource, stateFunc) {
   sharedData = sharedSource;
   setState = stateFunc;
-  resetPressCount = 0;
 }
 
 function begin() {
   const { score } = sharedData;
+  resetPressCount = 0;
+  updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
   runGameOverSequence(score.ships, score.treasure, score.totalTime, score.fireTime);
 }
 
@@ -29,7 +30,10 @@ function exit() {
 function handleInput(type, data) {
   if (type === INPUT_TYPES.FIRE) {
     resetPressCount += 1;
-    if (resetPressCount >= RESET_PRESS_MAX) setState(GAME_STATES.START);
+    if (resetPressCount >= RESET_PRESS_MAX) {
+      location.reload();
+      // setState(GAME_STATES.START);
+    }
     updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
   }
 }
@@ -41,7 +45,10 @@ function handleKeyboard(key) {
       break;
     case 70:
       resetPressCount += 1;
-      if (resetPressCount >= RESET_PRESS_MAX) setState(GAME_STATES.START);
+      if (resetPressCount >= RESET_PRESS_MAX) {
+        location.reload();
+        // setState(GAME_STATES.START);
+      }
       updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
       break;
     default: break;

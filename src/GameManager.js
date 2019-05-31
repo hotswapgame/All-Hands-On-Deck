@@ -104,9 +104,6 @@ function update(currentTime) {
 function reset() {
   prevTime = 0;
 
-  // reset enemy, treasure, and cannonball pool
-  cannonballPool.forEach(c => c.hide());
-
   // Something something soundtrack
   if (soundtrack) {
     soundtrack.GAIN.gain.setValueAtTime(0, soundtrack.ctx.currentTime);

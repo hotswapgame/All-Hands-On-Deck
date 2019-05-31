@@ -10,14 +10,14 @@ import { isInRange } from '../utils';
 import Flame from './Flame';
 import SpeechBubble, { SPRITES } from './SpeechBubble';
 import { playSound } from '../SoundPlayer';
+import ScreenShake from '../ScreenShake';
 
 class Player {
-  constructor(scene, camera, worldSize, fireCannon, gameOverCallback, triggerShake) {
+  constructor(scene, camera, worldSize, fireCannon, gameOverCallback) {
     this.type = GAME_TYPES.PLAYER;
     // move camera to a class that looks at the player maybe
     this.scene = scene;
     this.gameOverCallback = gameOverCallback;
-    this.triggerShake = triggerShake;
     this.velocityMin = 0;
     this.velocityMax = 0.0002; // scaled to world size bc rotation
     this.velocityTarget = this.velocityMin;
@@ -618,11 +618,6 @@ class Player {
     } else {
       this.bodyOffset.material.setValues({ color: 0x000000 });
     }
-
-    if (this.onFire && this.fireTime >= this.fireMax) {
-      // trigger game over here
-      this.gameOverCallback(this.fireScore);
-    }
   }
 
   updateBubbles(dt) {
@@ -685,7 +680,7 @@ class Player {
           // this.moveSphere.rotateOnAxis(this.forwardAxis, -0.01); // linear
           // this.moveSphere.rotateOnAxis(this.yawAxis, turn * 0.6); // ease in
           // this.isRockTurn = true;
-          this.triggerShake(50, 300);
+          ScreenShake.trigger(50, 300);
           this.addFlame(5000);
           this.addRoll(turn * -0.01);
           this.turnRate = 0;
@@ -699,7 +694,7 @@ class Player {
   }
 
   // Central update
-  update(dt, rocks, shouldCollideRocks) {
+  update(dt, rocks) {
     // Set this at the start of each frame, bc why not
     // Actually it's so that we are using the proper matrix from last frame
     this.updateWorldPosition();
@@ -710,7 +705,8 @@ class Player {
     this.updateBob(dt);
     this.updateLights(dt);
 
-    if (shouldCollideRocks) this.checkRockCollision(rocks);
+    // pass empty rocks array to skip this
+    if (rocks.length > 0) this.checkRockCollision(rocks);
 
     if (this.rockTurnTime <= 0) {
       // always moving forward

@@ -9,12 +9,11 @@ import { playSound } from '../SoundPlayer';
 import Flame from './Flame';
 
 class EnemyShip {
-  constructor(scene, worldSize, fireCannon, rocks) {
+  constructor(scene, worldSize, fireCannon) {
     this.type = GAME_TYPES.ENEMY;
     this.scene = scene;
     this.worldSize = worldSize;
     this.fireCannon = fireCannon;
-    this.rocks = rocks;
 
     this.speed = 0.00005;
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
@@ -254,14 +253,14 @@ class EnemyShip {
   updateFloat(dt) {
     this.floatAcc = -1 * (this.floatPos) * 0.00001;
     this.floatVel += this.floatAcc * dt;
-    this.floatVel *= 0.935;
+    this.floatVel *= 0.91;
     this.floatPos += this.floatVel * dt;
     this.gameObject.position.x = this.restingPos + this.floatPos;
     this.pitchSpawnOffset = -this.floatPos / this.restingPos * Math.PI * 4;
   }
 
   // Logic for seeking the player
-  updateHeading(dt, playerPos) {
+  updateHeading(dt, playerPos, rocks) {
     this.gameObject.getWorldPosition(this.worldPos);
     const forwardVec = new THREE.Vector3();
     this.forwardMarker.getWorldPosition(forwardVec);
@@ -276,7 +275,7 @@ class EnemyShip {
     let turn = 0;
     if (planeTest > 0.001 || planeTest < -0.001) turn = planeTest > 0 ? 1 : -1;
 
-    this.rocks.forEach((r) => {
+    rocks.forEach((r) => {
       // Check if rock is close
 
       if (r.getPosition().distanceTo(this.worldPos) < 40 + r.spawnBlockRadius) {
@@ -296,14 +295,14 @@ class EnemyShip {
     this.moveSphere.rotateOnAxis(this.yawAxis, dt * turn * 0.0003);
   }
 
-  update(dt, playerPos) {
+  update(dt, playerPos, rocks) {
     if (this.isActive) {
       if (!this.passedRockCheck) {
         this.gameObject.getWorldPosition(this.worldPos);
         if (this.worldPos.x !== this.deathWorldPos.x) {
           const posCheck = r => (r.getPosition().distanceTo(this.worldPos)
                                  < 10 + r.spawnBlockRadius);
-          this.passedRockCheck = !any(posCheck)(this.rocks);
+          this.passedRockCheck = !any(posCheck)(rocks);
 
           // start with player position
           this.moveSphere.rotation.set(this.playerRot.x, this.playerRot.y, this.playerRot.z);
@@ -318,7 +317,7 @@ class EnemyShip {
 
       this.updatePitch(dt);
       this.updateFloat(dt);
-      this.updateHeading(dt, playerPos);
+      this.updateHeading(dt, playerPos, rocks);
 
       // maybe add another enemy that's got cannons at the side
       // move

@@ -8,11 +8,10 @@ import { playSound } from '../SoundPlayer';
 import TreasureParticles from './TreasureParticles';
 
 class Treasure {
-  constructor(scene, worldSize, rocks) {
+  constructor(scene, worldSize) {
     this.type = GAME_TYPES.TREASURE;
     this.scene = scene;
     this.worldSize = worldSize;
-    this.rocks = rocks;
     this.passedRockCheck = false;
     this.spawnRot = new THREE.Vector3();
 
@@ -163,14 +162,14 @@ class Treasure {
     return false;
   }
 
-  update(dt) {
+  update(dt, rocks) {
     if (this.isActive) {
       if (!this.passedRockCheck) {
         this.gameObject.getWorldPosition(this.worldPos);
         if (this.worldPos.x !== this.deathWorldPos.x) {
           const posCheck = r => (r.getPosition().distanceTo(this.worldPos)
                                  < 25 + r.spawnBlockRadius);
-          this.passedRockCheck = !any(posCheck)(this.rocks);
+          this.passedRockCheck = !any(posCheck)(rocks);
           if (!this.passedRockCheck) {
             // start with player position
             this.moveSphere.rotation.set(this.spawnRot.x, this.spawnRot.y, this.spawnRot.z);

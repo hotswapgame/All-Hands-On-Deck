@@ -18,6 +18,8 @@ class Cannonball {
     this.yawAxis = new THREE.Vector3(1, 0, 0);
     this.hitRadius = 3; // Size for calculating collisions
 
+    this.hitBuffer = 100;
+
     this.angularV = 0;
 
     this.isActive = false;
@@ -85,6 +87,10 @@ class Cannonball {
     this.moveSphere.add(this.gameObject);
     this.scene.add(this.moveSphere);
     this.scene.add(this.smoke);
+
+    // bc emit smoke was the bottle neck
+    this.shouldEmitSmoke = false;
+    this.shouldExplode = 0;
   }
 
   updateWorldPos() {
@@ -93,7 +99,7 @@ class Cannonball {
   }
 
   getPosition() {
-    return this.worldPos;
+    return this.worldPos.clone();
   }
 
   fire(ownerType) {
@@ -105,13 +111,11 @@ class Cannonball {
     this.ownerType = ownerType;
     // Initialize size for startup animation
     this.gameObject.scale.set(0.001, 0.001, 0.001);
+    this.shouldExplode = 0;
+    this.hitBuffer = 100;
   }
 
   emitSmoke() {
-    // gotta move it so smoke is at right spot
-    this.gameObject.position.x = this.worldSize + 4;
-
-    this.scene.updateMatrixWorld();
     this.updateWorldPos();
     // set fire smoke stuff
     this.smoke.position.copy(this.worldPos);
@@ -119,10 +123,13 @@ class Cannonball {
     this.smokePuffs.forEach((puff) => {
       puff.mesh.position.set(0, 0, 0);
     });
+
+    this.shouldEmitSmoke = false;
     // this.smoke.rotation.setFromQuaternion(this.worldQuat);
   }
 
   updateSmoke(dt) {
+    if (this.shouldEmitSmoke) this.emitSmoke();
     // move smoke puffs
     if (this.smokeTime < this.smokeMax) {
       this.smokeTime += dt;
@@ -140,17 +147,25 @@ class Cannonball {
     this.fire(GAME_TYPES.ENEMY);
     this.enemyMesh.visible = true;
 
+    // gotta move it so smoke is at right spot
+    this.gameObject.position.x = this.worldSize + 4;
+
     // Set position, then rotate to front of cannon
     this.moveSphere.rotation.set(enemyRot.x, enemyRot.y, enemyRot.z);
     this.moveSphere.rotateOnAxis(this.forwardAxis, startOffset);
     this.angularV = angularVelocity;
-    this.emitSmoke();
+
+    this.shouldEmitSmoke = true;
+    this.shouldExplode = 0;
   }
 
   // Fires cannonball as if rom player
   playerFire(side, playerRot, startOffset, cannonOffset, cannonRotOffset) {
     this.fire(GAME_TYPES.PLAYER);
     this.playerMesh.visible = true;
+
+    // gotta move it so smoke is at right spot
+    this.gameObject.position.x = this.worldSize + 4;
 
     // Set position, then move to relative position of cannon
     this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);
@@ -171,7 +186,8 @@ class Cannonball {
     // Move to front of cannon
     this.moveSphere.rotateOnAxis(this.forwardAxis, cannonOffset);
 
-    this.emitSmoke();
+    this.shouldEmitSmoke = true;
+    this.shouldExplode = 0;
   }
 
   hide() {
@@ -182,6 +198,7 @@ class Cannonball {
     this.smoke.visible = false;
     this.flightTime = 0;
     this.isExploding = false;
+    this.shouldExplode = 0;
   }
 
   // Triggers exploding animation
@@ -197,6 +214,7 @@ class Cannonball {
     this.smoke.visible = false;
     this.isActive = false;
     this.flightTime = 0;
+    this.shouldExplode = 0;
   }
 
   // Triggers splashing animation
@@ -205,10 +223,15 @@ class Cannonball {
     this.hide();
   }
 
+  explodeNextUpdate() {
+    if (this.shouldExplode === 0) this.shouldExplode = 5;
+  }
+
   update(dt) {
     this.explosion.update(dt);
     if (this.isActive) {
       this.updateSmoke(dt);
+      this.hitBuffer -= dt;
 
       let move = dt * this.speed;
       if (this.ownerType === GAME_TYPES.ENEMY) {
@@ -251,6 +274,9 @@ class Cannonball {
         // this.moveSphere.rotateOnAxis(this.yawAxis, dt * this.angularV);
       }
       this.updateWorldPos();
+
+      if (this.shouldExplode < 0) this.explode();
+      else if (this.shouldExplode >= 1) this.shouldExplode -= 3;
     }
   }
 }

@@ -165,6 +165,54 @@ getModel('./Assets/world.stl')
 
 
 // CLEMENT'S BAD CLOUD SCRIPT
+const rotationSegmentCount = 4;
+const rotationStep = (Math.PI*2)/rotationSegmentCount;
+const clusterRange = Math.PI*0.06;
+const clusterSize = 3;
+let cloudRotation = [];
+for (let i=0; i<rotationSegmentCount; i++) {
+  for (let j=0; j<rotationSegmentCount; j++) {
+    let rx = Math.random()*rotationStep + i*rotationStep;
+    let ry = Math.random()*rotationStep + j*rotationStep;
+    cloudRotation.push({x:rx, y:ry});
+  }
+}
+for (let i=0; i<cloudRotation.length; i++) {
+  for (let j=0; j<clusterSize; j++) {
+    let cloudRotationX = cloudRotation[i].x + (Math.random()*clusterRange - clusterRange/2);
+    let cloudRotationY = cloudRotation[i].y + (Math.random()*clusterRange - clusterRange/2);
+    
+    // BIG CLOUDS
+    // let cloudScaleAreaX = 25 + Math.random()*20;
+    // let cloudScaleAreaY = 25 + Math.random()*20;
+
+    // SMALL CLOUDS
+    let cloudScaleAreaX = 10 + Math.random()*10;
+    let cloudScaleAreaY = 10 + Math.random()*10;
+
+    let cloudScaleHeight = 10 + Math.random()*15;
+    let cloudPositionHeight = WORLD_SIZE + 20 + Math.random()*0;
+    let cloudRotationZ = Math.PI*2*Math.random();
+    getModel(`./Assets/cloud2.stl`)
+      .then((geo) => {
+        const mat = new THREE.MeshBasicMaterial({
+          color: 0xFFFFFF,
+          transparent: true,
+          opacity: 0.8,
+          //side: THREE.BackSide,
+        });
+        let cloud = new THREE.Mesh(geo, mat);
+        cloud.scale.set(cloudScaleAreaX, cloudScaleAreaY, cloudScaleHeight);
+        cloud.rotation.set(cloudRotationX, cloudRotationY, cloudRotationZ);
+        let cloudPosition = new THREE.Vector3(0, 0, cloudPositionHeight);
+        let cloudRotationE = new THREE.Euler(cloudRotationX, cloudRotationY, cloudRotationZ);
+        cloudPosition.applyEuler(cloudRotationE);
+        cloud.position.set(cloudPosition.x, cloudPosition.y, cloudPosition.z);
+        scene.add(cloud);
+      });
+  }
+}
+/*
 for (let i=0; i<20; i++) {
   let randomCloudNum = 1 + Math.floor(Math.random()*2);
   let cloudScaleArea = 20 + Math.random()*20;
@@ -191,6 +239,7 @@ for (let i=0; i<20; i++) {
         scene.add(cloud);
       });
 }
+*/
 // END CLEMENT'S BAD CLOUD SCRIPT
 
 function spawnEnemy() {

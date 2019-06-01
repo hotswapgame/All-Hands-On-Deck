@@ -163,6 +163,36 @@ getModel('./Assets/world.stl')
     scene.add(world);
   });
 
+
+// CLEMENT'S BAD CLOUD SCRIPT
+for (let i=0; i<20; i++) {
+  let randomCloudNum = 1 + Math.floor(Math.random()*2);
+  let cloudScaleArea = 20 + Math.random()*20;
+  let cloudScaleHeight = cloudScaleArea/2 + Math.random()*cloudScaleArea/2;
+  let cloudPositionHeight = WORLD_SIZE + 20 + Math.random()*2;
+  let cloudRotationX = Math.PI*2*Math.random();
+  let cloudRotationY = Math.PI*2*Math.random();
+  let cloudRotationZ = Math.PI*2*Math.random();
+  getModel(`./Assets/cloud${randomCloudNum}.stl`)
+      .then((geo) => {
+        const mat = new THREE.MeshBasicMaterial({
+          color: 0xFFFFFF,
+          transparent: true,
+          opacity: 0.2,
+          side: THREE.BackSide,
+        });
+        let cloud = new THREE.Mesh(geo, mat);
+        cloud.scale.set(cloudScaleArea, cloudScaleArea, cloudScaleHeight);
+        cloud.rotation.set(cloudRotationX, cloudRotationY, cloudRotationZ);
+        let cloudPosition = new THREE.Vector3(0, 0, cloudPositionHeight);
+        let cloudRotation = new THREE.Euler(cloudRotationX, cloudRotationY, cloudRotationZ);
+        cloudPosition.applyEuler(cloudRotation);
+        cloud.position.set(cloudPosition.x, cloudPosition.y, cloudPosition.z);
+        scene.add(cloud);
+      });
+}
+// END CLEMENT'S BAD CLOUD SCRIPT
+
 function spawnEnemy() {
   activeEnemies += 1;
   const enemy = enemyPool.find(e => !e.isActive && !e.isDying);

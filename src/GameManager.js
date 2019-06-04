@@ -144,7 +144,7 @@ const worldMat = new THREE.MeshPhysicalMaterial({
   // color: 0x5599AA,
   // clearCoatRoughness: 1,
   // clearCoat: 1,
-  color: 0x666666,
+  color: 0xAAAAAA,
   reflectivity: 1,
   roughness: 0,
   metalness: 0,
@@ -165,15 +165,16 @@ getModel('./Assets/world.stl')
 
 
 // CLEMENT'S BAD CLOUD SCRIPT
-const rotationSegmentCount = 4;
-const rotationStep = (Math.PI*2)/rotationSegmentCount;
-const clusterRange = Math.PI*0.06;
-const clusterSize = 3;
+const rotationSegmentCount = 5;
+const rotationStep = (Math.PI*2)/(rotationSegmentCount+1);
+const rotationStepRange = rotationStep*0.2;
+const clusterRange = Math.PI*0.00;
+const clusterSize = 1;
 let cloudRotation = [];
 for (let i=0; i<rotationSegmentCount; i++) {
   for (let j=0; j<rotationSegmentCount; j++) {
-    let rx = Math.random()*rotationStep + i*rotationStep;
-    let ry = Math.random()*rotationStep + j*rotationStep;
+    let rx = Math.random()*rotationStepRange + i*rotationStep;
+    let ry = Math.random()*rotationStepRange + j*rotationStep;
     cloudRotation.push({x:rx, y:ry});
   }
 }
@@ -187,18 +188,21 @@ for (let i=0; i<cloudRotation.length; i++) {
     // let cloudScaleAreaY = 25 + Math.random()*20;
 
     // SMALL CLOUDS
-    let cloudScaleAreaX = 10 + Math.random()*10;
-    let cloudScaleAreaY = 10 + Math.random()*10;
+    let cloudPositionHeightFactor = 1.0 + Math.random()*0.2;
+    let cloudPositionHeight = WORLD_SIZE + 15*cloudPositionHeightFactor;
+    
+    let cloudScaleAreaX = (17 + Math.random()*10) * cloudPositionHeightFactor;
+    let cloudScaleAreaY = 0.9 * cloudScaleAreaX + (Math.random() * 0.2);
 
     let cloudScaleHeight = 10 + Math.random()*15;
-    let cloudPositionHeight = WORLD_SIZE + 20 + Math.random()*0;
     let cloudRotationZ = Math.PI*2*Math.random();
-    getModel(`./Assets/cloud2.stl`)
+    const cloudModelNum = Math.floor(Math.random() * 2) + 3;
+    getModel(`./Assets/cloud${cloudModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshBasicMaterial({
           color: 0xFFFFFF,
           transparent: true,
-          opacity: 0.8,
+          opacity: 0.6,
           //side: THREE.BackSide,
         });
         let cloud = new THREE.Mesh(geo, mat);

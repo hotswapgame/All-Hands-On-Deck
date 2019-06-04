@@ -12,7 +12,7 @@ class Rock {
     this.posSphere = new THREE.Object3D();
     const rockModelNum = Math.floor(Math.random() * 3);
     this.sizeArea = Math.random() * 10 + 8;
-    this.sizeHeight = Math.random() * 10 + 7;
+    this.sizeHeight = Math.random() * 15 + 8;
     this.rotZ = Math.random() * Math.PI;
 
     this.gameObject = new THREE.Object3D();
@@ -34,7 +34,7 @@ class Rock {
     // this.hitBox = new THREE.Mesh(hitgeo, new THREE.MeshBasicMaterial({ wireframe: true }));
     // this.gameObject.add(this.hitBox);
 
-    this.colorArr = [0xdddddd, 0xcccccc, 0xbbbbbb];
+    this.colorArr = [0xFAFAFA, 0xFAFAFA, 0xFAFAFA];
 
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {

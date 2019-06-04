@@ -11,7 +11,7 @@ class Bomber {
     this.gameObject.position.setX(GLOBALS.WORLD_SIZE - 2);
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
-    this.speed = 0.0001;
+    this.speed = 0.00008;
 
     // Steering markers
     this.forwardMarker = new THREE.Object3D();
@@ -100,7 +100,7 @@ class Bomber {
 
   // hide() { // remove from scene }
 
-  updateHeading(dt, playerPos) {
+  updateHeading(dt, playerPos, bosses) {
     const forwardVec = new THREE.Vector3();
     this.forwardMarker.getWorldPosition(forwardVec);
 
@@ -108,23 +108,39 @@ class Bomber {
     this.leftMarker.getWorldPosition(leftVec);
     // B′=B−A, C′=C−A, X′=X−A.
     const forwardCross = new THREE.Vector3().crossVectors(this.worldP, forwardVec).normalize();
+    const sideCross = new THREE.Vector3().crossVectors(this.worldP, leftVec).normalize();
 
     const planeTest = forwardCross.dot(playerPos.normalize());
     let turn = 0;
     if (planeTest > 0.004 || planeTest < -0.004) turn = planeTest > 0 ? 1 : -1;
 
+    bosses.forEach((b) => {
+      // Check if boss is close
+
+      if (b.getPosition().distanceTo(this.worldP) < 300) {
+        const bossPos = b.getPosition().normalize();
+        const sideTest = sideCross.dot(bossPos);
+        const frontTest = forwardCross.dot(bossPos);
+        // See if boss is in front
+        if (sideTest < 0) {
+          // tweak to find angle of avoidance
+          if (frontTest < 0.2 && frontTest > -0.2) turn = frontTest > 0 ? -1.5 : 1.5;
+        }
+      }
+    });
+
     this.headingRotation = turn;
     // hard coded turn rate at end, maybe make this a twean
-    this.moveSphere.rotateOnAxis(this.yawAxis, dt * turn * 0.0007);
+    this.moveSphere.rotateOnAxis(this.yawAxis, dt * turn * 0.0005);
   }
 
-  update(dt, playerPos) {
+  update(dt, playerPos, bosses) {
     if (this.isActive) {
       // update world pos
       this.gameObject.getWorldPosition(this.worldP);
 
       if (this.startupTime < 0) {
-        this.updateHeading(dt, playerPos);
+        this.updateHeading(dt, playerPos, bosses);
         this.moveSphere.rotateOnAxis(this.forwardAxis, this.speed * dt);
       } else {
         this.startupTime -= dt;

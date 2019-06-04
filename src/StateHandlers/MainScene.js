@@ -23,7 +23,7 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 10000; // 50000;
+const WAVE_MAX_TIME = 50000; // 50000;
 const ENEMY_SPAWN_BUFFER = 10000;
 let waveTimer = 5000; // Include a start offset when the game begins
 let soundtrack;
@@ -293,7 +293,7 @@ function update(dt) {
 
   player.update(dt, rocks, bosses);
   cannonballPool.forEach(c => c.update(dt));
-  bombers.forEach(b => b.update(dt, player.getPosition()));
+  bombers.forEach(b => b.update(dt, player.getPosition(), bosses));
   bosses.forEach(b => b.update(dt));
 
   // Make sure rocks don't spawn on player position

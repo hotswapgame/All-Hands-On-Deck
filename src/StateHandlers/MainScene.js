@@ -23,7 +23,7 @@ let waveEnemiesToSpawn = 0;
 let waveChestSpawned = true;
 let enemySpawnTimer = 0;
 let waveEnemySpawnWindow = 0;
-const WAVE_MAX_TIME = 50000; // 50000;
+const WAVE_MAX_TIME = 10000; // 50000;
 const ENEMY_SPAWN_BUFFER = 10000;
 let waveTimer = 5000; // Include a start offset when the game begins
 let soundtrack;
@@ -242,8 +242,8 @@ function updateWave(dt) {
     // Check for wave change
     switch (nextWave.type) {
       case WAVE_TYPES.BOSS:
-        rocks.forEach(r => r.startSinking()); // add random delay to rock sinking?
-        enemyPool.forEach((e) => { if (e.isActive) e.bossSink(); });
+        rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000))); // add random delay to rock sinking?
+        enemyPool.forEach((e) => { if (e.isActive) e.bossSink(Math.round(Math.random() * 800)); });
         waveEnemySpawnWindow = 1000;
         break;
       case WAVE_TYPES.BASIC:

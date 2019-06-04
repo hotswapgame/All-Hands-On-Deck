@@ -203,9 +203,9 @@ class EnemyShip {
     this.isActive = false;
   }
 
-  bossSink() {
+  bossSink(delay) {
     this.isDying = true;
-    this.deathTime = 0;
+    this.deathTime = delay;
     this.isBossSink = true;
     this.isActive = false;
   }
@@ -353,10 +353,11 @@ class EnemyShip {
       if (this.flashTime < 0) this.stopFlash(); // maybe don't do this every frame .__.
       else this.flashTime -= dt;
     } else if (this.isDying) {
-      this.deathTime += dt;
+      if (this.isBossSink) this.deathTime += dt * 0.6;
+      else this.deathTime += dt;
       // white flash
       if (this.deathTime < 60) {
-        this.showFlash();
+        if (!this.isBossSink) this.showFlash();
       } else {
         this.stopFlash();
 

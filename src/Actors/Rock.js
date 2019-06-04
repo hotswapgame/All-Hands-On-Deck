@@ -80,8 +80,9 @@ class Rock {
     return this.worldPos.clone();
   }
 
-  startSinking() {
+  startSinking(delay) {
     this.sinking = true;
+    this.sinkDelay = delay;
   }
 
   fixPlacement() {
@@ -113,10 +114,14 @@ class Rock {
     }
 
     if (this.sinking) {
-      const timeRatio = 1 - (this.sinkTime / this.RISE_TIME_MAX);
-      this.rockHolder.position.z = timeRatio * timeRatio * this.riseDiff;
+      if (this.sinkDelay < 0) {
+        const timeRatio = 1 - (this.sinkTime / this.RISE_TIME_MAX);
+        this.rockHolder.position.z = timeRatio * timeRatio * this.riseDiff;
+        this.sinkTime -= dt;
+      } else {
+        this.sinkDelay -= dt;
+      }
 
-      this.sinkTime -= dt;
       if (this.sinkTime <= 0) {
         this.sinking = false;
         this.isSunken = true;

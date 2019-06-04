@@ -32,8 +32,8 @@ export const WAVE_TYPES = {
 export const WAVES = [
   // Debug wave
   // { type: 'BASIC', count: 1 },
-  // { type: WAVE_TYPES.BASIC, count: 1 },
-  { type: WAVE_TYPES.BOSS, count: 2 },
+  { type: WAVE_TYPES.BASIC, count: 3 },
+  { type: WAVE_TYPES.BOSS, count: 1 },
   { type: WAVE_TYPES.BASIC, count: 6 },
   { type: WAVE_TYPES.BASIC, count: 7 },
   { type: WAVE_TYPES.BASIC, count: 9 },

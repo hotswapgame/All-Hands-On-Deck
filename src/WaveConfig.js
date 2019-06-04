@@ -1,20 +1,8 @@
 export const WAVE_SIZES = [
-  // Debug waves
-  // 1,
-  // 1,
-  // 1,
-  // 1,
-  // 1,
-  // actual curve
-  // 2,
-  // 3,
-  // 4,
   5,
   6,
   7,
-  // 8,
   9,
-  // 10,
   11,
   12,
   13,
@@ -35,6 +23,33 @@ export const WAVE_SIZES = [
   15,
 ];
 
-export default {
-  WAVE_SIZES,
+export const WAVE_TYPES = {
+  BASIC: 'BASIC',
+  BOMBER: 'BOMBER',
+  BOSS: 'BOSS',
 };
+
+export const WAVES = [
+  // Debug wave
+  // { type: 'BASIC', count: 1 },
+  // { type: WAVE_TYPES.BASIC, count: 1 },
+  { type: WAVE_TYPES.BOSS, count: 2 },
+  { type: WAVE_TYPES.BASIC, count: 6 },
+  { type: WAVE_TYPES.BASIC, count: 7 },
+  { type: WAVE_TYPES.BASIC, count: 9 },
+  { type: WAVE_TYPES.BOSS, count: 2 },
+  { type: WAVE_TYPES.BASIC, count: 11 },
+  { type: WAVE_TYPES.BASIC, count: 11 },
+  { type: WAVE_TYPES.BASIC, count: 12 },
+  { type: WAVE_TYPES.BASIC, count: 13 },
+  { type: WAVE_TYPES.BASIC, count: 13 },
+  { type: WAVE_TYPES.BASIC, count: 13 },
+  { type: WAVE_TYPES.BASIC, count: 13 },
+  { type: WAVE_TYPES.BASIC, count: 13 },
+  { type: WAVE_TYPES.BASIC, count: 13 },
+  { type: WAVE_TYPES.BASIC, count: 15 },
+  { type: WAVE_TYPES.BASIC, count: 15 },
+  { type: WAVE_TYPES.BASIC, count: 15 },
+  { type: WAVE_TYPES.BASIC, count: 15 },
+  { type: WAVE_TYPES.BASIC, count: 15 },
+];

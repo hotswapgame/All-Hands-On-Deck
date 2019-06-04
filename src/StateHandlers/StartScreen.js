@@ -37,7 +37,7 @@ function update(dt) {
   const { scene, renderer, camera, player, cannonballPool } = sharedData;
   ScreenShake.update(dt);
 
-  player.update(dt, []); // only collide rocks when not start seq
+  player.update(dt, false, false); // only collide rocks when not start seq, jank send dummy arrays
   cannonballPool.forEach(c => c.update(dt));
 
   switch (startSeqCount) {

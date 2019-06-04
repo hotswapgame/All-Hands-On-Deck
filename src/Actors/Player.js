@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { clamp } from 'ramda';
+import { clamp, any } from 'ramda';
 
 import { GAME_TYPES, SHIP_DIRECTIONS } from '../Constants';
 // maybe use asset manager only in one spot so I
@@ -632,9 +632,9 @@ class Player {
     this.ship.position.z = bobOffset;
   }
 
-  checkRockCollision(rocks) {
-    // Bail bc it's still recovering
-    if (this.rockTurnTime > 0) return;
+  checkRockCollision(rocks, bosses) {
+    // Bail bc it's still recovering or nothing to hit
+    if (this.rockTurnTime > 0 || (rocks.length < 1 && bosses.length < 1)) return;
 
     // Maybe do rock invulrablity window?
     const forwardVec = new THREE.Vector3();
@@ -646,21 +646,26 @@ class Player {
     const forwardCross = new THREE.Vector3().crossVectors(this.worldPos, forwardVec).normalize();
     const sideCross = new THREE.Vector3().crossVectors(this.worldPos, leftVec).normalize();
 
-    // this seems like a bottle neck
-    // maybe only do first two
-    this.hitboxes.forEach((b) => {
-      // get this hitbox world position
+    const hitPositions = this.hitboxes.map((hitbox) => {
       const worldP = new THREE.Vector3();
-      b.getWorldPosition(worldP);
+      hitbox.getWorldPosition(worldP);
 
-      // Loop over rocks
-      rocks.forEach((r) => {
-        // Check if rock is hit
-        // we use good placement bc sometimes the rock will hit on spawn
-        if (r.isGoodPlacement && !r.isRising
-            && r.getPosition().distanceTo(worldP) < this.rockHitRadius + r.hitRadius) {
+      return worldP;
+    });
+
+    const collideObj = (obj) => {
+      // Check if rock is hit
+      // we use good placement bc sometimes the obj will hit on spawn
+      if ((obj.isGoodPlacement && !obj.isRising) || obj.type === GAME_TYPES.BOSS) {
+        // check if it hits any of the players colliders
+        const collided = any(
+          pos => obj.getPosition().distanceTo(pos) < this.rockHitRadius + obj.hitRadius,
+          hitPositions
+        );
+
+        if (collided) {
           playSound('EXPLODE');
-          const rockPos = r.getPosition().normalize();
+          const objPos = obj.getPosition().normalize();
 
           //        -0.14
           //      +,- | -,-
@@ -668,18 +673,15 @@ class Player {
           //          |
           //      +,+ | -,+
           //         0.14
-          const frontTest = sideCross.dot(rockPos); // for grid y
-          const sideTest = forwardCross.dot(rockPos); // for grid x
+          const frontTest = sideCross.dot(objPos); // for grid y
+          const sideTest = forwardCross.dot(objPos); // for grid x
 
-          // // See if rock is in front
+          // // See if obj is in front
           // if (sideTest < 0) {
           // tweak to find angle of avoidance
           const turn = sideTest > 0 ? -1 : 1;
           // hard coded turn rate at end, maybe make this a twean
-          this.velocity = 0; // this.velocity * 0.001;
-          // this.moveSphere.rotateOnAxis(this.forwardAxis, -0.01); // linear
-          // this.moveSphere.rotateOnAxis(this.yawAxis, turn * 0.6); // ease in
-          // this.isRockTurn = true;
+          this.velocity = 0;
           ScreenShake.trigger(50, 300);
           this.addFlame(5000);
           this.addRoll(turn * -0.01);
@@ -687,14 +689,17 @@ class Player {
           this.setTurnAngle(0);
           this.rockTurnVal = turn;
           this.rockTurnTime = this.rockTurnTimeMax;
-          // }
         }
-      });
-    });
+      }
+    };
+
+    // Loop over rocks
+    rocks.forEach(collideObj);
+    bosses.forEach(collideObj);
   }
 
   // Central update
-  update(dt, rocks) {
+  update(dt, rocks, bosses) {
     // Set this at the start of each frame, bc why not
     // Actually it's so that we are using the proper matrix from last frame
     this.updateWorldPosition();
@@ -705,8 +710,7 @@ class Player {
     this.updateBob(dt);
     this.updateLights(dt);
 
-    // pass empty rocks array to skip this
-    if (rocks.length > 0) this.checkRockCollision(rocks);
+    if (rocks && bosses) this.checkRockCollision(rocks, bosses);
 
     if (this.rockTurnTime <= 0) {
       // always moving forward

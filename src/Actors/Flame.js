@@ -39,7 +39,7 @@ class Flame {
     // this.tempParticle = new THREE.Mesh(this.particleGeo);
     // this.gameObject.add(this.tempParticle);
 
-    this.gameObject.scale.set(0, 0, 0);
+    this.gameObject.scale.set(0.0001, 0.0001, 0.0001);
     this.gameObject.visible = false;
     this.growthRate = 0.0002;
   }
@@ -81,7 +81,6 @@ class Flame {
     this.particles.forEach((p) => {
       const pos = p.forward.clone();
       const s = ((p.initialPos + this.time) % 700) / 700;
-
       pos.multiplyScalar(s);
       p.mesh.position.x = pos.x;
       p.mesh.position.y = pos.y;
@@ -112,6 +111,14 @@ class Flame {
         this.isFlashing = false;
       }
     }
+  }
+
+  setStaticScale(newScale) {
+    if (this.isStatic) this.maxTime = newScale;
+  }
+
+  addStaticScale(delta) {
+    if (this.isStatic) this.maxTime += delta;
   }
 
   update(dt) {

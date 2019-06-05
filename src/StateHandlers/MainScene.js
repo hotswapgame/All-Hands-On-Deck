@@ -210,7 +210,7 @@ function updateWave(dt) {
       if (bombers.length > 0) {
         let bomberToRemove;
         bombers.forEach((b, i) => {
-          if (!b.isActive && !b.isExploding) bomberToRemove = i;
+          if (!b.isActive && !b.isDying) bomberToRemove = i;
         });
 
         if (bomberToRemove !== undefined) bombers.splice(bomberToRemove, 1);

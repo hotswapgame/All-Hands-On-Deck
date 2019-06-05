@@ -22,6 +22,10 @@ class JetSpray {
     this.baseScale += 0.2;
   }
 
+  hide() {
+    this.particles.forEach((p) => { p.visible = false; });
+  }
+
   update(dt) {
     if (this.particlesToSpawn > 0) this.particleTimer -= dt;
 

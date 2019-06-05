@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+
+import JetSpray from './JetSpray';
 import { getModel } from '../AssetManager';
 import { GLOBALS } from '../Constants';
 
@@ -44,7 +46,7 @@ class Bomber {
     this.scene.add(this.moveSphere);
 
     this.isActive = true;
-    this.startupTime = 4000;
+    this.startupTime = 4500;
     this.moveSphere.rotation.set(bossRot.x, bossRot.y, bossRot.z);
     this.moveSphere.rotateOnAxis(this.yawAxis, spawnAngle);
 
@@ -66,6 +68,8 @@ class Bomber {
       h.visible = false;
       this.gameObject.add(h);
     });
+
+    this.jetSpray = new JetSpray(this.gameObject, new THREE.Vector3(1, 1, 0));
   }
 
   getHit(ballPos) {
@@ -85,10 +89,6 @@ class Bomber {
     return isHit;
   }
 
-  // checkHit(pos, r) {
-
-  // }
-
   die() {
     // trigger death animation
     this.isActive = false;
@@ -97,8 +97,6 @@ class Bomber {
     // this.deathRollDir = Math.random() > 0.5 ? 1 : -1;
     this.scene.remove(this.moveSphere);
   }
-
-  // hide() { // remove from scene }
 
   updateHeading(dt, playerPos, bosses) {
     const forwardVec = new THREE.Vector3();
@@ -142,9 +140,12 @@ class Bomber {
       if (this.startupTime < 0) {
         this.updateHeading(dt, playerPos, bosses);
         this.moveSphere.rotateOnAxis(this.forwardAxis, this.speed * dt);
+        this.jetSpray.update(dt);
       } else {
         this.startupTime -= dt;
         this.moveSphere.rotateOnAxis(this.forwardAxis, this.speed * dt * 0.3);
+
+        if (this.startupTime < 0) this.jetSpray.startEmitting();
       }
     }
   }

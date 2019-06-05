@@ -41,21 +41,23 @@ class Boss {
     // this mat might need to change
     this.factoryMat = new THREE.MeshPhongMaterial({
       flatShading: true,
-      color: 0xCCCCCC,
+      color: 0x888888,
       shininess: 0.1,
     });
     this.portMat = new THREE.MeshPhongMaterial({
       flatShading: true,
-      color: 0x777777,
+      color: 0x333333,
       shininess: 0.1,
     });
     const gateMat = new THREE.MeshPhongMaterial({
       flatShading: true,
-      color: 0xCCCCCC,
+      color: 0xAAAAAA,
       shininess: 0.1,
     });
     const bodyMatOffset = new THREE.MeshBasicMaterial({
-      color: 0x000000,
+      color: 0x884444,
+      transparent: true,
+      opacity: 1.0,
       side: THREE.BackSide,
     });
     getModel('./Assets/boss/boss-factory.stl')
@@ -94,6 +96,13 @@ class Boss {
     this.moveSphere = new THREE.Object3D();
     this.moveSphere.add(this.gameObject);
     this.scene.add(this.moveSphere);
+
+    this.light = new THREE.PointLight(0x770000, 0.0, 20000);
+    this.light2 = new THREE.PointLight(0x770000, 0.0, 20000);
+    this.gameObject.add(this.light);
+    this.gameObject.add(this.light2);
+    this.light.position.set(1000, 0, 0);
+    this.light2.position.set(200, 0, 0);
 
     // start with player position
     this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);

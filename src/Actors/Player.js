@@ -62,7 +62,7 @@ class Player {
     // this mat might need to change
     const bodyMat = new THREE.MeshPhongMaterial({
       flatShading: true,
-      color: 0xCCCCCC,
+      color: 0xD0D0D0,
       shininess: 0.1,
     });
     const bodyMatOffset = new THREE.MeshBasicMaterial({
@@ -293,19 +293,19 @@ class Player {
     this.camera.rotateX(0.9);
 
     // Why am I setting lights on the player? so what you look at is illuminated nice
-    const light = new THREE.PointLight(0xFFFFFF, 0.2, 2000000);
-    const light2 = new THREE.PointLight(0x000000, 0.5, 2000000);
-    this.mainLight = new THREE.PointLight(0xFFEEEE, 0.8, 20000);
-    this.ambient = new THREE.AmbientLight(0x222222);
+    this.light = new THREE.PointLight(0xEEEEEE, 0.3, 20000);
+    this.light2 = new THREE.PointLight(0xEEEEEE, 0.2, 20000);
+    this.mainLight = new THREE.PointLight(0xEEEEEE, 0.5, 20000);
+    this.ambient = new THREE.AmbientLight(0x1A1A1A);
 
-    this.gameObject.add(light);
-    this.gameObject.add(light2);
+    this.gameObject.add(this.light);
+    this.gameObject.add(this.light2);
     this.gameObject.add(this.mainLight);
     this.gameObject.add(this.ambient);
 
-    light.position.set(0, 200, 200);
-    light2.position.set(0, -200, 200);
-    this.mainLight.position.set(0, -10, 200);
+    this.light.position.set(0, -10, 400);
+    this.light2.position.set(0, -10, 100);
+    this.mainLight.position.set(0, -10, 50);
 
     // Light transition
     this.lightStart = 20000;

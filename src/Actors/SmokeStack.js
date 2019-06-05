@@ -7,10 +7,11 @@ class SmokeStack {
     this.gameObject.position.copy(position);
 
     this.particleTimer = 0;
-    this.particleSpawnOffset = 30;
+    this.particleSpawnOffset = 40;
     this.particlesToSpawn = 0;
     this.particleGeo = new THREE.SphereGeometry(1, 10, 10);
     this.particles = [];
+    this.baseScale = 1;
     // Array.from(
     //   { length: 25 },
     //   () => ({
@@ -29,7 +30,11 @@ class SmokeStack {
   }
 
   startEmitting() {
-    this.particlesToSpawn = 45;
+    this.particlesToSpawn = 30;
+  }
+
+  increase() {
+    this.baseScale += 0.2;
   }
 
   update(dt) {
@@ -40,7 +45,7 @@ class SmokeStack {
         this.particleGeo,
         new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true })
       );
-      newParticle.ascend = new THREE.Vector3(0.008, Math.random() * 0.0025, Math.random() * 0.0025);
+      newParticle.ascend = new THREE.Vector3(0.009, Math.random() * 0.0025, Math.random() * 0.0025);
       this.particles.push(newParticle);
       this.gameObject.add(newParticle);
 
@@ -53,12 +58,12 @@ class SmokeStack {
       p.position.y += p.ascend.y * dt;
       p.position.z += p.ascend.z * dt;
       p.material.opacity -= 0.01;
-      // p.scale.x += 0.1;
-      // p.scale.y += 0.1;
-      // p.scale.z += 0.1;
-      if (p.position.x > 12) {
+      p.scale.x += this.baseScale / 100;
+      p.scale.y += this.baseScale / 100;
+      p.scale.z += this.baseScale / 100;
+      if (p.position.x > 15) {
         p.position.set(0, 0, 0);
-        p.scale.set(1, 1, 1);
+        p.scale.set(this.baseScale, this.baseScale, this.baseScale);
         p.material.opacity = 1;
       }
     });

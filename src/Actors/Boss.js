@@ -125,6 +125,7 @@ class Boss {
       this.isActive = false;
     }
 
+    this.smokeStacks.forEach(s => s.increase());
     this.startFlash();
     this.flashTime = 40;
   }

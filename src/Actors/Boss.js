@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import SmokeStack from './SmokeStack';
 import { GLOBALS } from '../Constants';
 import { getModel } from '../AssetManager';
 
@@ -101,6 +102,13 @@ class Boss {
     // move away from player based on randomly generated position
     this.moveSphere.rotateOnAxis(this.yawAxis, angle);
     this.moveSphere.rotateOnAxis(this.forwardAxis, -startOffset);
+
+    // smokeStacks
+    this.smokeStacks = [
+      new SmokeStack(this.gameObject, new THREE.Vector3(20, 20, 20)),
+    ];
+
+    this.smokeStacks.forEach(s => s.startEmitting());
   }
 
   getPosition() {
@@ -151,6 +159,8 @@ class Boss {
 
       if (this.flashTime <= 0) this.stopFlash();
     }
+
+    this.smokeStacks.forEach(s => s.update(dt));
   }
 }
 

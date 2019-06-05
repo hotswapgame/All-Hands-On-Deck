@@ -25,7 +25,7 @@ let screen;
 // night day
 let dayCount = 0;
 let dayStamp = 0;
-const dayDuration = 50000;
+const dayDuration = 5000000000;
 
 const scene = new THREE.Scene();
 // Possibly make this a class so I can do that sweet tween
@@ -66,8 +66,8 @@ renderer.setPixelRatio(window.devicePixelRatio);
 // should also include lights, except for player point light
 // const worldTex = new THREE.TextureLoader().load('./Assets/world.png'); //0x5599AA
 const worldMat = new THREE.MeshPhysicalMaterial({
-  color: 0x5599AA,
-  reflectivity: 1,
+  color: 0xAABBCC,
+  reflectivity: 0,
   roughness: 0,
   metalness: 0,
   opacity: 0.9,
@@ -80,6 +80,62 @@ getModel('./Assets/world.stl')
     world.scale.set(GLOBALS.WORLD_SIZE, GLOBALS.WORLD_SIZE, GLOBALS.WORLD_SIZE);
     scene.add(world);
   });
+
+// CLEMENT'S BAD CLOUD SCRIPT
+const rotationSegmentCount = 5;
+const rotationStep = (Math.PI*2)/(rotationSegmentCount+1);
+const rotationStepRange = rotationStep*0.2;
+const clusterRange = Math.PI*0.00;
+const clusterSize = 1;
+let cloudRotation = [];
+for (let i=0; i<rotationSegmentCount; i++) {
+  for (let j=0; j<rotationSegmentCount; j++) {
+    let rx = Math.random()*rotationStepRange + i*rotationStep;
+    let ry = Math.random()*rotationStepRange + j*rotationStep;
+    cloudRotation.push({x:rx, y:ry});
+  }
+}
+for (let i=0; i<cloudRotation.length; i++) {
+  for (let j=0; j<clusterSize; j++) {
+    let cloudRotationX = cloudRotation[i].x + (Math.random()*clusterRange - clusterRange/2);
+    let cloudRotationY = cloudRotation[i].y + (Math.random()*clusterRange - clusterRange/2);
+    
+    // BIG CLOUDS
+    // let cloudScaleAreaX = 25 + Math.random()*20;
+    // let cloudScaleAreaY = 25 + Math.random()*20;
+
+    // SMALL CLOUDS
+    let cloudPositionHeightFactor = 1.0 + Math.random()*0.2;
+    let cloudPositionHeight = GLOBALS.WORLD_SIZE + 15*cloudPositionHeightFactor;
+    
+    let cloudScaleAreaX = (17 + Math.random()*10) * cloudPositionHeightFactor;
+    let cloudScaleAreaY = 0.9 * cloudScaleAreaX + (Math.random() * 0.2);
+
+    let cloudScaleHeight = 10 + Math.random()*15;
+    let cloudRotationZ = Math.PI*2*Math.random();
+    const cloudModelNum = Math.floor(Math.random() * 2) + 3;
+    getModel(`./Assets/cloud${cloudModelNum}.stl`)
+      .then((geo) => {
+        const mat = new THREE.MeshBasicMaterial({
+          color: 0xFFFFFF,
+          transparent: true,
+          opacity: 0.6,
+          //side: THREE.BackSide,
+        });
+        let cloud = new THREE.Mesh(geo, mat);
+        cloud.scale.set(cloudScaleAreaX, cloudScaleAreaY, cloudScaleHeight);
+        cloud.rotation.set(cloudRotationX, cloudRotationY, cloudRotationZ);
+        let cloudPosition = new THREE.Vector3(0, 0, cloudPositionHeight);
+        let cloudRotationE = new THREE.Euler(cloudRotationX, cloudRotationY, cloudRotationZ);
+        cloudPosition.applyEuler(cloudRotationE);
+        cloud.position.set(cloudPosition.x, cloudPosition.y, cloudPosition.z);
+        scene.add(cloud);
+      });
+  }
+}
+
+// END CLEMENT'S BAD CLOUD SCRIPT
+
 
 function update(currentTime) {
   if (prevTime === 0) prevTime = currentTime;

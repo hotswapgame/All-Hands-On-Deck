@@ -34,7 +34,7 @@ class Rock {
     // this.hitBox = new THREE.Mesh(hitgeo, new THREE.MeshBasicMaterial({ wireframe: true }));
     // this.gameObject.add(this.hitBox);
 
-    this.colorArr = [0xdddddd, 0xcccccc, 0xbbbbbb];
+    this.colorArr = [0xFFFFFF, 0xFFFFFF, 0xFFFFFF];
 
     getModel(`./Assets/Rocks/rocks${rockModelNum}.stl`)
       .then((geo) => {
@@ -49,7 +49,7 @@ class Rock {
     getModel(`./Assets/Rocks/rocksOffset${rockModelNum}.stl`)
       .then((geo) => {
         const mat = new THREE.MeshBasicMaterial({
-          color: 0x444455,
+          color: 0x000000,
           side: THREE.BackSide,
         });
         this.rockOutline = new THREE.Mesh(geo, mat);

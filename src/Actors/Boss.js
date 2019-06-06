@@ -8,7 +8,7 @@ class Boss {
   constructor(scene, spawnBomber, playerRot, angle) {
     this.scene = scene;
     this.spawnBomber = spawnBomber;
-    this.hp = 10; // maybe make this a param
+    this.hp = 20; // maybe make this a param
     this.radius = 20;
     this.modelScale = 50;
     this.hitRadius = 27;
@@ -20,20 +20,21 @@ class Boss {
     this.riseTimeMax = 3000;
     this.riseTime = 0;
     this.isSinking = false;
+    this.sinkTime = 0;
     this.riseStartOffset = -100;
     this.gameObject = new THREE.Object3D();
     this.gameObject.position.set(GLOBALS.WORLD_SIZE + this.riseStartOffset, 0, 0);
 
     // (1.26)
     this.gateSpawnAngles = [0.32, 1.58, 2.84, 4.1, 5.37];
-    this.spawnDoor = 0;
+    this.spawnDoor = 2;
 
     this.passedRockCheck = false;
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
 
-    this.BOMBER_TIME_MAX = 4500;
-    this.bomberTime = this.BOMBER_TIME_MAX;
+    this.BOMBER_TIME_MAX = 2000;
+    this.bomberTime = 500;
     this.isActive = true;
 
     // const hitGeo = new THREE.SphereGeometry(this.hitRadius, 10, 10);
@@ -111,7 +112,7 @@ class Boss {
 
     // start with player position
     this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);
-    const startOffset = -Math.PI / 5 - (Math.random() * Math.PI / 6);
+    const startOffset = -Math.PI / 4 - (Math.random() * Math.PI / 6);
 
     // move away from player based on randomly generated position
     this.moveSphere.rotateOnAxis(this.yawAxis, angle);
@@ -138,7 +139,6 @@ class Boss {
 
     if (this.hp <= 0) {
       this.isSinking = true;
-      this.sinkTime = 0;
     }
 
     this.smokeStacks.forEach(s => s.increase());
@@ -180,7 +180,7 @@ class Boss {
       this.gameObject.position.x = GLOBALS.WORLD_SIZE + pos;
     } else if (this.isSinking) {
       this.sinkTime += dt;
-      if (this.sinkTime >= 5000) {
+      if (this.sinkTime >= 2000) {
         this.scene.remove(this.moveSphere);
         this.isActive = false;
       }

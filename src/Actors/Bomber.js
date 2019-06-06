@@ -14,7 +14,7 @@ class Bomber {
     this.gameObject.position.setX(GLOBALS.WORLD_SIZE - 2);
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
-    this.speed = 0.00008;
+    this.speed = 0.00009;
 
     // Steering markers
     this.forwardMarker = new THREE.Object3D();
@@ -47,7 +47,7 @@ class Bomber {
     this.scene.add(this.moveSphere);
 
     this.isActive = true;
-    this.startupTime = 4500;
+    this.startupTime = 3500;
     this.moveSphere.rotation.set(bossRot.x, bossRot.y, bossRot.z);
     this.moveSphere.rotateOnAxis(this.yawAxis, spawnAngle);
 
@@ -92,14 +92,16 @@ class Bomber {
   }
 
   die() {
-    // trigger death animation
-    this.isActive = false;
-    this.isDying = true; // true;
-    this.body.visible = false;
-    this.jetSpray.hide();
-    // this.deathTime = 0;
-    // this.deathRollDir = Math.random() > 0.5 ? 1 : -1;
-    this.burst = new BombBurst(this.gameObject);
+    if (!this.isDying) {
+      // trigger death animation
+      this.isActive = false;
+      this.isDying = true; // true;
+      this.body.visible = false;
+      this.jetSpray.hide();
+      // this.deathTime = 0;
+      // this.deathRollDir = Math.random() > 0.5 ? 1 : -1;
+      this.burst = new BombBurst(this.gameObject);
+    }
   }
 
   updateHeading(dt, playerPos, bosses) {
@@ -147,7 +149,7 @@ class Bomber {
         this.jetSpray.update(dt);
       } else {
         this.startupTime -= dt;
-        this.moveSphere.rotateOnAxis(this.forwardAxis, this.speed * dt * 0.3);
+        this.moveSphere.rotateOnAxis(this.forwardAxis, this.speed * dt * 0.4);
 
         if (this.startupTime < 0) this.jetSpray.startEmitting();
       }

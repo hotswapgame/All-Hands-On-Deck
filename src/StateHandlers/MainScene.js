@@ -204,6 +204,7 @@ function updateWave(dt) {
         });
 
         if (bossToRemove !== undefined) bosses.splice(bossToRemove, 1);
+        if (bosses.length === 1 && bosses[0].isSinking) bombers.forEach(b => b.die());
       }
 
       // filter out bombers from wave if they dead
@@ -276,8 +277,8 @@ function updateWave(dt) {
   if (waveEnemiesToSpawn > 0 && enemySpawnTimer < 0) {
     if (currentWave.type === WAVE_TYPES.BASIC) spawnEnemy();
     else if (currentWave.type === WAVE_TYPES.BOSS) {
-      const baseAngle = -Math.PI / 12 * (currentWave.count - 1);
-      const spawnAngle = baseAngle + Math.PI / 6 * (currentWave.count - waveEnemiesToSpawn);
+      const baseAngle = -Math.PI / 8 * (currentWave.count - 1);
+      const spawnAngle = baseAngle + Math.PI / 4 * (currentWave.count - waveEnemiesToSpawn);
       spawnBoss(spawnAngle);
     }
     enemySpawnTimer = waveEnemySpawnWindow;
@@ -374,7 +375,7 @@ function handleInput(type, data) {
       player.setSailSpeed(data);
       break;
     case INPUT_TYPES.RUDDER:
-      player.setTurnAngle(data);
+      player.setTurnAngle(data * 1.2);
       break;
     case INPUT_TYPES.HATCH:
       player.loadCannon(data);
@@ -385,7 +386,7 @@ function handleInput(type, data) {
     case INPUT_TYPES.KEY:
       openTreasure();
       break;
-    case INPUT_TYPES.FIRE:
+    case INPUT_TYPES.FLAME:
       player.calmFire(1000);
       break;
     default: break;

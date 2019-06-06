@@ -28,7 +28,7 @@ function exit() {
 }
 
 function handleInput(type, data) {
-  if (type === INPUT_TYPES.FIRE) {
+  if (type === INPUT_TYPES.FLAME) {
     resetPressCount += 1;
     if (resetPressCount >= RESET_PRESS_MAX) {
       location.reload();

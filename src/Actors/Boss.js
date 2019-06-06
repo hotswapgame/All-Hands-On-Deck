@@ -14,10 +14,10 @@ class Boss {
     this.hitRadius = 27;
     this.worldPos = new THREE.Vector3();
     this.baseSink = -4;
-    this.riseRotSpeed = 0.1;
+    this.riseRotSpeed = 0.05;
     this.isRising = true;
     this.rotOffset = Math.PI;
-    this.riseTimeMax = 2000;
+    this.riseTimeMax = 3000;
     this.riseTime = 0;
     this.isSinking = false;
     this.riseStartOffset = -100;
@@ -40,7 +40,9 @@ class Boss {
     // this.gameObject = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ wireframe: true, color: 0xffffff }));
 
     this.flashTime = 0;
-    this.flashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    this.flashMat = new THREE.MeshBasicMaterial({ color: 0xfafafa });
+    this.flashMat2 = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.75, side: THREE.BackSide });
+    
     // this mat might need to change
     this.factoryMat = new THREE.MeshPhongMaterial({
       flatShading: true,
@@ -57,7 +59,7 @@ class Boss {
       color: 0xAAAAAA,
       shininess: 0.1,
     });
-    const bodyMatOffset = new THREE.MeshBasicMaterial({
+    this.bodyMatOffset = new THREE.MeshBasicMaterial({
       color: 0x000000,
       transparent: true,
       opacity: 1.0,
@@ -83,7 +85,7 @@ class Boss {
 
     getModel('./Assets/boss/boss-outline.stl')
       .then((geo) => {
-        this.outline = new THREE.Mesh(geo, bodyMatOffset);
+        this.outline = new THREE.Mesh(geo, this.bodyMatOffset);
         this.outline.scale.set(this.modelScale, this.modelScale, this.modelScale);
         this.outline.rotateY(Math.PI / 2);
         this.outline.position.set(this.baseSink, 0, 0);
@@ -153,11 +155,13 @@ class Boss {
   startFlash() {
     this.factory.material = this.flashMat;
     this.ports.material = this.flashMat;
+    this.outline.material = this.flashMat2;
   }
 
   stopFlash() {
     this.factory.material = this.factoryMat;
     this.ports.material = this.portMat;
+    this.outline.material = this.bodyMatOffset;
   }
 
   update(dt) {
@@ -166,6 +170,8 @@ class Boss {
       if (this.riseTime >= this.riseTimeMax) {
         this.riseTime = this.riseTimeMax;
         this.isRising = false;
+      } else if (this.riseTime >= this.riseTimeMax*0.5) {
+        this.smokeStacks.forEach(s => s.update(dt));
       }
 
       const timeRatio = this.riseTime / this.riseTimeMax * (this.riseTime / this.riseTimeMax - 2);
@@ -174,7 +180,7 @@ class Boss {
       this.gameObject.position.x = GLOBALS.WORLD_SIZE + pos;
     } else if (this.isSinking) {
       this.sinkTime += dt;
-      if (this.sinkTime >= 2500) {
+      if (this.sinkTime >= 5000) {
         this.scene.remove(this.moveSphere);
         this.isActive = false;
       }
@@ -182,8 +188,9 @@ class Boss {
       const timeRatio = this.sinkTime / 1500;
       const pos = (timeRatio * (timeRatio) * (-80));
       this.gameObject.position.x = GLOBALS.WORLD_SIZE + pos;
-      this.gameObject.position.y = Math.cos(this.sinkTime / 2);
-      this.gameObject.position.z = Math.sin(this.sinkTime / 2);
+      const sinkTimeFactor = Math.pow(this.sinkTime, 0.9) / 2.0;
+      this.gameObject.position.y = 2*Math.cos(sinkTimeFactor);
+      this.gameObject.position.z = 2*Math.sin(sinkTimeFactor);
     } else {
       // Spawn bomber logic
       this.bomberTime -= dt;

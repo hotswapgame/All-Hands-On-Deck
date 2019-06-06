@@ -238,6 +238,7 @@ function updateWave(dt) {
     const nextWave = waveCount < WAVES.length ? WAVES[waveCount] : WAVES[WAVES.length - 1];
     enemySpawnTimer = 5000; // Wait 5 sec into new wave before spawning
     waveEnemiesToSpawn = nextWave.count;
+    bombers.forEach(b => b.die());
 
     // Check for wave change
     switch (nextWave.type) {

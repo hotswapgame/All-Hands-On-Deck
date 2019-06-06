@@ -66,7 +66,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
 // should also include lights, except for player point light
 // const worldTex = new THREE.TextureLoader().load('./Assets/world.png'); //0x5599AA
 const worldMat = new THREE.MeshPhysicalMaterial({
-  color: 0xAABBCC,
+  color: 0xAAAAAA,
   reflectivity: 0,
   roughness: 0,
   metalness: 0,

@@ -4,13 +4,13 @@ class BombBurst {
   constructor(parent) {
     this.gameObject = new THREE.Object3D();
 
-    this.burstTime = 50;
+    this.burstTime = 70;
     this.isBursting = true;
     this.fadeTime = 1000;
     this.isFading = false;
     this.isActive = true;
 
-    this.burstMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    this.burstMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
     this.fadeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
     this.clouds = [];
 
@@ -21,9 +21,9 @@ class BombBurst {
     this.gameObject.add(this.burstSphere);
     const lineGeo = new THREE.SphereGeometry(0.75, 3, 2);
     this.burstLines = [];
-    for (let i = 0; i < 6; i += 1) {
+    for (let i = 0; i < 7; i += 1) {
       const newLine = new THREE.Mesh(lineGeo, this.burstMat);
-      newLine.scale.y = 22;
+      newLine.scale.y = 20;
       newLine.rotation.z = Math.random() * Math.PI;
       newLine.rotation.x = Math.random() * Math.PI * 2;
       this.burstLines.push(newLine);
@@ -39,9 +39,9 @@ class BombBurst {
     if (this.isBursting) {
       this.burstTime -= dt;
       this.burstLines.forEach((l) => {
-        l.scale.x -= 0.15;
-        // l.scale.y -= 0.5;
-        l.scale.z -= 0.15;
+        l.scale.x -= 0.1;
+        l.scale.y -= 0.02;
+        l.scale.z -= 0.1;
       });
       this.burstSphere.scale.x -= 0.2;
       this.burstSphere.scale.y -= 0.2;

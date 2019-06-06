@@ -16,14 +16,19 @@ class Boss {
     this.baseSink = -4;
     this.riseRotSpeed = 0.1;
     this.isRising = true;
-    this.riseStartOffset = 100;
+    this.rotOffset = Math.PI;
+    this.riseTimeMax = 2000;
+    this.riseTime = 0;
+    this.isSinking = false;
+    this.riseStartOffset = -100;
+    this.gameObject = new THREE.Object3D();
+    this.gameObject.position.set(GLOBALS.WORLD_SIZE + this.riseStartOffset, 0, 0);
 
     // (1.26)
     this.gateSpawnAngles = [0.32, 1.58, 2.84, 4.1, 5.37];
     this.spawnDoor = 0;
 
     this.passedRockCheck = false;
-    this.spawnRot = new THREE.Vector3();
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
 
@@ -33,8 +38,6 @@ class Boss {
 
     // const hitGeo = new THREE.SphereGeometry(this.hitRadius, 10, 10);
     // this.gameObject = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ wireframe: true, color: 0xffffff }));
-    this.gameObject = new THREE.Object3D();
-    this.gameObject.position.set(GLOBALS.WORLD_SIZE, 0, 0);
 
     this.flashTime = 0;
     this.flashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
@@ -55,7 +58,7 @@ class Boss {
       shininess: 0.1,
     });
     const bodyMatOffset = new THREE.MeshBasicMaterial({
-      color: 0x884444,
+      color: 0x000000,
       transparent: true,
       opacity: 1.0,
       side: THREE.BackSide,
@@ -106,7 +109,7 @@ class Boss {
 
     // start with player position
     this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);
-    const startOffset = -Math.PI / 4 - (Math.random() * Math.PI / 6);
+    const startOffset = -Math.PI / 5 - (Math.random() * Math.PI / 6);
 
     // move away from player based on randomly generated position
     this.moveSphere.rotateOnAxis(this.yawAxis, angle);
@@ -114,7 +117,9 @@ class Boss {
 
     // smokeStacks
     this.smokeStacks = [
-      new SmokeStack(this.gameObject, new THREE.Vector3(20, 20, 20)),
+      new SmokeStack(this.gameObject, new THREE.Vector3(28, -2, 9)),
+      new SmokeStack(this.gameObject, new THREE.Vector3(35, 0.3, -3)),
+      new SmokeStack(this.gameObject, new THREE.Vector3(38, 5.3, -6)),
     ];
 
     this.smokeStacks.forEach(s => s.startEmitting());
@@ -130,8 +135,8 @@ class Boss {
     this.hp -= amt;
 
     if (this.hp <= 0) {
-      this.scene.remove(this.moveSphere);
-      this.isActive = false;
+      this.isSinking = true;
+      this.sinkTime = 0;
     }
 
     this.smokeStacks.forEach(s => s.increase());
@@ -156,21 +161,46 @@ class Boss {
   }
 
   update(dt) {
-    // Spawn bomber logic
-    this.bomberTime -= dt;
-    if (this.bomberTime <= 0) {
-      this.spawnBomber(this.moveSphere.rotation, this.gateSpawnAngles[this.spawnDoor % 5]);
-      this.spawnDoor += 1;
-      this.bomberTime = this.BOMBER_TIME_MAX;
+    if (this.isRising) {
+      this.riseTime += dt;
+      if (this.riseTime >= this.riseTimeMax) {
+        this.riseTime = this.riseTimeMax;
+        this.isRising = false;
+      }
+
+      const timeRatio = this.riseTime / this.riseTimeMax * (this.riseTime / this.riseTimeMax - 2);
+      this.gameObject.rotation.x = (timeRatio * (this.rotOffset)) + this.rotOffset;
+      const pos = (timeRatio * (this.riseStartOffset)) + this.riseStartOffset;
+      this.gameObject.position.x = GLOBALS.WORLD_SIZE + pos;
+    } else if (this.isSinking) {
+      this.sinkTime += dt;
+      if (this.sinkTime >= 2500) {
+        this.scene.remove(this.moveSphere);
+        this.isActive = false;
+      }
+
+      const timeRatio = this.sinkTime / 1500;
+      const pos = (timeRatio * (timeRatio) * (-80));
+      this.gameObject.position.x = GLOBALS.WORLD_SIZE + pos;
+      this.gameObject.position.y = Math.cos(this.sinkTime / 2);
+      this.gameObject.position.z = Math.sin(this.sinkTime / 2);
+    } else {
+      // Spawn bomber logic
+      this.bomberTime -= dt;
+      if (this.bomberTime <= 0) {
+        this.spawnBomber(this.moveSphere.rotation, this.gateSpawnAngles[this.spawnDoor % 5]);
+        this.spawnDoor += 1;
+        this.bomberTime = this.BOMBER_TIME_MAX;
+      }
+
+      if (this.flashTime > 0) {
+        this.flashTime -= dt;
+
+        if (this.flashTime <= 0) this.stopFlash();
+      }
+
+      this.smokeStacks.forEach(s => s.update(dt));
     }
-
-    if (this.flashTime > 0) {
-      this.flashTime -= dt;
-
-      if (this.flashTime <= 0) this.stopFlash();
-    }
-
-    this.smokeStacks.forEach(s => s.update(dt));
   }
 }
 

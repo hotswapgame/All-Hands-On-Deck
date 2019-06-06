@@ -154,7 +154,6 @@ class Bomber {
     }
 
     if (this.isDying) {
-      console.log('wat');
       this.burst.update(dt);
       if (!this.burst.isActive) {
         this.isDying = false;

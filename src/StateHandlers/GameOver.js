@@ -16,7 +16,7 @@ function begin() {
   const { score } = sharedData;
   resetPressCount = 0;
   updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
-  runGameOverSequence(score.ships, score.treasure, score.totalTime, score.fireTime);
+  runGameOverSequence(score.ships, score.factory, score.treasure, score.totalTime, score.fireTime);
 }
 
 function update(dt) {

@@ -210,7 +210,10 @@ function updateWave(dt) {
       if (bosses.length > 0) {
         let bossToRemove;
         bosses.forEach((b, i) => {
-          if (!b.isActive) bossToRemove = i;
+          if (!b.isActive) {
+            bossToRemove = i
+            sharedData.score.factory += 1;
+          };
         });
 
         if (bossToRemove !== undefined) bosses.splice(bossToRemove, 1);

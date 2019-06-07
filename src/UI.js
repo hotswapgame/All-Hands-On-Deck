@@ -59,15 +59,16 @@ export function updateResetGradient(resetPercent) {
   `;
 }
 
-export function runGameOverSequence(shipSunk, treasureFound, timeTotal, timeFire) {
+export function runGameOverSequence(shipSunk, factoryDestroyed, treasureFound, timeTotal, timeFire) {
   const elementHUD = document.getElementById('screen-hud');
   if (elementHUD.classList.contains('active')) {
     elementHUD.classList.remove('active');
   }
-  const element = document.getElementById('game-over'); // clement you should be more specifc than just 'element'
-  element.classList.add('active');
+  const elementGO = document.getElementById('game-over'); // clement you should be more specifc than just 'element'
+  elementGO.classList.add('active');
 
   document.getElementById('sunk').getElementsByClassName('stat')[0].innerHTML = shipSunk;
+  document.getElementById('factory').getElementsByClassName('stat')[0].innerHTML = factoryDestroyed;
   document.getElementById('treasure').getElementsByClassName('stat')[0].innerHTML = treasureFound;
 
   let secA = Math.floor((timeTotal % 60000) / 1000);

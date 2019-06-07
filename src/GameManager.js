@@ -194,6 +194,7 @@ const gameState = {
   cannonballPool,
   score: {
     ships: 0,
+    factory: 0,
     treasure: 0,
     totalTime: 0,
     fireTime: 0,

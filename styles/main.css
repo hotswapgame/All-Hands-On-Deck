@@ -127,7 +127,7 @@ h2 {
 .stat-box {
   position: relative;
   float: left;
-  width: 50%;
+  width: 33%;
   margin: 0 0 5vh 0;
   padding: 0;
   text-align: center;
@@ -161,11 +161,11 @@ h2 {
   line-height: 1em;
 }
 
-#sunk .stat-heading, #treasure .stat-heading {
+#sunk .stat-heading, #treasure .stat-heading, #factory .stat-heading {
   font-size: 3.0vh;
 }
 
-#sunk .stat, #treasure .stat {
+#sunk .stat, #treasure .stat, #factory .stat {
   font-size: 8vh;
   margin-top: 0.2em;
 }

@@ -74,6 +74,12 @@ class Bomber {
     this.burst = undefined;
   }
 
+  getPosition() {
+    const worldP = new THREE.Vector3();
+    this.hitboxes[0].getWorldPosition(worldP);
+    return worldP;
+  }
+
   getHit(ballPos) {
     let isHit = false;
 

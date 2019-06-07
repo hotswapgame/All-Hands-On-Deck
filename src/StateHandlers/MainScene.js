@@ -1,3 +1,5 @@
+import { any } from 'ramda';
+
 import EnemyShip from '../Actors/EnemyShip';
 import Boss from '../Actors/Boss';
 import Treasure from '../Actors/Treasure';
@@ -172,6 +174,14 @@ function checkCollisions() {
         ScreenShake.trigger(15, 300);
         score.ships += 1;
       }
+
+      const bPos = b1.getPosition();
+      rocks.forEach((r) => {
+        if (bPos.distanceTo(r.getPosition()) < r.hitRadius + 10) {
+          b1.die(true);
+          playSound('EXPLODE');
+        }
+      });
     }
   });
 }
@@ -246,11 +256,12 @@ function updateWave(dt) {
       case WAVE_TYPES.BOSS:
         rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000))); // add random delay to rock sinking?
         enemyPool.forEach((e) => { if (e.isActive) e.bossSink(Math.round(Math.random() * 800)); });
-        waveEnemySpawnWindow = 1000;
+        waveEnemySpawnWindow = 1500;
         break;
       case WAVE_TYPES.BASIC:
         waveChestSpawned = false;
         if (currentWave.type === WAVE_TYPES.BOSS || rocks.length === 0) {
+          rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000)));
           shouldGenRocks = true;
         }
 
@@ -263,7 +274,7 @@ function updateWave(dt) {
 
   if (shouldGenRocks) {
     // some code
-    const rockCount = currentWave.type === WAVE_TYPES.BOSS ? 15 : 30;
+    const rockCount = currentWave.type === WAVE_TYPES.BOSS ? 15 : 35;
     // actually need a for loop here :/
     for (let i = 0; i < rockCount; i += 1) {
       // spawn new rocks
@@ -280,6 +291,9 @@ function updateWave(dt) {
       const baseAngle = -Math.PI / 8 * (currentWave.count - 1);
       const spawnAngle = baseAngle + Math.PI / 4 * (currentWave.count - waveEnemiesToSpawn);
       spawnBoss(spawnAngle);
+
+      // when all bosses are spawned, spawn rocks
+      if (waveEnemiesToSpawn === 1) shouldGenRocks = true;
     }
     enemySpawnTimer = waveEnemySpawnWindow;
     waveEnemiesToSpawn -= 1;
@@ -301,8 +315,11 @@ function update(dt) {
   // Make sure rocks don't spawn on player position
   rocks.forEach((r) => {
     if (!r.isGoodPlacement) {
+      const rPos = r.getPosition();
+      const collideBoss = any(b => b.getPosition().distanceTo(rPos) < 80, bosses);
+      const collidePlayer = rPos.distanceTo(player.getPosition()) < 120;
       // arbitary spawn distance of 130
-      if (r.getPosition().distanceTo(player.getPosition()) < 130) {
+      if (collideBoss || collidePlayer) {
         r.randomlyPlace();
       } else {
         r.fixPlacement();

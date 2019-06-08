@@ -27,9 +27,9 @@ const sounds = {
 };
 
 export function startSoundtrack() {
-  sounds.soundtrackRoot.play();
-  sounds.soundtrackMain.play();
-  sounds.soundtrackBoss.play();
+  // sounds.soundtrackRoot.play();
+  // sounds.soundtrackMain.play();
+  // sounds.soundtrackBoss.play();
 }
 
 export function setBossSoundtrack() {
@@ -78,5 +78,5 @@ export function pauseFire() {
 }
 
 export function playTreasure() {
-  
+
 }

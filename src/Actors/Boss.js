@@ -8,7 +8,7 @@ class Boss {
   constructor(scene, spawnBomber, playerRot, angle) {
     this.scene = scene;
     this.spawnBomber = spawnBomber;
-    this.hp = 20; // maybe make this a param
+    this.hp = 17; // maybe make this a param
     this.radius = 20;
     this.modelScale = 50;
     this.hitRadius = 27;
@@ -55,11 +55,6 @@ class Boss {
       color: 0x333333,
       shininess: 0.1,
     });
-    const gateMat = new THREE.MeshPhongMaterial({
-      flatShading: true,
-      color: 0xAAAAAA,
-      shininess: 0.1,
-    });
     this.bodyMatOffset = new THREE.MeshBasicMaterial({
       color: 0x000000,
       transparent: true,
@@ -103,12 +98,12 @@ class Boss {
     this.moveSphere.add(this.gameObject);
     this.scene.add(this.moveSphere);
 
-    this.light = new THREE.PointLight(0x770000, 0.0, 20000);
-    this.light2 = new THREE.PointLight(0x770000, 0.0, 20000);
-    this.gameObject.add(this.light);
-    this.gameObject.add(this.light2);
-    this.light.position.set(1000, 0, 0);
-    this.light2.position.set(200, 0, 0);
+    // this.light = new THREE.PointLight(0x770000, 0.0, 20000);
+    // this.light2 = new THREE.PointLight(0x770000, 0.0, 20000);
+    // this.gameObject.add(this.light);
+    // this.gameObject.add(this.light2);
+    // this.light.position.set(1000, 0, 0);
+    // this.light2.position.set(200, 0, 0);
 
     // start with player position
     this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);

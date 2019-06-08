@@ -1,6 +1,7 @@
 import ScreenShake from '../ScreenShake';
 import { hideStartScreen, cycleInstructions, showStartScreen } from '../UI';
 import { GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';
+import { startSoundtrack, setStartSoundtrack } from '../SoundPlayer';
 
 // local state variables
 // Start sequence stuff
@@ -21,6 +22,9 @@ function begin() {
   showStartScreen();
   sharedData.player.reset();
   sharedData.cannonballPool.forEach(c => c.hide());
+
+  setStartSoundtrack();
+  startSoundtrack();
 
   // reset score
   sharedData.score.ships = 0;
@@ -74,7 +78,7 @@ function handleInput(type, data) {
 
   switch (type) {
     case INPUT_TYPES.SAIL:
-      player.setSailSpeed(data);
+      player.setSailSpeed(data * 1.5);
       break;
     case INPUT_TYPES.RUDDER:
       player.setTurnAngle(data);

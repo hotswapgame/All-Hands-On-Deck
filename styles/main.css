@@ -161,14 +161,14 @@ h2 {
   line-height: 1em;
 }
 
-#sunk .stat-heading, #treasure .stat-heading, #factory .stat-heading {
+/* #sunk .stat-heading, #treasure .stat-heading, #factory .stat-heading {
   font-size: 3.0vh;
 }
 
 #sunk .stat, #treasure .stat, #factory .stat {
   font-size: 8vh;
   margin-top: 0.2em;
-}
+} */
 
 #treasure-stat {
   color: #FFFFAA;

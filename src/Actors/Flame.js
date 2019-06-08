@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { createLoopedSound } from '../SoundPlayer';
+import { playFire, pauseFire } from '../SoundPlayer';
 
 class Flame {
   constructor(parent, position, maxTime, isStatic) {
@@ -46,9 +46,7 @@ class Flame {
 
   hide() {
     this.gameObject.visible = false;
-    if (this.sound) {
-      this.sound.GAIN.gain.setValueAtTime(0, this.sound.ctx.currentTime);
-    }
+    if (!this.isStatic) pauseFire();
   }
 
   setFlame(amount) {
@@ -69,11 +67,8 @@ class Flame {
     this.time = startTime;
     this.gameObject.visible = true;
 
-    if (!this.sound && !this.isStatic) {
-      this.sound = createLoopedSound('FLAME');
-      this.sound.sound.start(0);
-    } else {
-      // this.sound.gain.value = 0.2;
+    if (!this.isPlaying && !this.isStatic) {
+      playFire(0.5);
     }
   }
 
@@ -132,12 +127,12 @@ class Flame {
     if (this.isStatic) s = this.maxTime / 10000;
     this.gameObject.scale.set(s, s, s);
 
-    if (this.sound && this.time > 0 && this.time < this.maxTime) {
-      this.sound.GAIN.gain.setValueAtTime(
-        0.2 + this.time / this.maxTime * 0.8,
-        this.sound.ctx.currentTime
-      );
-    }
+    // if (this.sound && this.time > 0 && this.time < this.maxTime) {
+    //   this.sound.GAIN.gain.setValueAtTime(
+    //     0.2 + this.time / this.maxTime * 0.8,
+    //     this.sound.ctx.currentTime
+    //   );
+    // }
   }
 }
 

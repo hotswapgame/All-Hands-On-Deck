@@ -9,7 +9,7 @@ import { getModel } from '../AssetManager';
 import { isInRange } from '../utils';
 import Flame from './Flame';
 import SpeechBubble, { SPRITES } from './SpeechBubble';
-import { playSound } from '../SoundPlayer';
+import { playPlayerCannon } from '../SoundPlayer';
 import ScreenShake from '../ScreenShake';
 
 class Player {
@@ -26,7 +26,7 @@ class Player {
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
     this.worldPos = new THREE.Vector3(0, 0, 0); // stores world location
-    this.TURN_MAX = 0.0004;
+    this.TURN_MAX = 0.0005;
 
     this.rollOffset = 0;
     this.turnRollOffset = 0;
@@ -508,7 +508,7 @@ class Player {
     const ammo = this.ammo[side];
     // don't light without ammo
     if (ammo > 0) {
-      playSound('CANNON');
+      playPlayerCannon();
       // Filthy gosh darn for loop
       for (let i = 0; i < ammo; i += 1) {
         let rotOffset = 0;
@@ -528,7 +528,7 @@ class Player {
       this.addRoll(this.FIRE_ROLL_AMOUNT[side]);
     } else {
       this.triggerBubble(side, 'NO_AMMO');
-      playSound('ERROR');
+      // playSound('ERROR');
     }
 
     this.updateCannonOutlines();

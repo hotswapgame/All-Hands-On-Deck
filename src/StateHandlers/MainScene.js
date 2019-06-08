@@ -5,9 +5,9 @@ import Boss from '../Actors/Boss';
 import Treasure from '../Actors/Treasure';
 import Rock from '../Actors/Rock';
 import ScreenShake from '../ScreenShake';
-import { playSound, createLoopedSound } from '../SoundPlayer';
+import { playSound, setBossSoundtrack, setMainSoundtrack, playExplosion } from '../SoundPlayer';
 
-import { WAVE_SIZES, WAVES, WAVE_TYPES } from '../WaveConfig';
+import { WAVES, WAVE_TYPES } from '../WaveConfig';
 import { GLOBALS, GAME_TYPES, GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';
 
 import { increaseHUDCount } from '../UI';
@@ -87,6 +87,7 @@ function init(sharedSource, stateFunc) {
 function begin() {
   increaseHUDCount(0, 'enemy-count');
   increaseHUDCount(0, 'treasure-count');
+  setMainSoundtrack();
 
   // Reset local state vars
   enemySpawnSide = -1;
@@ -153,7 +154,7 @@ function checkCollisions() {
     if (e1.isActive) {
       if (player.getEnemyHit(e1)) {
         e1.die(true);
-        playSound('EXPLODE');
+        playExplosion();
         player.addFlame(1500);
         player.slowSpeed(0.6);
         ScreenShake.trigger(2, 200);
@@ -168,7 +169,7 @@ function checkCollisions() {
     if (b1.isActive) {
       if (player.getEnemyHit(b1)) {
         b1.die(true);
-        playSound('EXPLODE');
+        playExplosion();
         player.addFlame(900);
         player.slowSpeed(0.8);
         ScreenShake.trigger(15, 300);
@@ -186,6 +187,19 @@ function checkCollisions() {
   });
 }
 
+function filterRocks() {
+  // Remove rocks for boss fight for now
+  if (rocks.length > 0) {
+    let rockToRemove;
+
+    rocks.forEach((r, i) => {
+      if (r.isSunken) rockToRemove = i;
+    });
+
+    if (rockToRemove !== undefined) rocks.splice(rockToRemove, 1);
+  }
+}
+
 // Handles spawning and wave change logic
 function updateWave(dt) {
   const { scene, player } = sharedData;
@@ -195,25 +209,16 @@ function updateWave(dt) {
   // wave update logic
   switch (currentWave.type) {
     case WAVE_TYPES.BOSS:
-      // Remove rocks for boss fight for now
-      if (rocks.length > 0) {
-        let rockToRemove;
-
-        rocks.forEach((r, i) => {
-          if (r.isSunken) rockToRemove = i;
-        });
-
-        if (rockToRemove !== undefined) rocks.splice(rockToRemove, 1);
-      }
+      filterRocks();
 
       // filter out bosses from wave if they dead
       if (bosses.length > 0) {
         let bossToRemove;
         bosses.forEach((b, i) => {
           if (!b.isActive) {
-            bossToRemove = i
+            bossToRemove = i;
             sharedData.score.factory += 1;
-          };
+          }
         });
 
         if (bossToRemove !== undefined) bosses.splice(bossToRemove, 1);
@@ -232,6 +237,7 @@ function updateWave(dt) {
       break;
     case WAVE_TYPES.BASIC:
       waveTimer -= dt;
+      filterRocks();
       // Treasure spawn logic
       if (!waveChestSpawned && waveTimer < (WAVE_MAX_TIME - WAVE_MAX_TIME / 100)) {
         waveChestSpawned = true;
@@ -260,9 +266,11 @@ function updateWave(dt) {
         rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000))); // add random delay to rock sinking?
         enemyPool.forEach((e) => { if (e.isActive) e.bossSink(Math.round(Math.random() * 800)); });
         waveEnemySpawnWindow = 1500;
+        setBossSoundtrack();
         break;
       case WAVE_TYPES.BASIC:
         waveChestSpawned = false;
+        setMainSoundtrack();
         if (currentWave.type === WAVE_TYPES.BOSS || rocks.length === 0) {
           rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000)));
           shouldGenRocks = true;
@@ -277,7 +285,7 @@ function updateWave(dt) {
 
   if (shouldGenRocks) {
     // some code
-    const rockCount = currentWave.type === WAVE_TYPES.BOSS ? 15 : 35;
+    const rockCount = currentWave.type === WAVE_TYPES.BOSS ? 15 : 30;
     // actually need a for loop here :/
     for (let i = 0; i < rockCount; i += 1) {
       // spawn new rocks
@@ -395,7 +403,7 @@ function handleInput(type, data) {
       player.setSailSpeed(data);
       break;
     case INPUT_TYPES.RUDDER:
-      player.setTurnAngle(data * 1.2);
+      player.setTurnAngle(data * 1.5);
       break;
     case INPUT_TYPES.HATCH:
       player.loadCannon(data);

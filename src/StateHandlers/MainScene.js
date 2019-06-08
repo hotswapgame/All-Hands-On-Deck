@@ -270,8 +270,9 @@ function updateWave(dt) {
         break;
       case WAVE_TYPES.BASIC:
         waveChestSpawned = false;
-        setMainSoundtrack();
+        // setMainSoundtrack();
         if (currentWave.type === WAVE_TYPES.BOSS || rocks.length === 0) {
+          setMainFromBossSoundtrack();
           rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000)));
           shouldGenRocks = true;
         }

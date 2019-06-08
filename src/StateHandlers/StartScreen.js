@@ -62,6 +62,7 @@ function update(dt) {
       break;
     case 4:
       hideStartScreen();
+      setMainSoundtrack();
       setState(GAME_STATES.MAIN);
       break;
     default: break;

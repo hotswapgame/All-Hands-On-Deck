@@ -34,14 +34,14 @@ export function startSoundtrack() {
 
 export function setBossSoundtrack() {
   sounds.soundtrackBoss.fade(0.2, 0.9, 5000);
-  sounds.soundtrackMain.fade(0.4, 0, 5000);
-  sounds.soundtrackRoot.fade(0.6, 0.2, 5000);
+  sounds.soundtrackMain.fade(0.4, 0.2, 5000);
+  sounds.soundtrackRoot.fade(0.6, 0.4, 5000);
 }
 
 export function setMainFromBossSoundtrack() {
   sounds.soundtrackBoss.fade(0.9, 0.2, 5000);
-  sounds.soundtrackMain.fade(0, 0.4, 5000);
-  sounds.soundtrackRoot.fade(0.2, 0.6, 5000);
+  sounds.soundtrackMain.fade(0.2, 0.4, 5000);
+  sounds.soundtrackRoot.fade(0.4, 0.6, 5000);
 }
 
 export function setMainSoundtrack() {

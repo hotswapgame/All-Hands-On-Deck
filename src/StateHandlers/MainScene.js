@@ -5,7 +5,7 @@ import Boss from '../Actors/Boss';
 import Treasure from '../Actors/Treasure';
 import Rock from '../Actors/Rock';
 import ScreenShake from '../ScreenShake';
-import { setBossSoundtrack, setMainSoundtrack, playExplosion } from '../SoundPlayer';
+import { setBossSoundtrack, setMainSoundtrack, setMainFromBossSoundtrack, playExplosion } from '../SoundPlayer';
 
 import { WAVES, WAVE_TYPES } from '../WaveConfig';
 import { GLOBALS, GAME_TYPES, GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';

@@ -1,7 +1,7 @@
 import ScreenShake from '../ScreenShake';
 import { hideStartScreen, cycleInstructions, showStartScreen } from '../UI';
 import { GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';
-import { startSoundtrack, setStartSoundtrack } from '../SoundPlayer';
+import { startSoundtrack, setStartSoundtrack, setMainSoundtrack } from '../SoundPlayer';
 
 // local state variables
 // Start sequence stuff

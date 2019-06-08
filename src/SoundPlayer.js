@@ -76,3 +76,7 @@ export function playFire(volume) {
 export function pauseFire() {
   sounds.fireCrackle.pause();
 }
+
+export function playTreasure() {
+  
+}

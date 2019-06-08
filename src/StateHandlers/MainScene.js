@@ -5,7 +5,7 @@ import Boss from '../Actors/Boss';
 import Treasure from '../Actors/Treasure';
 import Rock from '../Actors/Rock';
 import ScreenShake from '../ScreenShake';
-import { playSound, setBossSoundtrack, setMainSoundtrack, playExplosion } from '../SoundPlayer';
+import { setBossSoundtrack, setMainSoundtrack, playExplosion } from '../SoundPlayer';
 
 import { WAVES, WAVE_TYPES } from '../WaveConfig';
 import { GLOBALS, GAME_TYPES, GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';
@@ -180,7 +180,7 @@ function checkCollisions() {
       rocks.forEach((r) => {
         if (bPos.distanceTo(r.getPosition()) < r.hitRadius + 10) {
           b1.die(true);
-          playSound('EXPLODE');
+          playExplosion();
         }
       });
     }

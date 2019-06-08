@@ -5,7 +5,7 @@ import { GAME_TYPES } from '../Constants';
 import { getModel } from '../AssetManager';
 import { isInRange } from '../utils';
 
-import { playSound } from '../SoundPlayer';
+import { playEnemyCannon } from '../SoundPlayer';
 import Flame from './Flame';
 
 class EnemyShip {
@@ -342,7 +342,7 @@ class EnemyShip {
       this.shootTimer += dt;
       if (this.shootTimer >= this.shootMax) {
         this.shootTimer = 0;
-        playSound('CANNON');
+        playEnemyCannon();
         this.fireCannon(this.moveSphere.rotation, this.headingRotation * 0.0003);
         this.addPitch(0.006);
       }

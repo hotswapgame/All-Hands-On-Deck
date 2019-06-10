@@ -5,7 +5,7 @@ import Boss from '../Actors/Boss';
 import Treasure from '../Actors/Treasure';
 import Rock from '../Actors/Rock';
 import ScreenShake from '../ScreenShake';
-import { setBossSoundtrack, setMainSoundtrack, playExplosion } from '../SoundPlayer';
+import { setBossSoundtrack, setMainSoundtrack, setMainFromBossSoundtrack, playExplosion, playTreasure } from '../SoundPlayer';
 
 import { WAVES, WAVE_TYPES } from '../WaveConfig';
 import { GLOBALS, GAME_TYPES, GAME_STATES, INPUT_TYPES, SHIP_DIRECTIONS } from '../Constants';
@@ -270,8 +270,11 @@ function updateWave(dt) {
         break;
       case WAVE_TYPES.BASIC:
         waveChestSpawned = false;
-        setMainSoundtrack();
+        // setMainSoundtrack();
         if (currentWave.type === WAVE_TYPES.BOSS || rocks.length === 0) {
+          if (currentWave.type === WAVE_TYPES.BOSS) {
+            setMainFromBossSoundtrack();
+          }
           rocks.forEach(r => r.startSinking(Math.round(Math.random() * 1000)));
           shouldGenRocks = true;
         }
@@ -388,6 +391,7 @@ function openTreasure() {
       // score
       sharedData.score.treasure += 1;
       sharedData.player.heal();
+      playTreasure();
       increaseHUDCount(sharedData.score.treasure, 'treasure-count');
     }
   });

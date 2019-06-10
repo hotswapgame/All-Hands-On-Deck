@@ -9,7 +9,7 @@ import { getModel } from '../AssetManager';
 import { isInRange } from '../utils';
 import Flame from './Flame';
 import SpeechBubble, { SPRITES } from './SpeechBubble';
-import { playPlayerCannon } from '../SoundPlayer';
+import { playPlayerCannon, playExplosion } from '../SoundPlayer';
 import ScreenShake from '../ScreenShake';
 
 class Player {
@@ -664,7 +664,7 @@ class Player {
         );
 
         if (collided) {
-          playSound('EXPLODE');
+          playExplosion();
           const objPos = obj.getPosition().normalize();
 
           //        -0.14

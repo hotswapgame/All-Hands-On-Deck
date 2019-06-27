@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { clamp } from 'ramda';
+import { clamp, any } from 'ramda';
 
 import { GAME_TYPES, SHIP_DIRECTIONS } from '../Constants';
 // maybe use asset manager only in one spot so I
@@ -9,7 +9,7 @@ import { getModel } from '../AssetManager';
 import { isInRange } from '../utils';
 import Flame from './Flame';
 import SpeechBubble, { SPRITES } from './SpeechBubble';
-import { playSound } from '../SoundPlayer';
+import { playPlayerCannon, playExplosion } from '../SoundPlayer';
 import ScreenShake from '../ScreenShake';
 
 class Player {
@@ -26,7 +26,7 @@ class Player {
     this.forwardAxis = new THREE.Vector3(0, 0, 1);
     this.yawAxis = new THREE.Vector3(1, 0, 0);
     this.worldPos = new THREE.Vector3(0, 0, 0); // stores world location
-    this.TURN_MAX = 0.0004;
+    this.TURN_MAX = 0.0005;
 
     this.rollOffset = 0;
     this.turnRollOffset = 0;
@@ -62,7 +62,7 @@ class Player {
     // this mat might need to change
     const bodyMat = new THREE.MeshPhongMaterial({
       flatShading: true,
-      color: 0xCCCCCC,
+      color: 0xD0D0D0,
       shininess: 0.1,
     });
     const bodyMatOffset = new THREE.MeshBasicMaterial({
@@ -293,19 +293,19 @@ class Player {
     this.camera.rotateX(0.9);
 
     // Why am I setting lights on the player? so what you look at is illuminated nice
-    const light = new THREE.PointLight(0xFFFFFF, 0.2, 2000000);
-    const light2 = new THREE.PointLight(0x000000, 0.5, 2000000);
-    this.mainLight = new THREE.PointLight(0xFFEEEE, 0.8, 20000);
-    this.ambient = new THREE.AmbientLight(0x222222);
+    this.light = new THREE.PointLight(0xEEEEEE, 0.3, 20000);
+    this.light2 = new THREE.PointLight(0xEEEEEE, 0.2, 20000);
+    this.mainLight = new THREE.PointLight(0xEEEEEE, 0.5, 20000);
+    this.ambient = new THREE.AmbientLight(0x1A1A1A);
 
-    this.gameObject.add(light);
-    this.gameObject.add(light2);
+    this.gameObject.add(this.light);
+    this.gameObject.add(this.light2);
     this.gameObject.add(this.mainLight);
     this.gameObject.add(this.ambient);
 
-    light.position.set(0, 200, 200);
-    light2.position.set(0, -200, 200);
-    this.mainLight.position.set(0, -10, 200);
+    this.light.position.set(0, -10, 400);
+    this.light2.position.set(0, -10, 100);
+    this.mainLight.position.set(0, -10, 50);
 
     // Light transition
     this.lightStart = 20000;
@@ -508,7 +508,7 @@ class Player {
     const ammo = this.ammo[side];
     // don't light without ammo
     if (ammo > 0) {
-      playSound('CANNON');
+      playPlayerCannon();
       // Filthy gosh darn for loop
       for (let i = 0; i < ammo; i += 1) {
         let rotOffset = 0;
@@ -528,7 +528,7 @@ class Player {
       this.addRoll(this.FIRE_ROLL_AMOUNT[side]);
     } else {
       this.triggerBubble(side, 'NO_AMMO');
-      playSound('ERROR');
+      // playSound('ERROR');
     }
 
     this.updateCannonOutlines();
@@ -632,9 +632,9 @@ class Player {
     this.ship.position.z = bobOffset;
   }
 
-  checkRockCollision(rocks) {
-    // Bail bc it's still recovering
-    if (this.rockTurnTime > 0) return;
+  checkRockCollision(rocks, bosses) {
+    // Bail bc it's still recovering or nothing to hit
+    if (this.rockTurnTime > 0 || (rocks.length < 1 && bosses.length < 1)) return;
 
     // Maybe do rock invulrablity window?
     const forwardVec = new THREE.Vector3();
@@ -646,21 +646,26 @@ class Player {
     const forwardCross = new THREE.Vector3().crossVectors(this.worldPos, forwardVec).normalize();
     const sideCross = new THREE.Vector3().crossVectors(this.worldPos, leftVec).normalize();
 
-    // this seems like a bottle neck
-    // maybe only do first two
-    this.hitboxes.forEach((b) => {
-      // get this hitbox world position
+    const hitPositions = this.hitboxes.map((hitbox) => {
       const worldP = new THREE.Vector3();
-      b.getWorldPosition(worldP);
+      hitbox.getWorldPosition(worldP);
 
-      // Loop over rocks
-      rocks.forEach((r) => {
-        // Check if rock is hit
-        // we use good placement bc sometimes the rock will hit on spawn
-        if (r.isGoodPlacement && !r.isRising
-            && r.getPosition().distanceTo(worldP) < this.rockHitRadius + r.hitRadius) {
-          playSound('EXPLODE');
-          const rockPos = r.getPosition().normalize();
+      return worldP;
+    });
+
+    const collideObj = (obj) => {
+      // Check if rock is hit
+      // we use good placement bc sometimes the obj will hit on spawn
+      if ((obj.isGoodPlacement && !obj.isRising) || obj.type === GAME_TYPES.BOSS) {
+        // check if it hits any of the players colliders
+        const collided = any(
+          pos => obj.getPosition().distanceTo(pos) < this.rockHitRadius + obj.hitRadius,
+          hitPositions
+        );
+
+        if (collided) {
+          playExplosion();
+          const objPos = obj.getPosition().normalize();
 
           //        -0.14
           //      +,- | -,-
@@ -668,18 +673,15 @@ class Player {
           //          |
           //      +,+ | -,+
           //         0.14
-          const frontTest = sideCross.dot(rockPos); // for grid y
-          const sideTest = forwardCross.dot(rockPos); // for grid x
+          const frontTest = sideCross.dot(objPos); // for grid y
+          const sideTest = forwardCross.dot(objPos); // for grid x
 
-          // // See if rock is in front
+          // // See if obj is in front
           // if (sideTest < 0) {
           // tweak to find angle of avoidance
           const turn = sideTest > 0 ? -1 : 1;
           // hard coded turn rate at end, maybe make this a twean
-          this.velocity = 0; // this.velocity * 0.001;
-          // this.moveSphere.rotateOnAxis(this.forwardAxis, -0.01); // linear
-          // this.moveSphere.rotateOnAxis(this.yawAxis, turn * 0.6); // ease in
-          // this.isRockTurn = true;
+          this.velocity = 0;
           ScreenShake.trigger(50, 300);
           this.addFlame(5000);
           this.addRoll(turn * -0.01);
@@ -687,14 +689,17 @@ class Player {
           this.setTurnAngle(0);
           this.rockTurnVal = turn;
           this.rockTurnTime = this.rockTurnTimeMax;
-          // }
         }
-      });
-    });
+      }
+    };
+
+    // Loop over rocks
+    rocks.forEach(collideObj);
+    bosses.forEach(collideObj);
   }
 
   // Central update
-  update(dt, rocks) {
+  update(dt, rocks, bosses) {
     // Set this at the start of each frame, bc why not
     // Actually it's so that we are using the proper matrix from last frame
     this.updateWorldPosition();
@@ -705,8 +710,7 @@ class Player {
     this.updateBob(dt);
     this.updateLights(dt);
 
-    // pass empty rocks array to skip this
-    if (rocks.length > 0) this.checkRockCollision(rocks);
+    if (rocks && bosses) this.checkRockCollision(rocks, bosses);
 
     if (this.rockTurnTime <= 0) {
       // always moving forward

@@ -16,7 +16,7 @@ function begin() {
   const { score } = sharedData;
   resetPressCount = 0;
   updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
-  runGameOverSequence(score.ships, score.treasure, score.totalTime, score.fireTime);
+  runGameOverSequence(score.ships, score.factory, score.treasure, score.totalTime, score.fireTime);
 }
 
 function update(dt) {
@@ -28,7 +28,7 @@ function exit() {
 }
 
 function handleInput(type, data) {
-  if (type === INPUT_TYPES.FIRE) {
+  if (type === INPUT_TYPES.FLAME) {
     resetPressCount += 1;
     if (resetPressCount >= RESET_PRESS_MAX) {
       location.reload();

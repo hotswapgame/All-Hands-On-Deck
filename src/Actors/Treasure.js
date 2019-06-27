@@ -3,7 +3,7 @@ import { any } from 'ramda';
 
 import { GAME_TYPES } from '../Constants';
 import { getModel } from '../AssetManager';
-import { playSound } from '../SoundPlayer';
+import { playTreasure } from '../SoundPlayer';
 
 import TreasureParticles from './TreasureParticles';
 
@@ -155,7 +155,7 @@ class Treasure {
       // do that sweet end animation code
       this.isOpening = true;
 
-      playSound('COINS');
+      playTreasure();
       return true;
     }
 

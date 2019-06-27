@@ -5,7 +5,7 @@ import { GAME_TYPES } from '../Constants';
 import { getModel } from '../AssetManager';
 import { isInRange } from '../utils';
 
-import { playSound } from '../SoundPlayer';
+import { playEnemyCannon } from '../SoundPlayer';
 import Flame from './Flame';
 
 class EnemyShip {
@@ -102,9 +102,9 @@ class EnemyShip {
     this.hitCount = 0;
     this.flashTime = 0;
     this.flames = new Flame(this.gameObject, new THREE.Vector3(0, 10, 0), 20000, true);
-    this.flames.burn(10000);
 
     this.isDying = false;
+    this.isSinking = false;
     this.deathTime = 0;
     this.DEATH_TIME_MAX = 1000;
     this.deathRollDir = 0;
@@ -165,6 +165,7 @@ class EnemyShip {
   // Spawn within an arc of the player at a set distance
   spawn(playerRot, spawnSide) {
     this.isActive = true;
+    this.isBossSink = false;
     this.passedRockCheck = false;
     this.floatPos = -20;
     this.pitchSpawnOffset = -Math.PI / 3;
@@ -197,6 +198,18 @@ class EnemyShip {
     }
   }
 
+  sink() {
+    this.isSinking = true;
+    this.isActive = false;
+  }
+
+  bossSink(delay) {
+    this.isDying = true;
+    this.deathTime = delay;
+    this.isBossSink = true;
+    this.isActive = false;
+  }
+
   showFlash() {
     this.body.material = this.flashMat;
     this.sail.material = this.flashMat;
@@ -217,6 +230,8 @@ class EnemyShip {
     this.stopFlash();
     this.isActive = false;
     this.isDying = false;
+    this.isSinking = false;
+    this.isBossSink = false;
     this.gameObject.getWorldPosition(this.worldPos);
     this.deathWorldPos.copy(this.worldPos);
   }
@@ -327,7 +342,7 @@ class EnemyShip {
       this.shootTimer += dt;
       if (this.shootTimer >= this.shootMax) {
         this.shootTimer = 0;
-        playSound('CANNON');
+        playEnemyCannon();
         this.fireCannon(this.moveSphere.rotation, this.headingRotation * 0.0003);
         this.addPitch(0.006);
       }
@@ -338,16 +353,19 @@ class EnemyShip {
       if (this.flashTime < 0) this.stopFlash(); // maybe don't do this every frame .__.
       else this.flashTime -= dt;
     } else if (this.isDying) {
-      this.deathTime += dt;
+      if (this.isBossSink) this.deathTime += dt * 0.6;
+      else this.deathTime += dt;
       // white flash
       if (this.deathTime < 60) {
-        this.showFlash();
+        if (!this.isBossSink) this.showFlash();
       } else {
         this.stopFlash();
 
         // roll over
-        const rollOffset = dt * this.deathRollDir * 0.003;
-        this.gameObject.rotateY(rollOffset);
+        if (!this.isBossSink) {
+          const rollOffset = dt * this.deathRollDir * 0.003;
+          this.gameObject.rotateY(rollOffset);
+        }
         // float
         const sinkPos = -(this.deathTime - 60) / this.DEATH_TIME_MAX * 20;
         this.gameObject.position.x = this.restingPos + sinkPos;

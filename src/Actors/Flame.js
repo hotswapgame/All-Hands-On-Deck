@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { createLoopedSound } from '../SoundPlayer';
+import { playFire, pauseFire } from '../SoundPlayer';
 
 class Flame {
   constructor(parent, position, maxTime, isStatic) {
@@ -39,16 +39,14 @@ class Flame {
     // this.tempParticle = new THREE.Mesh(this.particleGeo);
     // this.gameObject.add(this.tempParticle);
 
-    this.gameObject.scale.set(0, 0, 0);
+    this.gameObject.scale.set(0.0001, 0.0001, 0.0001);
     this.gameObject.visible = false;
     this.growthRate = 0.0002;
   }
 
   hide() {
     this.gameObject.visible = false;
-    if (this.sound) {
-      this.sound.GAIN.gain.setValueAtTime(0, this.sound.ctx.currentTime);
-    }
+    if (!this.isStatic) pauseFire();
   }
 
   setFlame(amount) {
@@ -69,11 +67,8 @@ class Flame {
     this.time = startTime;
     this.gameObject.visible = true;
 
-    if (!this.sound && !this.isStatic) {
-      this.sound = createLoopedSound('FLAME');
-      this.sound.sound.start(0);
-    } else {
-      // this.sound.gain.value = 0.2;
+    if (!this.isPlaying && !this.isStatic) {
+      playFire(0.5);
     }
   }
 
@@ -81,7 +76,6 @@ class Flame {
     this.particles.forEach((p) => {
       const pos = p.forward.clone();
       const s = ((p.initialPos + this.time) % 700) / 700;
-
       pos.multiplyScalar(s);
       p.mesh.position.x = pos.x;
       p.mesh.position.y = pos.y;
@@ -114,6 +108,14 @@ class Flame {
     }
   }
 
+  setStaticScale(newScale) {
+    if (this.isStatic) this.maxTime = newScale;
+  }
+
+  addStaticScale(delta) {
+    if (this.isStatic) this.maxTime += delta;
+  }
+
   update(dt) {
     this.updateParticles(dt);
     this.updateFlash(dt);
@@ -125,12 +127,12 @@ class Flame {
     if (this.isStatic) s = this.maxTime / 10000;
     this.gameObject.scale.set(s, s, s);
 
-    if (this.sound && this.time > 0 && this.time < this.maxTime) {
-      this.sound.GAIN.gain.setValueAtTime(
-        0.2 + this.time / this.maxTime * 0.8,
-        this.sound.ctx.currentTime
-      );
-    }
+    // if (this.sound && this.time > 0 && this.time < this.maxTime) {
+    //   this.sound.GAIN.gain.setValueAtTime(
+    //     0.2 + this.time / this.maxTime * 0.8,
+    //     this.sound.ctx.currentTime
+    //   );
+    // }
   }
 }
 

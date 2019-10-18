@@ -142,6 +142,10 @@ function handleKeyboard(key) {
     case 39:
       player.setTurnAngle(-0.00005);
       break;
+    case 48:
+      sharedData.serial.stop();
+      setTimeout(() => location.reload(), 500);
+      break;
     default: break;
   }
 }

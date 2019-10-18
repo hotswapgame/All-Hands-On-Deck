@@ -32,6 +32,7 @@ class SerialProducer {
   stop() {
     // Implement stop
     console.log(this.port);
+    if (this.port) this.port.destroy();
   }
 }
 

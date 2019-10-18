@@ -98,13 +98,6 @@ class Boss {
     this.moveSphere.add(this.gameObject);
     this.scene.add(this.moveSphere);
 
-    // this.light = new THREE.PointLight(0x770000, 0.0, 20000);
-    // this.light2 = new THREE.PointLight(0x770000, 0.0, 20000);
-    // this.gameObject.add(this.light);
-    // this.gameObject.add(this.light2);
-    // this.light.position.set(1000, 0, 0);
-    // this.light2.position.set(200, 0, 0);
-
     // start with player position
     this.moveSphere.rotation.set(playerRot.x, playerRot.y, playerRot.z);
     const startOffset = -Math.PI / 4 - (Math.random() * Math.PI / 6);
@@ -117,7 +110,7 @@ class Boss {
     this.smokeStacks = [
       new SmokeStack(this.gameObject, new THREE.Vector3(28, -2, 9)),
       new SmokeStack(this.gameObject, new THREE.Vector3(35, 0.3, -3)),
-      new SmokeStack(this.gameObject, new THREE.Vector3(38, 5.3, -6)),
+      new SmokeStack(this.gameObject, new THREE.Vector3(39, 5.27, -5.4)),
     ];
 
     this.smokeStacks.forEach(s => s.startEmitting());
@@ -165,7 +158,7 @@ class Boss {
       if (this.riseTime >= this.riseTimeMax) {
         this.riseTime = this.riseTimeMax;
         this.isRising = false;
-      } else if (this.riseTime >= this.riseTimeMax*0.5) {
+      } else if (this.riseTime >= this.riseTimeMax * 0.5) {
         this.smokeStacks.forEach(s => s.update(dt));
       }
 

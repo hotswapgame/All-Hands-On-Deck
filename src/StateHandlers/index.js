@@ -17,7 +17,7 @@ function setState(newState) {
   handlers[currentState].begin();
 }
 
-export function init(source) {
+function init(source) {
   StartHandler.init(source, setState);
   MainHandler.init(source, setState);
   EndHandler.init(source, setState);
@@ -25,7 +25,7 @@ export function init(source) {
   setState(GAME_STATES.START);
 }
 
-export function update(dt) {
+function update(dt) {
   if (handlers[currentState]) handlers[currentState].update(dt);
 }
 

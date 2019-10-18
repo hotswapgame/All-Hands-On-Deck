@@ -75,7 +75,7 @@ export function getWick(input$) {
   return input$
     .map(find(isWick))
     .filter(notNil)
-    .map(data => ({ id: data[0], isLit: data[2] > 575 }));
+    .map(data => ({ id: data[0], isLit: data[2] > 550 }));
 }
 
 export function getFlame(input$) {

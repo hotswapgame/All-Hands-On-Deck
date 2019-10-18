@@ -16,6 +16,16 @@ int count = 0;
 // sck (clk), mosi (dout), miso (din), cs (chip select)
 // 13         11           12          10
 
+String fillZeroes(int val, int len) {
+  String valStr = String(val);
+  int valStrLen = valStr.length();
+  for (int i=valStrLen; i<len; i++) {
+    valStr = '0' + valStr;
+  }
+  return valStr;
+}
+
+
 void setup() {
   Serial.begin(9600);
   while (!Serial);
@@ -32,7 +42,7 @@ void loop() {
   Serial.print(1);
   Serial.print(" ");
   for (int chan=0; chan<8; chan++) {
-    Serial.print(adc1.readADC(chan));
+    Serial.print(fillZeroes(adc1.readADC(chan), 4));
     if (chan == 3) {
       Serial.print(":");
       Serial.print(1);
@@ -47,7 +57,7 @@ void loop() {
   Serial.print(2);
   Serial.print(" ");
   for (int chan=0; chan<8; chan++) {
-    Serial.print(adc2.readADC(chan));
+    Serial.print(fillZeroes(adc2.readADC(chan), 4));
     if (chan == 3) {
       Serial.print(":");
       Serial.print(2);
@@ -57,7 +67,7 @@ void loop() {
       Serial.print(" ");
     }
   }
-  Serial.print("-");
+  Serial.println("-");
   count++;
   
   delay(100);

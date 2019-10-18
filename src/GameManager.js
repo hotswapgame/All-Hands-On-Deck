@@ -201,13 +201,14 @@ const gameState = {
   },
 };
 
-export function init(input$) {
+export function init(input$, serial) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   screen = document.querySelector('#screen');
   screen.appendChild(renderer.domElement);
   ScreenShake.init(screen); // attach screen shake el
   resize();
 
+  gameState.serial = serial;
   // initialize all state managers
   StateManager.init(gameState);
 

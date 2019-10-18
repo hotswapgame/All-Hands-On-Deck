@@ -427,6 +427,7 @@ function handleInput(type, data) {
 
 function handleKeyboard(key) {
   const { player } = sharedData;
+  console.log(key);
 
   switch (key) {
     case 87:
@@ -458,6 +459,10 @@ function handleKeyboard(key) {
       break;
     case 75:
       openTreasure();
+      break;
+    case 48:
+      sharedData.serial.stop();
+      setTimeout(() => location.reload(), 500);
       break;
     default: break;
   }

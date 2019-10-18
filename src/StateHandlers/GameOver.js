@@ -31,7 +31,8 @@ function handleInput(type, data) {
   if (type === INPUT_TYPES.FLAME) {
     resetPressCount += 1;
     if (resetPressCount >= RESET_PRESS_MAX) {
-      location.reload();
+      sharedData.serial.stop();
+      setTimeout(() => location.reload(), 500);
       // setState(GAME_STATES.START);
     }
     updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);

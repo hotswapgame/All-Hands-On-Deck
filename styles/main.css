@@ -170,6 +170,10 @@ h2 {
   margin-top: 0.2em;
 } */
 
+body {
+  cursor: none;
+}
+
 #treasure-stat {
   color: #FFFFAA;
   animation: glow 1.5s ease infinite;

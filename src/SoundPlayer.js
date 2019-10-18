@@ -30,9 +30,9 @@ const sounds = {
 };
 
 export function startSoundtrack() {
-  // sounds.soundtrackRoot.play();
-  // sounds.soundtrackMain.play();
-  // sounds.soundtrackBoss.play();
+  sounds.soundtrackRoot.play();
+  sounds.soundtrackMain.play();
+  sounds.soundtrackBoss.play();
 }
 
 export function setBossSoundtrack() {
@@ -48,14 +48,16 @@ export function setMainFromBossSoundtrack() {
 }
 
 export function setMainSoundtrack() {
-  sounds.soundtrackBoss.fade(0.0, 0.0, 5000);
-  sounds.soundtrackMain.fade(0.0, 0.1, 5000);
-  sounds.soundtrackRoot.fade(0.2, 0.4, 5000);
+  console.log('set main');
+  sounds.soundtrackBoss.fade(0.01, 0.2, 5000);
+  sounds.soundtrackMain.fade(0.01, 0.2, 5000);
+  sounds.soundtrackRoot.fade(0.2, 0.2, 5000);
 }
 
 export function setStartSoundtrack() {
-  sounds.soundtrackBoss.volume(0);
-  sounds.soundtrackMain.volume(0);
+  console.log('set start');
+  sounds.soundtrackBoss.volume(0.01);
+  sounds.soundtrackMain.volume(0.01);
   sounds.soundtrackRoot.volume(0.2);
 }
 

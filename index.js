@@ -13,13 +13,13 @@ function createWindow() {
     width: 1200,
     height: 600,
     // prod stuff
-    // fullscreen: true,
-    // autoHideMenuBar: true,
+    fullscreen: true,
+    autoHideMenuBar: true,
     titleBarStyle: 'hidden',
   });
 
-  // mainWindow.setMenu(null);
-  mainWindow.webContents.openDevTools(); // Open the DevTools.
+  mainWindow.setMenu(null);
+  // mainWindow.webContents.openDevTools(); // Open the DevTools.
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({

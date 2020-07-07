@@ -16,7 +16,7 @@
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
     "babel-loader": "^8.0.4",
-    "electron": "^3.0.2",
+    "electron": "^7.2.4",
     "electron-rebuild": "^1.8.2",
     "howler": "^2.1.2",
     "matter-js": "^0.14.2",

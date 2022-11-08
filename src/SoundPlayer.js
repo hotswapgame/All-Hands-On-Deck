@@ -42,21 +42,21 @@ export function setBossSoundtrack() {
 }
 
 export function setMainFromBossSoundtrack() {
-  sounds.soundtrackBoss.fade(0.6, 0.2, 5000);
-  sounds.soundtrackMain.fade(0.6, 0.1, 5000);
-  sounds.soundtrackRoot.fade(0.4, 0.4, 5000);
+  sounds.soundtrackBoss.fade(0.6, 0.6, 5000);
+  sounds.soundtrackMain.fade(0.6, 0.45, 5000);
+  sounds.soundtrackRoot.fade(0.4, 0.7, 5000);
 }
 
 export function setMainSoundtrack() {
   sounds.soundtrackBoss.fade(0.0, 0.0, 5000);
-  sounds.soundtrackMain.fade(0.0, 0.1, 5000);
-  sounds.soundtrackRoot.fade(0.2, 0.4, 5000);
+  sounds.soundtrackMain.fade(0.0, 0.45, 5000);
+  sounds.soundtrackRoot.fade(0.4, 0.7, 5000);
 }
 
 export function setStartSoundtrack() {
   sounds.soundtrackBoss.volume(0);
   sounds.soundtrackMain.volume(0);
-  sounds.soundtrackRoot.volume(0.2);
+  sounds.soundtrackRoot.volume(0.4);
 }
 
 export function playPlayerCannon() {
@@ -88,5 +88,6 @@ export function pauseFire() {
 }
 
 export function playTreasure() {
+
   sounds.treasure[0].play();
 }

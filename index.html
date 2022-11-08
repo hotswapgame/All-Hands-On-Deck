@@ -71,13 +71,12 @@
     <div id="screen-bg"></div>
   </body>
 
+  <script src="./build/app.js"></script>
   <script>
     // These need to be imported here so that the compiled code can use it
     // BC i'm weird and wanted to use babel... :P
-    const SerialPort = require('serialport');
-    const DelimiterParser = require('@serialport/parser-delimiter');
-
-    require('./build/app.js');
+    // const SerialPort = require('serialport');
+    // const DelimiterParser = require('@serialport/parser-delimiter');
 
     let enemyCount = 0;
     let treasureCount = 0;

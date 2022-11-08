@@ -425,38 +425,38 @@ function handleInput(type, data) {
   }
 }
 
-function handleKeyboard(key) {
+function handleKeyboard({ key }) {
   const { player } = sharedData;
 
   switch (key) {
-    case 87:
+    case 't':
       player.lightFuse(SHIP_DIRECTIONS.PORT);
       break;
-    case 83:
+    case 'g':
       player.lightFuse(SHIP_DIRECTIONS.STARBOARD);
       break;
-    case 65:
+    case 'y':
       player.loadCannon(SHIP_DIRECTIONS.PORT);
       break;
-    case 68:
+    case 'h':
       player.loadCannon(SHIP_DIRECTIONS.STARBOARD);
       break;
-    case 38:
-      player.setSailSpeed(0.00001);
+    case 'w':
+      player.setSailSpeed(0.00002);
       break;
-    case 40:
-      player.setSailSpeed(-0.00001);
+    case 's':
+      player.setSailSpeed(-0.00002);
       break;
-    case 70:
-      player.calmFire(600);
+    case 'f':
+      player.calmFire(2000);
       break;
-    case 37:
-      player.setTurnAngle(0.00005);
+    case 'a':
+      player.setTurnAngle(0.0001);
       break;
-    case 39:
-      player.setTurnAngle(-0.00005);
+    case 'd':
+      player.setTurnAngle(-0.0001);
       break;
-    case 75:
+    case 'k':
       openTreasure();
       break;
     default: break;

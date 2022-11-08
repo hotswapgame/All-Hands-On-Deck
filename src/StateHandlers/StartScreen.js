@@ -102,33 +102,34 @@ function handleInput(type, data) {
   }
 }
 
-function handleKeyboard(key) {
+function handleKeyboard({ key }) {
   const { player } = sharedData;
+  // console.log(key);
 
   switch (key) {
-    case 87:
+    case 't':
       player.lightFuse(SHIP_DIRECTIONS.PORT);
       break;
-    case 83:
+    case 'g':
       player.lightFuse(SHIP_DIRECTIONS.STARBOARD);
       break;
-    case 65:
+    case 'y':
       player.loadCannon(SHIP_DIRECTIONS.PORT);
       break;
-    case 68:
+    case 'h':
       player.loadCannon(SHIP_DIRECTIONS.STARBOARD);
       break;
-    case 38:
+    case 'w':
       hideStartScreen();
       setState(GAME_STATES.MAIN);
       break;
-    case 40:
+    case 's':
       player.setSailSpeed(-0.00001);
       // if (isGameOver) {
       //   reset();
       // }
       break;
-    case 70:
+    case 'f':
       player.calmFire(600);
       // if (isGameOver) {
       //   resetPressCount += 1;
@@ -136,10 +137,10 @@ function handleKeyboard(key) {
       //   updateResetGradient(1 - resetPressCount / RESET_PRESS_MAX);
       // }
       break;
-    case 37:
+    case 'a':
       player.setTurnAngle(0.00005);
       break;
-    case 39:
+    case 'd':
       player.setTurnAngle(-0.00005);
       break;
     default: break;

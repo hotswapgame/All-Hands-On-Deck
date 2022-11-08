@@ -38,12 +38,12 @@ function handleInput(type, data) {
   }
 }
 
-function handleKeyboard(key) {
+function handleKeyboard({ key }) {
   switch (key) {
-    case 40:
+    case 'k':
       setState(GAME_STATES.START);
       break;
-    case 70:
+    case 'f':
       resetPressCount += 1;
       if (resetPressCount >= RESET_PRESS_MAX) {
         location.reload();

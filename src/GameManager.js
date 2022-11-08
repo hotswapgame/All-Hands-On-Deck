@@ -215,126 +215,126 @@ export function init(input$) {
 
   // keyboard shortcuts
   // maybe move these to the init of each state handler and remove them
-  window.onkeyup = ({ keyCode }) => {
-    StateManager.handleKeyboard(keyCode);
+  window.onkeyup = (e) => {
+    StateManager.handleKeyboard(e);
     // if (e.keyCode === 73) {
     //   player.addFlame(8000);
     // }
   };
 
-  // Steering
-  getRudderKnob(input$)
-    .map(data => data.value + Math.PI)
-    .fold(
-      (prev, value) => {
-        let delta = 0;
-        const valChange = prev.value - value;
-        if (valChange > 0.05) delta = -0.000007;
-        if (valChange < -0.05) delta = 0.000007; // 0.0003
-        return {
-          delta,
-          value,
-        };
-      },
-      { delta: 0, value: 0 }
-    )
-    .filter(data => data.delta !== 0)
-    .subscribe({
-      next: data => StateManager.handleInput(INPUT_TYPES.RUDDER, data.delta),
-      error: console.log,
-      complete: console.log,
-    });
+  // // Steering
+  // getRudderKnob(input$)
+  //   .map(data => data.value + Math.PI)
+  //   .fold(
+  //     (prev, value) => {
+  //       let delta = 0;
+  //       const valChange = prev.value - value;
+  //       if (valChange > 0.05) delta = -0.000007;
+  //       if (valChange < -0.05) delta = 0.000007; // 0.0003
+  //       return {
+  //         delta,
+  //         value,
+  //       };
+  //     },
+  //     { delta: 0, value: 0 }
+  //   )
+  //   .filter(data => data.delta !== 0)
+  //   .subscribe({
+  //     next: data => StateManager.handleInput(INPUT_TYPES.RUDDER, data.delta),
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
-  // Speed
-  getSailKnob(input$)
-    .map(data => data.value + Math.PI)
-    .fold(
-      (prev, value) => {
-        let delta = 0;
-        const valChange = prev.value - value;
-        if (valChange > 0.05) delta = 0.000002;
-        if (valChange < -0.05) delta = -0.000002;
-        return {
-          delta,
-          value,
-        };
-      },
-      { delta: 0, value: 0 }
-    )
-    .filter(data => data.delta !== 0)
-    .subscribe({
-      next: data => StateManager.handleInput(INPUT_TYPES.SAIL, data.delta),
-      error: console.log,
-      complete: console.log,
-    });
+  // // Speed
+  // getSailKnob(input$)
+  //   .map(data => data.value + Math.PI)
+  //   .fold(
+  //     (prev, value) => {
+  //       let delta = 0;
+  //       const valChange = prev.value - value;
+  //       if (valChange > 0.05) delta = 0.000002;
+  //       if (valChange < -0.05) delta = -0.000002;
+  //       return {
+  //         delta,
+  //         value,
+  //       };
+  //     },
+  //     { delta: 0, value: 0 }
+  //   )
+  //   .filter(data => data.delta !== 0)
+  //   .subscribe({
+  //     next: data => StateManager.handleInput(INPUT_TYPES.SAIL, data.delta),
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
-  // Ammo
-  getHatch(input$)
-    .fold(
-      (acc, curr) => ({ id: curr.id, prev: curr.isOpen, shouldLoad: (curr.isOpen && !acc.prev) }),
-      { id: 0, shouldLoad: false }
-    )
-    .filter(prop('shouldLoad'))
-    .map(({ id }) => (id === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD))
-    .subscribe({
-      next: data => StateManager.handleInput(INPUT_TYPES.HATCH, data),
-      error: console.log,
-      complete: console.log,
-    });
+  // // Ammo
+  // getHatch(input$)
+  //   .fold(
+  //     (acc, curr) => ({ id: curr.id, prev: curr.isOpen, shouldLoad: (curr.isOpen && !acc.prev) }),
+  //     { id: 0, shouldLoad: false }
+  //   )
+  //   .filter(prop('shouldLoad'))
+  //   .map(({ id }) => (id === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD))
+  //   .subscribe({
+  //     next: data => StateManager.handleInput(INPUT_TYPES.HATCH, data),
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
-  // Fire
-  getWick(input$)
-    .fold(
-      (acc, curr) => ({ id: curr.id, prev: curr.isLit, shouldLight: (curr.isLit && !acc.prev) }),
-      { id: 0, shouldLight: false }
-    )
-    .filter(prop('shouldLight'))
-    .map(({ id }) => (id === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD))
-    .subscribe({
-      next: data => StateManager.handleInput(INPUT_TYPES.WICK, data),
-      error: console.log,
-      complete: console.log,
-    });
+  // // Fire
+  // getWick(input$)
+  //   .fold(
+  //     (acc, curr) => ({ id: curr.id, prev: curr.isLit, shouldLight: (curr.isLit && !acc.prev) }),
+  //     { id: 0, shouldLight: false }
+  //   )
+  //   .filter(prop('shouldLight'))
+  //   .map(({ id }) => (id === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD))
+  //   .subscribe({
+  //     next: data => StateManager.handleInput(INPUT_TYPES.WICK, data),
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
-  // Put fire out
-  getFlame(input$)
-    .fold((acc, curr) => ({
-      prev: curr.isPressed,
-      output: (!acc.prev && curr.isPressed),
-    }), { prev: false })
-    .filter(data => data.output)
-    .subscribe({
-      next: () => StateManager.handleInput(INPUT_TYPES.FLAME),
-      error: console.log,
-      complete: console.log,
-    });
+  // // Put fire out
+  // getFlame(input$)
+  //   .fold((acc, curr) => ({
+  //     prev: curr.isPressed,
+  //     output: (!acc.prev && curr.isPressed),
+  //   }), { prev: false })
+  //   .filter(data => data.output)
+  //   .subscribe({
+  //     next: () => StateManager.handleInput(INPUT_TYPES.FLAME),
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
-  // open treasure
-  getKey(input$)
-    .fold((acc, curr) => ({
-      prev: curr.isPressed,
-      output: (!acc.prev && curr.isPressed),
-    }), { prev: false })
-    .filter(data => data.output)
-    .subscribe({
-      next: d => StateManager.handleInput(INPUT_TYPES.KEY, d),
-      error: console.log,
-      complete: console.log,
-    });
+  // // open treasure
+  // getKey(input$)
+  //   .fold((acc, curr) => ({
+  //     prev: curr.isPressed,
+  //     output: (!acc.prev && curr.isPressed),
+  //   }), { prev: false })
+  //   .filter(data => data.output)
+  //   .subscribe({
+  //     next: d => StateManager.handleInput(INPUT_TYPES.KEY, d),
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
-  // Used to trigger speech bubbles
-  getAllInputSwap(input$)
-    .map(([sideId, type]) => [
-      sideId === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD,
-      type,
-    ])
-    .subscribe({
-      next: ([side, type]) => {
-        player.triggerBubble(side, type);
-      },
-      error: console.log,
-      complete: console.log,
-    });
+  // // Used to trigger speech bubbles
+  // getAllInputSwap(input$)
+  //   .map(([sideId, type]) => [
+  //     sideId === 1 ? SHIP_DIRECTIONS.PORT : SHIP_DIRECTIONS.STARBOARD,
+  //     type,
+  //   ])
+  //   .subscribe({
+  //     next: ([side, type]) => {
+  //       player.triggerBubble(side, type);
+  //     },
+  //     error: console.log,
+  //     complete: console.log,
+  //   });
 
   playListener();
 }

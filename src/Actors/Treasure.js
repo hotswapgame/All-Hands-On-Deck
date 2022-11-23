@@ -89,7 +89,7 @@ class Treasure {
         this.chest.add(this.topRotContainerOffset);
       });
 
-    this.triggerRadius = 42;
+    this.triggerRadius = 55;
     this.triggerAnimationMax = 1500;
     this.triggerAnimationTime = this.triggerAnimationMax;
     this.isTriggered = false;
